@@ -1,0 +1,346 @@
+<?php
+
+namespace MorningTrain\Laravel\Resources\Support\Contracts;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
+use MorningTrain\Foundation\Api\FilterCollection;
+use Illuminate\Support\Str;
+use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
+use MorningTrain\Laravel\Support\Traits\StaticCreate;
+
+abstract class Operation
+{
+
+    const ROUTE_METHOD = 'get';
+
+    use StaticCreate;
+
+    protected $model;
+    protected $fields = [];
+    protected $filters = [];
+    protected $columns = [];
+    protected $view = [];
+
+    /////////////////////////////////
+    /// Request helpers
+    /////////////////////////////////
+
+    public function execute($parameters)
+    {
+
+        $key_value = null;
+        if (is_array($parameters) && isset($parameters[0])) {
+            $key_value = $parameters[0];
+        }
+
+        $query = $this->query();
+
+        if ($this->isSingular()) {
+
+            if ($key_value !== null) {
+                $query->where($this->getModelKeyName(), '=', $key_value);
+            } else {
+                return $this->handle($this->onEmptyResult());
+            }
+
+            $instance = $query->first();
+
+            if ($instance === null) {
+                $instance = $this->onEmptyResult();
+            }
+
+            return $this->handle($instance);
+        }
+
+        return $query->get();
+
+    }
+
+    public function handle($model_or_models)
+    {
+        return $model_or_models;
+    }
+
+    public function onEmptyResult()
+    {
+        return null;
+    }
+
+    /////////////////////////////////
+    /// Basic helpers
+    /////////////////////////////////
+
+    public static function getName()
+    {
+        return Str::snake(class_basename(get_called_class()));
+    }
+
+    public function getModelKeyName()
+    {
+        return $this->getEmptyModelInstance()->getKeyName();
+    }
+
+    public function getEmptyModelInstance()
+    {
+        return new $this->model;
+    }
+
+    /////////////////////////////////
+    /// Getter/Setters
+    /////////////////////////////////
+
+    public function genericGetSet($name, $value = null)
+    {
+        if ($value === null) {
+            return $this->{$name};
+        }
+        $this->{$name} = $value;
+        return $this;
+    }
+
+    public function resource($value = null)
+    {
+        return $this->genericGetSet('resource', $value);
+    }
+
+    public function model($value = null)
+    {
+        return $this->genericGetSet('model', $value);
+    }
+
+    public function filters($value = null)
+    {
+        return $this->genericGetSet('filters', $value);
+    }
+
+    public function columns($value = null)
+    {
+        return $this->genericGetSet('columns', $value);
+    }
+
+    public function fields($value = null)
+    {
+        return $this->genericGetSet('fields', $value);
+    }
+
+    /////////////////////////////////
+    /// Views
+    /////////////////////////////////
+
+    public function view($value = null)
+    {
+        return $this->genericGetSet('view', $value);
+    }
+
+    public function getView(string $val = null, $default = null)
+    {
+        $view = $this->view;
+
+        return $val === null ?
+            $view :
+            $view[$val] ?? $default;
+    }
+
+    public function constrainToView(Builder &$query)
+    {
+        $relations = $this->getView('with');
+        $with = [];
+
+        if (is_array($relations)) {
+            foreach ($relations as $key => $relation) {
+                if (is_array($relation)) {
+                    $relation = "{$key}:" . implode(',', $relation);
+                }
+
+                $with[] = $relation;
+            }
+        }
+
+        return empty($with) ?
+            $query :
+            $query->with($with);
+    }
+
+    public function transformToView(string $name, $model)
+    {
+        $appends = static::getView($name, 'appends', []);
+        $columns = static::getView($name, 'columns', []);
+        $with = static::getView($name, 'with', []);
+        $relations = [];
+
+        foreach ($with as $key => $val) {
+            $relations[] = is_array($val) ? $key : $val;
+        }
+
+        array_push($appends, 'permitted_actions');
+
+        $only = array_merge($appends, $columns, $relations);
+
+        $model = is_array($appends) ?
+            $model->append($appends) :
+            $model;
+
+        return empty($columns) ?
+            $model :
+            $model->only($only);
+    }
+
+    /////////////////////////////////
+    /// Helpers
+    /////////////////////////////////
+
+    public function hasModel()
+    {
+        return !!$this->model && (new $this->model instanceof Model);
+    }
+
+    public function hasFilters()
+    {
+        return is_array($this->filters) && !empty($this->filters);
+    }
+
+    public function isSingular()
+    {
+        return true;
+    }
+
+    /////////////////////////////////
+    /// Query
+    /////////////////////////////////
+
+    public function query()
+    {
+
+        if (!$this->hasModel()) {
+            throw new \Exception('No model available for query building in action');
+        }
+
+        $query = ($this->model)::query();
+
+        if ($this->hasFilters()) {
+            $this->applyFiltersToQuery($query);
+        }
+
+        if (!empty($this->getView('with'))) {
+            $this->constrainToView($query);
+        }
+
+        return $query;
+    }
+
+    public function applyFiltersToQuery(&$query)
+    {
+        FilterCollection::create($this->filters)->apply($query, request());
+    }
+
+    /////////////////////////////////
+    /// Exporting
+    /////////////////////////////////
+
+    protected function exportFilters()
+    {
+
+        $export = [];
+
+        if (!empty($this->filters)) {
+            foreach ($this->filters as $filter) {
+                $keys = $filter->getAllKeys();
+                if (!empty($keys)) {
+                    foreach ($keys as $key) {
+                        $export[$key] = [
+                            "key" => $key,
+                            "value" => $filter->getDefaultValue($key)
+                        ];
+                    }
+                }
+            }
+        }
+
+        if ($this->isSingular()) {
+
+            $key = $this->resource()->name;
+
+            $export[$key] = [
+                "key" => $key,
+                "value" => null
+            ];
+
+        }
+
+        return $export;
+    }
+
+    public function export()
+    {
+
+        $data = [];
+
+        $data['name'] = static::getName();
+        $data['filters'] = $this->exportFilters();
+
+        return $data;
+    }
+
+    /////////////////////////////////
+    /// Meta data for response payload
+    /////////////////////////////////
+
+    public function getMetaData()
+    {
+        return array_merge(
+            [],
+            $this->getFilterMeta()
+        );
+    }
+
+    public function getFilterMeta()
+    {
+
+        $export = [];
+
+        if (!empty($this->filters)) {
+            foreach ($this->filters as $filter) {
+                $export = array_merge($export, $filter->getMetaData());
+            }
+        }
+
+        return $export;
+    }
+
+    /////////////////////////////////
+    /// Routes
+    /////////////////////////////////
+
+    public static function getControllerMethodName()
+    {
+        return static::getName() . 'Operation';
+    }
+
+    public static function routes($namespace, $resource_name)
+    {
+
+        $operationClass = get_called_class();
+
+        Route::group(['operation' => $operationClass], function () use ($namespace, $resource_name) {
+
+            $key = $resource_name;
+            $route_name = $namespace . '.resources.' . $resource_name . '.' . static::getName();
+            $route_path = Str::plural($resource_name) . '/' . static::getName() . "/{" . $key . "?}";
+            $route_controller = '\\' . ResourceController::class . '@' . static::getControllerMethodName();
+
+            $route = Route::name($route_name);
+
+            $callable = [$route, static::ROUTE_METHOD];
+
+            if (is_callable($callable)) {
+                call_user_func($callable, $route_path, $route_controller);
+            }
+
+        });
+
+    }
+
+}

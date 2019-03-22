@@ -66,6 +66,20 @@ class ResourceController
     /// Response helpers
     /////////////////////////////////
 
+    protected function buildModelPayload(Model $model)
+    {
+        $response = [
+            'model' => $this->modelResponse($model)
+        ];
+
+        /// Add filter metadata to response
+        $metadata = ["meta" => $this->operation()->getMetadata()];
+
+        $response = array_merge($response, $metadata);
+
+        return $response;
+    }
+
     protected function buildCollectionPayload(Collection $collection)
     {
         $response = [
@@ -93,7 +107,7 @@ class ResourceController
     {
 
         if ($payload_data instanceof Model) {
-            return $payload_data; /// TODO - Should we nest the model like with collection? Or should the collection be unnested?
+            return $this->buildModelPayload($payload_data);
         }
 
         if ($payload_data instanceof Collection) {

@@ -18,17 +18,28 @@ abstract class Operation
     const ROUTE_METHOD = 'get';
 
     protected $model;
+    protected $slug;
+    protected $resource;
     protected $fields = [];
     protected $filters = [];
     protected $columns = [];
     protected $view = [];
+    public $data = null;
+
+    public function __construct($resource, $slug)
+    {
+        $this->resource = $resource;
+        $this->slug = $slug;
+    }
 
     /////////////////////////////////
     /// Request helpers
     /////////////////////////////////
 
-    public function execute($parameters)
+    public function prepare($parameters)
     {
+
+        $model_or_collection = null;
 
         $key_value = null;
         if (is_array($parameters) && isset($parameters[0])) {
@@ -41,29 +52,26 @@ abstract class Operation
 
             if ($key_value !== null) {
                 $query->where($this->getModelKeyName(), '=', $key_value);
+                $model_or_collection = $query->firstOrFail();
             } else {
-                return $this->handle($this->onEmptyResult());
+                $model_or_collection = $this->onEmptyResult();
             }
 
-            // TODO - consider permissions
-            // Maybe throw if can't find
-            //$instance = $query->first();
-            $instance = $query->firstOrFail();
-
-            //if ($instance === null) {
-            //    $instance = $this->onEmptyResult();
-            //}
-
-            return $this->handle($instance);
+        } else {
+            $model_or_collection = $query->get();
         }
 
-        return $query->get();
-
+        $this->data = $model_or_collection;
     }
 
-    public function handle(Model $model_or_models)
+    public function execute()
     {
-        return $model_or_models;
+        return new Payload($this, $this->handle($this->data));
+    }
+
+    public function handle($model_or_collection)
+    {
+        return $model_or_collection;
     }
 
     public function onEmptyResult()
@@ -209,6 +217,11 @@ abstract class Operation
         return true;
     }
 
+    public function canExecute()
+    {
+        return true;
+    }
+
     /////////////////////////////////
     /// Query
     /////////////////////////////////
@@ -321,16 +334,19 @@ abstract class Operation
         return static::getName() . 'Operation';
     }
 
-    public static function routes($namespace, $resource_name)
+    public function matchesControllerMethod($method_name)
+    {
+        return static::getControllerMethodName() === $method_name;
+    }
+
+    public function routes($namespace)
     {
 
-        $operationClass = get_called_class();
+        Route::group(['operation' => $this->slug], function () use ($namespace) {
 
-        Route::group(['operation' => $operationClass], function () use ($namespace, $resource_name) {
-
-            $key = $resource_name;
-            $route_name = $namespace . '.resources.' . $resource_name . '.' . static::getName();
-            $route_path = Str::plural($resource_name) . '/' . static::getName() . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
+            $key = $this->resource->name;
+            $route_name = $namespace . '.resources.' . $this->resource->name . '.' . $this->slug;
+            $route_path = Str::plural($this->resource->name) . '/' . $this->slug . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
             $route_controller = '\\' . ResourceController::class . '@' . static::getControllerMethodName();
 
             $route = Route::name($route_name);

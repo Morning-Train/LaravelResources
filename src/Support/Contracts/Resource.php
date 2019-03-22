@@ -59,37 +59,30 @@ abstract class Resource
 
     public function boot()
     {
-        if (static::hasOperations()) {
-            foreach (static::$operations as $action) {
-                $this->configureOperation($action);
-            }
-        }
+        $this->configureOperations();
     }
 
     /////////////////////////////////
     /// Operations
     /////////////////////////////////
 
-    public function configureOperation($operationSlug)
+    public function configureOperation($operationSlug, $operationClass)
     {
 
         //Create action instance
-        $this->instantiateOperation($operationSlug);
-
-        //Determine the pretty name of the operation
-        $action_name = (strtolower($operationSlug))::getName();
+        $this->instantiateOperation($operationSlug, $operationClass);
 
         //Call method to configure action
-        $method = Str::camel('configure_' . $action_name . '_action');
+        $method = Str::camel('configure_' . $operationSlug . '_operation');
 
         $callable = [$this, $method];
 
-        $action_instance = $this->operation($operationSlug);
+        $operation = $this->operation($operationSlug);
 
-        $action_instance->resource($this);
+        $operation->resource($this);
 
         if (method_exists($this, $method) && is_callable($callable)) {
-            call_user_func($callable, $action_instance);
+            call_user_func($callable, $operation);
         }
 
     }
@@ -109,9 +102,9 @@ abstract class Resource
         $actions = [];
 
         if (static::hasOperations()) {
-            foreach (static::$operations as $action) {
-                $instance = $this->operation($action);
-                $actions[($action::getName())] = $instance->export();
+            foreach (static::getOperations() as $operationSlug => $operationClass) {
+                $instance = $this->operation($operationSlug);
+                $actions[($operationClass::getName())] = $instance->export();
             }
         }
 
@@ -125,14 +118,11 @@ abstract class Resource
     public static function routes($namespace)
     {
 
-        $resource = get_called_class();
-        $name = static::getName();
-
-        Route::group(['resource' => $resource], function () use ($namespace, $name) {
+        Route::group(['resource' => get_called_class()], function () use ($namespace) {
 
             if (static::hasOperations()) {
-                foreach (static::$operations as $operation) {
-                    ($operation)::routes($namespace, $name);
+                foreach (static::getOperations() as $operationSlug => $operationClass) {
+                    static::getOperationInstance($operationSlug)->routes($namespace);
                 }
             }
 

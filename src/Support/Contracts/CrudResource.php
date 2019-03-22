@@ -44,7 +44,7 @@ abstract class CrudResource extends Resource
     // Action configuration
     /////////////////////////////////
 
-    protected function configureIndexAction(Operation $action)
+    protected function configureIndexOperation(Operation $action)
     {
 
         //Set Eloquent model to be used by the action
@@ -61,7 +61,7 @@ abstract class CrudResource extends Resource
 
     }
 
-    protected function configureReadAction(Operation $action)
+    protected function configureReadOperation(Operation $action)
     {
 
         //Set Eloquent model to be used by the action
@@ -72,7 +72,7 @@ abstract class CrudResource extends Resource
 
     }
 
-    protected function configureStoreAction(Operation $action)
+    protected function configureStoreOperation(Operation $action)
     {
 
         //Set Eloquent model to be used by the action
@@ -82,7 +82,7 @@ abstract class CrudResource extends Resource
 
     }
 
-    protected function configureDeleteAction(Operation $action)
+    protected function configureDeleteOperation(Operation $action)
     {
 
         //Set Eloquent model to be used by the action

@@ -2,9 +2,9 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
-use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
+use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
 
-class Index extends Operation
+class Index extends EloquentOperation
 {
 
     const ROUTE_METHOD = 'get';

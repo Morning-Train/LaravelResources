@@ -2,9 +2,9 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
-use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
+use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
 
-class Delete extends Operation
+class Delete extends EloquentOperation
 {
 
     const ROUTE_METHOD = 'delete';

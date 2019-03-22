@@ -2,12 +2,11 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use MorningTrain\Laravel\Fields\Contracts\FieldContract;
-use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
+use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
 
-class Store extends Operation
+class Store extends EloquentOperation
 {
     const ROUTE_METHOD = 'post';
 
@@ -16,7 +15,7 @@ class Store extends Operation
         return $this->getEmptyModelInstance();
     }
 
-    public function handle(Model $model)
+    public function handle($model)
     {
         /** @var Request $request */
         $request = request();

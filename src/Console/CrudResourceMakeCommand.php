@@ -22,7 +22,7 @@ class CrudResourceMakeCommand extends GeneratorCommand
 
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\Resources';
+        return $rootNamespace . '\Resources\Api';
     }
 
     protected function getNameInput()
@@ -52,7 +52,8 @@ class CrudResourceMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         // TODO: Implement getStub() method.
-        return __DIR__.'';
+        return __DIR__.'/stubs/crud-resource.stub';
+
         throw new \Exception('STOP RIGHT THERE!!');
     }
 

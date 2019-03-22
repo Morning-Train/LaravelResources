@@ -2,12 +2,13 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
-use MorningTrain\Foundation\Api\Field;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use MorningTrain\Laravel\Fields\Contracts\FieldContract;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
 
 class Store extends Operation
 {
-
     const ROUTE_METHOD = 'post';
 
     public function onEmptyResult()
@@ -15,62 +16,29 @@ class Store extends Operation
         return $this->getEmptyModelInstance();
     }
 
-    public function handle($model)
+    public function handle(Model $model)
     {
-
+        /** @var Request $request */
         $request = request();
 
-        $this->performValidation($model, $request);
+        $this->performValidation($model, $request); // TODO patch value?
 
         if (is_array($this->fields) && !empty($this->fields)) {
 
+            /** @var FieldContract $field */
             foreach ($this->fields as $field) {
-                $field->update($model, $request, Field::BEFORE_SAVE);
+                $field->update($model, $request, FieldContract::BEFORE_SAVE);
             }
 
             $model->save();
 
             foreach ($this->fields as $field) {
-                $field->update($model, $request, Field::AFTER_SAVE);
+                $field->update($model, $request, FieldContract::AFTER_SAVE);
             }
 
         }
 
         return $model;
-    }
-
-    // MOVE to Trait in Fields Package
-    protected function performValidation($model, $request, $patch = false)
-    {
-        // Compute validation rules
-        $rules = [];
-
-        foreach ($this->fields as $field) {
-            $rule = $field->getValidationRules($model, $request);
-
-            if (is_array($rule)) {
-                $rules = array_merge($rules, $rule);
-            }
-        }
-
-        // Convert validation rules if patch request
-        if ($patch) {
-            $rules = $this->getPatchValidationRules($rules);
-        }
-
-        // Validate
-        $request->validate($rules);
-    }
-
-    protected function getPatchValidationRules(array $rules)
-    {
-        $patch_rules = [];
-
-        foreach ($rules as $prop => $rule) {
-            $patch_rules[$prop] = "sometimes|$rule";
-        }
-
-        return $patch_rules;
     }
 
 }

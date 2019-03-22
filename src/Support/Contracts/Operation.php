@@ -3,20 +3,19 @@
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
-use MorningTrain\Foundation\Api\FilterCollection;
+use MorningTrain\Foundation\Api\FilterCollection; // TODO
 use Illuminate\Support\Str;
+use MorningTrain\Laravel\Fields\Traits\ValidatesFields;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
 abstract class Operation
 {
+    use StaticCreate, ValidatesFields;
 
     const ROUTE_METHOD = 'get';
-
-    use StaticCreate;
 
     protected $model;
     protected $fields = [];
@@ -46,11 +45,14 @@ abstract class Operation
                 return $this->handle($this->onEmptyResult());
             }
 
-            $instance = $query->first();
+            // TODO - consider permissions
+            // Maybe throw if can't find
+            //$instance = $query->first();
+            $instance = $query->firstOrFail();
 
-            if ($instance === null) {
-                $instance = $this->onEmptyResult();
-            }
+            //if ($instance === null) {
+            //    $instance = $this->onEmptyResult();
+            //}
 
             return $this->handle($instance);
         }
@@ -59,7 +61,7 @@ abstract class Operation
 
     }
 
-    public function handle($model_or_models)
+    public function handle(Model $model_or_models)
     {
         return $model_or_models;
     }
@@ -328,7 +330,7 @@ abstract class Operation
 
             $key = $resource_name;
             $route_name = $namespace . '.resources.' . $resource_name . '.' . static::getName();
-            $route_path = Str::plural($resource_name) . '/' . static::getName() . "/{" . $key . "?}";
+            $route_path = Str::plural($resource_name) . '/' . static::getName() . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
             $route_controller = '\\' . ResourceController::class . '@' . static::getControllerMethodName();
 
             $route = Route::name($route_name);

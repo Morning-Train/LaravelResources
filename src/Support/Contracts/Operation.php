@@ -5,9 +5,9 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
-use MorningTrain\Foundation\Api\FilterCollection; // TODO
 use Illuminate\Support\Str;
 use MorningTrain\Laravel\Fields\Traits\ValidatesFields;
+use MorningTrain\Laravel\Filters\Filters\FilterCollection;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 

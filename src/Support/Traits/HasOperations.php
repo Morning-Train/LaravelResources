@@ -10,7 +10,7 @@ trait HasOperations
 
     protected static $operations = [];
     protected static $operation_instances = [];
-    protected static $_cached_operations = null;
+    protected static $_cached_operations = [];
 
     public function operation($slug)
     {
@@ -38,8 +38,7 @@ trait HasOperations
 
     public static function getOperations()
     {
-
-        if (static::$_cached_operations === null) {
+        if (!isset(static::$_cached_operations[get_called_class()])) {
             $raw_operations = static::$operations;
 
             if (!is_array($raw_operations) || empty($raw_operations)) {
@@ -55,10 +54,10 @@ trait HasOperations
                 $operations[$key] = $operation;
             }
 
-            static::$_cached_operations = $operations;
+            static::$_cached_operations[get_called_class()] = $operations;
         }
 
-        return static::$_cached_operations;
+        return static::$_cached_operations[get_called_class()];
     }
 
     protected static function hasOperations()

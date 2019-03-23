@@ -306,14 +306,14 @@ abstract class Operation
     /// Routes
     /////////////////////////////////
 
-    public static function getControllerMethodName()
+    public function getControllerMethodName()
     {
         return static::getName() . 'Operation';
     }
 
     public function matchesControllerMethod($method_name)
     {
-        return static::getControllerMethodName() === $method_name;
+        return $this->getControllerMethodName() === $method_name;
     }
 
     public function getRoutePath()
@@ -332,7 +332,7 @@ abstract class Operation
 
             $route_name = $namespace . '.resources.' . $this->resource->name . '.' . $this->slug;
             $route_path = $this->getRoutePath();
-            $route_controller = '\\' . ResourceController::class . '@' . static::getControllerMethodName();
+            $route_controller = '\\' . ResourceController::class . '@' . $this->getControllerMethodName();
 
             $route = Route::name($route_name);
 

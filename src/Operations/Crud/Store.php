@@ -15,7 +15,7 @@ class Store extends EloquentOperation
         return $this->getEmptyModelInstance();
     }
 
-    public function handle($model)
+    public function handle($model = null)
     {
         /** @var Request $request */
         $request = request();

@@ -38,30 +38,7 @@ abstract class Operation
 
     public function prepare($parameters)
     {
-
-        $model_or_collection = null;
-
-        $key_value = null;
-        if (is_array($parameters) && isset($parameters[0])) {
-            $key_value = $parameters[0];
-        }
-
-        $query = $this->query();
-
-        if ($this->isSingular()) {
-
-            if ($key_value !== null) {
-                $query->where($this->getModelKeyName(), '=', $key_value);
-                $model_or_collection = $query->firstOrFail();
-            } else {
-                $model_or_collection = $this->onEmptyResult();
-            }
-
-        } else {
-            $model_or_collection = $query->get();
-        }
-
-        $this->data = $model_or_collection;
+        //
     }
 
     public function execute()
@@ -69,7 +46,7 @@ abstract class Operation
         return new Payload($this, $this->handle($this->data));
     }
 
-    public function handle($model_or_collection)
+    public function handle($model_or_collection = null)
     {
         return $model_or_collection;
     }
@@ -339,14 +316,22 @@ abstract class Operation
         return static::getControllerMethodName() === $method_name;
     }
 
+    public function getRoutePath()
+    {
+
+        $key = $this->resource->name;
+        $route_path = Str::plural($this->resource->name) . '/' . $this->slug . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
+
+        return $route_path;
+    }
+
     public function routes($namespace)
     {
 
         Route::group(['operation' => $this->slug], function () use ($namespace) {
 
-            $key = $this->resource->name;
             $route_name = $namespace . '.resources.' . $this->resource->name . '.' . $this->slug;
-            $route_path = Str::plural($this->resource->name) . '/' . $this->slug . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
+            $route_path = $this->getRoutePath();
             $route_controller = '\\' . ResourceController::class . '@' . static::getControllerMethodName();
 
             $route = Route::name($route_name);

@@ -9,7 +9,7 @@ class Delete extends EloquentOperation
 
     const ROUTE_METHOD = 'delete';
 
-    public function handle($model)
+    public function handle($model = null)
     {
         return $model->delete();
     }

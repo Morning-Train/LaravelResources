@@ -2,6 +2,7 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -70,6 +71,10 @@ class Payload
 
     public function response()
     {
+
+        if($this->data instanceof View) {
+            return $this->data;
+        }
 
         $status = 200;
         $headers = [];

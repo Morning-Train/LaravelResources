@@ -72,7 +72,7 @@ class ResourceController
         /// It will factor in if the resource has been configured with the operation
         /// It will also check to see if the current user has access to it
         if (!$operation->canExecute()) {
-            return $this->response(['message' => 'Unable to perform action'], 400);
+            return response()->json(['message' => 'Unable to perform action'], 400);
         }
 
         /// We are ready to execute the operation

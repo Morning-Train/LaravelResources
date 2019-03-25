@@ -4,6 +4,7 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use MorningTrain\Laravel\Fields\Traits\ValidatesFields;
@@ -25,6 +26,7 @@ abstract class Operation
     protected $columns = [];
     protected $view = [];
     public $data = null;
+    protected $restricted = false;
 
     public function __construct($resource, $slug)
     {
@@ -91,6 +93,12 @@ abstract class Operation
     public function resource($value = null)
     {
         return $this->genericGetSet('resource', $value);
+    }
+
+
+    public function restrict($value = true)
+    {
+        return $this->genericGetSet('restricted', $value);
     }
 
     public function model($value = null)
@@ -200,9 +208,26 @@ abstract class Operation
         return true;
     }
 
+    public function getPermissionSlug()
+    {
+        return implode('.', [
+            $this->namespace(),
+            $this->resource()->name,
+            $this->slug
+        ]);
+    }
+
     public function canExecute()
     {
-        return true;
+        if (!$this->restricted) {
+            return true;
+        }
+
+        if (Auth::check() && Auth::user()->can($this->getPermissionSlug())) {
+            return true;
+        }
+
+        return false;
     }
 
     /////////////////////////////////

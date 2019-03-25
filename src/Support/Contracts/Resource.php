@@ -127,7 +127,7 @@ abstract class Resource
 
             if (static::hasOperations()) {
                 foreach (static::getOperations() as $operationSlug => $operationClass) {
-                    static::getOperationInstance($operationSlug)->routes($namespace);
+                    static::getOperationInstance($operationSlug)->namespace($namespace)->routes();
                 }
             }
 

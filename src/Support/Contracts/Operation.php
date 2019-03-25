@@ -113,6 +113,12 @@ abstract class Operation
         return $this->genericGetSet('fields', $value);
     }
 
+
+    public function namespace($value = null)
+    {
+        return $this->genericGetSet('namespace', $value);
+    }
+
     /////////////////////////////////
     /// Views
     /////////////////////////////////
@@ -325,12 +331,12 @@ abstract class Operation
         return $route_path;
     }
 
-    public function routes($namespace)
+    public function routes()
     {
 
-        Route::group(['operation' => $this->slug], function () use ($namespace) {
+        Route::group(['operation' => $this->slug], function () {
 
-            $route_name = $namespace . '.resources.' . $this->resource->name . '.' . $this->slug;
+            $route_name = $this->namespace() . '.resources.' . $this->resource->name . '.' . $this->slug;
             $route_path = $this->getRoutePath();
             $route_controller = '\\' . ResourceController::class . '@' . $this->getControllerMethodName();
 

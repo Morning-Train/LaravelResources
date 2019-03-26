@@ -50,14 +50,6 @@ class LaravelResourcesServiceProvider extends ServiceProvider
                 CrudResourceMakeCommand::class,
             ]);
         }
-
-        $resources = config('resources');
-
-        if (!empty($resources)) {
-            foreach ($resources as $namespace => $resources) {
-                ResourceRepository::boot($namespace);
-            }
-        }
     }
 
 }

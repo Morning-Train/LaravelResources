@@ -367,7 +367,7 @@ abstract class Operation
     public function routes()
     {
 
-        $route_group_props = ['operation' => $this->slug];
+        $route_group_props = ['operation' => $this->slug, 'resource_namespace' => $this->namespace()];
 
         $middlewares = [];
 

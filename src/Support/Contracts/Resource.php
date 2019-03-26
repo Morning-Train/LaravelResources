@@ -111,11 +111,6 @@ abstract class Resource
         return $actions;
     }
 
-    public function getModelKeyName()
-    {
-        return null;
-    }
-
     /////////////////////////////////
     /// Routes
     /////////////////////////////////

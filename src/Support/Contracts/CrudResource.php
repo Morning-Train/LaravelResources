@@ -90,18 +90,4 @@ abstract class CrudResource extends Resource
 
     }
 
-    /////////////////////////////////
-    // Overrides
-    /////////////////////////////////
-
-    public function getModelKeyName()
-    {
-        return $this->getEmptyModelInstance()->getKeyName();
-    }
-
-    public function getEmptyModelInstance()
-    {
-        return new static::$model;
-    }
-
 }

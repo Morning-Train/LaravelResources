@@ -79,7 +79,6 @@ class ResourceRepository
 
                 $environment_data[$namespace][$name] = [
                     "name" => $name,
-                    "key" => $resource->getModelKeyName(),
                     "actions" => $resource->exportOperations()
                 ];
 

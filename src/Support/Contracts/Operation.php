@@ -69,11 +69,18 @@ abstract class Operation
 
     public function getModelKeyName()
     {
+        $instance = $this->getEmptyModelInstance();
+        if ($instance === null) {
+            return null;
+        }
         return $this->getEmptyModelInstance()->getKeyName();
     }
 
     public function getEmptyModelInstance()
     {
+        if (!class_exists($this->model)) {
+            return null;
+        }
         return new $this->model;
     }
 
@@ -302,6 +309,7 @@ abstract class Operation
         $data = [];
 
         $data['name'] = static::getName();
+        $data['key'] = $this->getModelKeyName();
         $data['filters'] = $this->exportFilters();
 
         return $data;

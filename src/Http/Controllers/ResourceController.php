@@ -9,6 +9,7 @@ use MorningTrain\Laravel\Resources\Support\Contracts\Resource;
 class ResourceController
 {
 
+    protected $resource_namespace;
     protected $resource_class;
     protected $operation_class;
     protected $resource = null;
@@ -17,6 +18,7 @@ class ResourceController
     public function __construct()
     {
         if ($current_route = Route::getCurrentRoute()) {
+            $this->resource_namespace = $current_route->action['resource_namespace'];
             $this->resource_class = $current_route->action['resource'];
             $this->operation_class = $current_route->action['operation'];
         }
@@ -29,6 +31,7 @@ class ResourceController
     {
         if ($this->resource === null) {
             $this->resource = ($this->resource_class)::instance();
+            $this->resource->boot($this->resource_namespace);
         }
         return $this->resource;
     }

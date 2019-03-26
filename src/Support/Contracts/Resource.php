@@ -13,6 +13,7 @@ abstract class Resource
 
     protected $resource_instance;
     protected $resource_type;
+    protected $namespace;
     public $name;
 
     public function __construct($resource = null)
@@ -57,9 +58,15 @@ abstract class Resource
     /// Setup
     /////////////////////////////////
 
-    public function boot()
+    protected $has_booted = false;
+
+    public function boot($namespace)
     {
-        $this->configureOperations();
+        if (!$this->has_booted) {
+            $this->namespace = $namespace;
+            $this->configureOperations();
+            $this->has_booted = true;
+        }
     }
 
     /////////////////////////////////
@@ -80,6 +87,7 @@ abstract class Resource
         $operation = $this->operation($operationSlug);
 
         $operation->resource($this);
+        $operation->namespace($this->namespace);
 
         if (method_exists($this, $method) && is_callable($callable)) {
             call_user_func($callable, $operation);
@@ -115,14 +123,14 @@ abstract class Resource
     /// Routes
     /////////////////////////////////
 
-    public static function routes($namespace)
+    public static function routes()
     {
 
-        Route::group(['resource' => get_called_class()], function () use ($namespace) {
+        Route::group(['resource' => get_called_class()], function () {
 
             if (static::hasOperations()) {
                 foreach (static::getOperations() as $operationSlug => $operationClass) {
-                    static::getOperationInstance($operationSlug)->namespace($namespace)->routes();
+                    static::getOperationInstance($operationSlug)->routes();
                 }
             }
 

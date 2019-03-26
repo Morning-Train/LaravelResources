@@ -34,8 +34,10 @@ class ResourceRepository
             return;
         }
 
+        $this->boot($namespace);
+
         foreach ($this->getResources($namespace)->keys() as $resource) {
-            ($resource)::routes($namespace);
+            ($resource)::routes();
         }
     }
 
@@ -64,16 +66,28 @@ class ResourceRepository
     public function boot($namespace)
     {
 
+        //Boot individual resources
+        if ($this->hasResources($namespace)) {
+            foreach ($this->getResources($namespace) as $class => $resource) {
+                $resource->boot($namespace);
+            }
+
+        }
+
+    }
+
+    public function export($namespace)
+    {
+
         $environment_data = [];
 
-        //Boot individual resources
         if ($this->hasResources($namespace)) {
 
             $environment_data[$namespace] = [];
 
             foreach ($this->getResources($namespace) as $class => $resource) {
 
-                $resource->boot();
+                $resource->boot($namespace);
 
                 $name = ($class)::getName();
 
@@ -91,7 +105,6 @@ class ResourceRepository
                 'resources' => $environment_data
             ];
         });
-
 
     }
 

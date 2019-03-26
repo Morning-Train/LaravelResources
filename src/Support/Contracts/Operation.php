@@ -359,7 +359,19 @@ abstract class Operation
     public function routes()
     {
 
-        Route::group(['operation' => $this->slug], function () {
+        $route_group_props = ['operation' => $this->slug];
+
+        $middlewares = [];
+
+        if ($this->restricted) {
+            $middlewares[] = 'permission:' . $this->getPermissionSlug();
+        }
+
+        if (!empty($middlewares)) {
+            $route_group_props['middleware'] = $middlewares;
+        }
+
+        Route::group($route_group_props, function () {
 
             $route_name = $this->namespace() . '.resources.' . $this->resource->name . '.' . $this->slug;
             $route_path = $this->getRoutePath();

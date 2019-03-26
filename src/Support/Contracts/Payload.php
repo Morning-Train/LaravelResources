@@ -80,10 +80,8 @@ class Payload
         $headers = [];
         $options = 0;
 
-        $res = [
-            'payload' => $this->buildPayload($this->data),
-            'message' => 'Success'
-        ];
+        $res = $this->buildPayload($this->data);
+        $res['message'] = 'Success';
 
         return response()->json($res, $status, $headers, $options);
     }

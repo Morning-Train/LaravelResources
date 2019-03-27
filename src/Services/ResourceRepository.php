@@ -18,7 +18,16 @@ class ResourceRepository
     public function register($namespace, $resource)
     {
         $this->ensureNamespace($namespace);
-        $this->resources->get($namespace)->put($resource, ($resource)::instance());
+        $this->resources->get($namespace)->put($resource, new $resource);
+    }
+
+    public function get($namespace, $resource)
+    {
+        $this->ensureNamespace($namespace);
+        if (!$this->resources->get($namespace)->has($resource)) {
+            $this->resources->get($namespace)->put($resource, new $resource);
+        }
+        return $this->resources->get($namespace)->get($resource);
     }
 
     public function ensureNamespace($namespace)
@@ -93,7 +102,7 @@ class ResourceRepository
 
                 $environment_data[$namespace][$name] = [
                     "name" => $name,
-                    "actions" => $resource->exportOperations()
+                    "actions" => $resource->export()
                 ];
 
             }

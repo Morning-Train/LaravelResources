@@ -9,26 +9,14 @@ use MorningTrain\Laravel\Resources\Support\Traits\HasOperations;
 abstract class Resource
 {
     use HasOperations;
-
-
-    protected $resource_instance;
-    protected $resource_type;
+    
     protected $namespace;
     public $name;
 
     public function __construct($resource = null)
     {
-        $this->resource_instance = $resource;
-
         $this->name = static::getName();
-
     }
-
-    public static function instance($resource = null)
-    {
-        return new static($resource);
-    }
-
 
     /////////////////////////////////
     /// Request helpers
@@ -95,17 +83,11 @@ abstract class Resource
 
     }
 
-    public function canPerformOperation($operationSlug)
-    {
-        $has_access = true; /// TODO - Permissions check
-        return $this->hasOperation($operationSlug) === true && $has_access;
-    }
-
     /////////////////////////////////
     /// Export to JS
     /////////////////////////////////
 
-    public function exportOperations()
+    public function export()
     {
         $actions = [];
 

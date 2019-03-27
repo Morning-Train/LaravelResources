@@ -3,6 +3,7 @@
 namespace MorningTrain\Laravel\Resources\Http\Controllers;
 
 use Illuminate\Support\Facades\Route;
+use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
 use MorningTrain\Laravel\Resources\Support\Contracts\Resource;
 
@@ -30,7 +31,7 @@ class ResourceController
     protected function resource()
     {
         if ($this->resource === null) {
-            $this->resource = ($this->resource_class)::instance();
+            $this->resource = ResourceRepository::get($this->resource_namespace, $this->resource_class);
             $this->resource->boot($this->resource_namespace);
         }
         return $this->resource;

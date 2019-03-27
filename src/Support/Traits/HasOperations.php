@@ -8,73 +8,104 @@ use Illuminate\Support\Str;
 trait HasOperations
 {
 
+    /// Should be overridden if providing operation class names
     protected static $operations = [];
+
+    public function operations()
+    {
+        /// Should be overridden if providing operation instances instead of classes
+        return [];
+    }
+
     protected static $operation_instances = [];
     protected static $_cached_operations = [];
 
     public function operation($slug)
     {
-        return static::$operation_instances[get_called_class()][$slug];
-    }
-
-    public static function getOperationInstances()
-    {
-        return static::$operation_instances[get_called_class()];
-    }
-
-
-    public static function getOperationInstance($slug)
-    {
-        return static::getOperationInstances()[$slug];
-    }
-
-    protected function instantiateOperation($operationSlug, $operationClass)
-    {
-        if (!isset(static::$operation_instances[get_called_class()])) {
-            static::$operation_instances[get_called_class()] = [];
+        if ($this->hasOperation($slug)) {
+            return $this->getOperations()[$slug];
         }
-        static::$operation_instances[get_called_class()][$operationSlug] = new $operationClass($this, $operationSlug);
+
+        throw new \Exception("Tried to get operation ($slug), but it is not found on resource (" . $this->name . ")");
+
     }
 
-    public static function getOperations()
+    public function getOperations()
     {
-        if (!isset(static::$_cached_operations[get_called_class()])) {
-            $raw_operations = static::$operations;
+        if (!isset(static::$_cached_operations[get_class($this)])) {
 
-            if (!is_array($raw_operations) || empty($raw_operations)) {
-                throw new \Exception('About to get operations for ' . get_called_class() . ', but none was found!');
-            }
+            $raw_class_operations = static::$operations;
 
             $operations = [];
 
-            foreach ($raw_operations as $key => $operation) {
-                if (is_int($key)) {
-                    $key = Str::snake(strtolower(class_basename($operation)));
+            if (is_array($raw_class_operations) && !empty($raw_class_operations)) {
+                foreach ($raw_class_operations as $key => $operation) {
+
+                    if (!class_exists($operation)) {
+                        throw new \Exception("Supplied operation ($operation) on resource (" . get_class($this) . "), but it is not a class!");
+                    }
+
+                    if (is_int($key)) {
+                        $key = Str::snake(strtolower(class_basename($operation)));
+                    }
+                    $operations[$key] = new $operation;
                 }
-                $operations[$key] = $operation;
             }
 
-            static::$_cached_operations[get_called_class()] = $operations;
+            $instance_operations = $this->operations();
+
+            if (is_array($instance_operations) && !empty($instance_operations)) {
+                foreach ($instance_operations as $key => $operation) {
+                    if (is_int($key)) {
+                        $key = Str::snake(strtolower(class_basename(get_class($operation))));
+                    }
+                    $operations[$key] = $operation;
+                }
+            }
+
+            if (empty($operations)) {
+                throw new \Exception('Looking for operations on resource: ' . get_class($this) . ', but none was found!');
+            }
+
+            static::$_cached_operations[get_class($this)] = $operations;
         }
 
-        return static::$_cached_operations[get_called_class()];
+        return static::$_cached_operations[get_class($this)];
     }
 
-    protected static function hasOperations()
+    public function hasOperations()
     {
-        return is_array(static::getOperations()) && !empty(static::getOperations());
+        return is_array($this->getOperations()) && !empty($this->getOperations());
     }
 
-    public function hasOperation($operationSlug)
+    public function hasOperation($operationName)
     {
-        return in_array($operationSlug, static::getOperations());
+        return isset($this->getOperations()[$operationName]);
     }
 
     public function configureOperations()
     {
-        if (static::hasOperations()) {
-            foreach (static::getOperations() as $operationSlug => $operationClass) {
-                $this->configureOperation($operationSlug, $operationClass);
+        if ($this->hasOperations()) {
+            foreach ($this->getOperations() as $operationName => $operation) {
+
+                /// Set current resource on operation
+                $operation->resource($this);
+                $operation->name($operationName);
+
+                // Method to be called for this specific operation
+                $method = Str::camel('configure_' . $operation->name . '_operation');
+                $callable = [$this, $method];
+                if (method_exists($this, $method) && is_callable($callable)) {
+                    call_user_func($callable, $operation);
+                }
+
+                /// Generic function to always be called on the operation
+                $method = Str::camel('configure_operation');
+                $callable = [$this, $method];
+                if (method_exists($this, $method) && is_callable($callable)) {
+                    call_user_func($callable, $operation);
+                }
+
             }
         }
     }

@@ -45,8 +45,8 @@ class ResourceRepository
 
         $this->boot($namespace);
 
-        foreach ($this->getResources($namespace)->keys() as $resource) {
-            ($resource)::routes();
+        foreach ($this->getResources($namespace) as $resource) {
+            $resource->routes();
         }
     }
 

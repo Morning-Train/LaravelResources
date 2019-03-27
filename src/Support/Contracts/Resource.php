@@ -58,65 +58,35 @@ abstract class Resource
     }
 
     /////////////////////////////////
-    /// Operations
-    /////////////////////////////////
-
-    public function configureOperation($operationSlug, $operationClass)
-    {
-
-        //Create action instance
-        $this->instantiateOperation($operationSlug, $operationClass);
-
-        //Call method to configure action
-        $method = Str::camel('configure_' . $operationSlug . '_operation');
-
-        $callable = [$this, $method];
-
-        $operation = $this->operation($operationSlug);
-
-        $operation->resource($this);
-
-        if (method_exists($this, $method) && is_callable($callable)) {
-            call_user_func($callable, $operation);
-        }
-
-    }
-
-    /////////////////////////////////
     /// Export to JS
     /////////////////////////////////
 
     public function export()
     {
-        $actions = [];
+        $exportData = [];
 
-        if (static::hasOperations()) {
-            foreach (static::getOperations() as $operationSlug => $operationClass) {
-                $instance = $this->operation($operationSlug);
-                $actions[($operationClass::getName())] = $instance->export();
+        if($this->hasOperations()){
+            foreach($this->getOperations() as $operation) {
+                $exportData[$operation->name] = $operation->export();
             }
         }
 
-        return $actions;
+        return $exportData;
     }
 
     /////////////////////////////////
     /// Routes
     /////////////////////////////////
 
-    public static function routes()
+    public function routes()
     {
-
         Route::group(['resource' => get_called_class()], function () {
-
-            if (static::hasOperations()) {
-                foreach (static::getOperations() as $operationSlug => $operationClass) {
-                    static::getOperationInstance($operationSlug)->routes();
+            if($this->hasOperations()) {
+                foreach($this->getOperations() as $operation) {
+                    $operation->routes();
                 }
             }
-
         });
-
     }
 
 }

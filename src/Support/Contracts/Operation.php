@@ -12,15 +12,7 @@ abstract class Operation
 {
     use StaticCreate;
 
-    protected $name;
-
     public $data = null;
-
-    public function __construct($resource, $name)
-    {
-        $this->resource = $resource;
-        $this->name = $name;
-    }
 
     /////////////////////////////////
     /// Request helpers
@@ -39,15 +31,6 @@ abstract class Operation
     public function handle($model_or_collection = null)
     {
         return $model_or_collection;
-    }
-
-    /////////////////////////////////
-    /// Basic helpers
-    /////////////////////////////////
-
-    public static function getName()
-    {
-        return Str::snake(class_basename(get_called_class()));
     }
 
     /////////////////////////////////
@@ -71,6 +54,22 @@ abstract class Operation
             $this->resource()->name,
             $this->name
         ]);
+    }
+
+    /////////////////////////////////
+    /// Name
+    /////////////////////////////////
+
+    public $name;
+
+    public function name($value = null)
+    {
+        return $this->genericGetSet('name', $value);
+    }
+
+    public static function getName()
+    {
+        return Str::snake(class_basename(get_called_class()));
     }
 
     /////////////////////////////////

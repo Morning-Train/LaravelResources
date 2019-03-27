@@ -3,12 +3,10 @@
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use MorningTrain\Laravel\Fields\Traits\ValidatesFields;
-use MorningTrain\Laravel\Filters\Filters\FilterCollection;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
@@ -18,11 +16,9 @@ abstract class Operation
 
     const ROUTE_METHOD = 'get';
 
-    protected $model;
     protected $slug;
     protected $resource;
     protected $fields = [];
-    protected $filters = [];
     protected $columns = [];
     protected $view = [];
     public $data = null;
@@ -53,11 +49,6 @@ abstract class Operation
         return $model_or_collection;
     }
 
-    public function onEmptyResult()
-    {
-        return null;
-    }
-
     /////////////////////////////////
     /// Basic helpers
     /////////////////////////////////
@@ -65,23 +56,6 @@ abstract class Operation
     public static function getName()
     {
         return Str::snake(class_basename(get_called_class()));
-    }
-
-    public function getModelKeyName()
-    {
-        $instance = $this->getEmptyModelInstance();
-        if ($instance === null) {
-            return null;
-        }
-        return $this->getEmptyModelInstance()->getKeyName();
-    }
-
-    public function getEmptyModelInstance()
-    {
-        if (!class_exists($this->model)) {
-            return null;
-        }
-        return new $this->model;
     }
 
     /////////////////////////////////
@@ -108,16 +82,6 @@ abstract class Operation
         return $this->genericGetSet('restricted', $value);
     }
 
-    public function model($value = null)
-    {
-        return $this->genericGetSet('model', $value);
-    }
-
-    public function filters($value = null)
-    {
-        return $this->genericGetSet('filters', $value);
-    }
-
     public function columns($value = null)
     {
         return $this->genericGetSet('columns', $value);
@@ -127,7 +91,6 @@ abstract class Operation
     {
         return $this->genericGetSet('fields', $value);
     }
-
 
     public function namespace($value = null)
     {
@@ -197,23 +160,8 @@ abstract class Operation
     }
 
     /////////////////////////////////
-    /// Helpers
+    /// Permissions
     /////////////////////////////////
-
-    public function hasModel()
-    {
-        return !!$this->model && (new $this->model instanceof Model);
-    }
-
-    public function hasFilters()
-    {
-        return is_array($this->filters) && !empty($this->filters);
-    }
-
-    public function isSingular()
-    {
-        return true;
-    }
 
     public function getPermissionSlug()
     {
@@ -238,107 +186,23 @@ abstract class Operation
     }
 
     /////////////////////////////////
-    /// Query
-    /////////////////////////////////
-
-    public function query()
-    {
-
-        if (!$this->hasModel()) {
-            throw new \Exception('No model available for query building in action');
-        }
-
-        $query = ($this->model)::query();
-
-        if ($this->hasFilters()) {
-            $this->applyFiltersToQuery($query);
-        }
-
-        if (!empty($this->getView('with'))) {
-            $this->constrainToView($query);
-        }
-
-        return $query;
-    }
-
-    public function applyFiltersToQuery(&$query)
-    {
-        FilterCollection::create($this->filters)->apply($query, request());
-    }
-
-    /////////////////////////////////
     /// Exporting
     /////////////////////////////////
 
-    protected function exportFilters()
-    {
-
-        $export = [];
-
-        if (!empty($this->filters)) {
-            foreach ($this->filters as $filter) {
-                $keys = $filter->getAllKeys();
-                if (!empty($keys)) {
-                    foreach ($keys as $key) {
-                        $export[$key] = [
-                            "key" => $key,
-                            "value" => $filter->getDefaultValue($key)
-                        ];
-                    }
-                }
-            }
-        }
-
-        if ($this->isSingular()) {
-
-            $key = $this->resource()->name;
-
-            $export[$key] = [
-                "key" => $key,
-                "value" => null
-            ];
-
-        }
-
-        return $export;
-    }
-
     public function export()
     {
-
-        $data = [];
-
-        $data['name'] = static::getName();
-        $data['key'] = $this->getModelKeyName();
-        $data['filters'] = $this->exportFilters();
-
-        return $data;
+        return [
+            "name" => static::getName()
+        ];
     }
 
     /////////////////////////////////
     /// Meta data for response payload
     /////////////////////////////////
 
-    public function getMetaData()
+    public function getMeta()
     {
-        return array_merge(
-            [],
-            $this->getFilterMeta()
-        );
-    }
-
-    public function getFilterMeta()
-    {
-
-        $export = [];
-
-        if (!empty($this->filters)) {
-            foreach ($this->filters as $filter) {
-                $export = array_merge($export, $filter->getMetaData());
-            }
-        }
-
-        return $export;
+        return [];
     }
 
     /////////////////////////////////

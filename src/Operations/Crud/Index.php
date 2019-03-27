@@ -9,9 +9,9 @@ class Index extends EloquentOperation
 
     const ROUTE_METHOD = 'get';
 
-    public function isSingular()
+    public function expectsCollection()
     {
-        return false;
+        return true;
     }
 
 }

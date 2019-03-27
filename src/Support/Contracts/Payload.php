@@ -25,7 +25,7 @@ class Payload
         ];
 
         /// Add filter metadata to response
-        $metadata = ["meta" => $this->operation()->getMetadata()];
+        $metadata = ["meta" => $this->operation()->getMeta()];
 
         $response = array_merge($response, $metadata);
 
@@ -41,7 +41,7 @@ class Payload
         ];
 
         /// Add filter metadata to response
-        $metadata = ["meta" => $this->operation->getMetadata()];
+        $metadata = ["meta" => $this->operation->getMeta()];
 
         if (is_array($metadata)) {
             $response = array_merge($response, $metadata);

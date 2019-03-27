@@ -9,11 +9,11 @@ use MorningTrain\Laravel\Resources\Support\Traits\HasOperations;
 abstract class Resource
 {
     use HasOperations;
-    
+
     protected $namespace;
     public $name;
 
-    public function __construct($resource = null)
+    public function __construct()
     {
         $this->name = static::getName();
     }

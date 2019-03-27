@@ -10,7 +10,7 @@ class Store extends EloquentOperation
 {
     const ROUTE_METHOD = 'post';
 
-    public function onEmptyResult()
+    public function onEmptyModel()
     {
         return $this->getEmptyModelInstance();
     }

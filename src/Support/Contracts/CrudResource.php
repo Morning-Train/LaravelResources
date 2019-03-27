@@ -2,8 +2,6 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
-use Illuminate\Database\Eloquent\Builder;
-use MorningTrain\Foundation\Api\Filter;
 use MorningTrain\Laravel\Resources\Operations\Crud\Delete;
 use MorningTrain\Laravel\Resources\Operations\Crud\Index;
 use MorningTrain\Laravel\Resources\Operations\Crud\Read;
@@ -12,15 +10,16 @@ use MorningTrain\Laravel\Resources\Operations\Crud\Store;
 abstract class CrudResource extends Resource
 {
 
-    protected static $model;
+    protected $model;
+    protected $restricted = true;
 
     public function operations()
     {
         return [
-            Index::create()->model(static::$model)->filters($this->getFilters()),
-            Read::create()->model(static::$model),
-            Store::create()->model(static::$model)->fields($this->getFields()),
-            Delete::create()->model(static::$model)
+            Index::create()->model($this->model)->restrict($this->restricted)->filters($this->getFilters()),
+            Read::create()->model($this->model)->restrict($this->restricted),
+            Store::create()->model($this->model)->restrict($this->restricted)->fields($this->getFields()),
+            Delete::create()->model($this->model)->restrict($this->restricted)
         ];
     }
 

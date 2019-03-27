@@ -2,6 +2,7 @@
 
 namespace MorningTrain\Laravel\Resources\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
@@ -54,8 +55,10 @@ class ResourceController
      * @return \Illuminate\Http\JsonResponse|mixed
      * @throws \Exception
      */
-    public function __call($method, $parameters)
+    public function executeOperation(Request $request, $parameter = null)
     {
+
+        /// TODO - Better management of an uncertain amount of parameters - We should pass along everyting
 
         /// Magic method to catch all calls to this controller
         /// It allows us to dynamically route the request to a specific operation
@@ -65,12 +68,12 @@ class ResourceController
 
         /// First we should validate to see if the requested method is valid
         /// If that is not the case, then we might assume that something is misconfigured
-        if (($operation instanceof Operation) === false || $operation->matchesControllerMethod($method) === false) {
-            throw new \Exception("Tried to execute method ($method) on ResourceController, but it does not match an operation and is deemed invalid.");
+        if (($operation instanceof Operation) === false) {
+            throw new \Exception("Tried to execute method, but it does not match an operation and is deemed invalid.");
         }
 
         /// Prepare operation (It will retrieve data/model/collection) which will be used to perform validation checks
-        $operation->prepare($parameters);
+        $operation->prepare([$parameter]);
 
         /// We check to see if the current operation can be performed
         /// It will factor in if the resource has been configured with the operation

@@ -12,16 +12,14 @@ abstract class Operation
 {
     use StaticCreate;
 
-    protected $slug;
     protected $name;
 
     public $data = null;
 
-    public function __construct($resource, $slug)
+    public function __construct($resource, $name)
     {
         $this->resource = $resource;
-        $this->slug = $slug;
-        $this->name = static::getName();
+        $this->name = $name;
     }
 
     /////////////////////////////////
@@ -65,6 +63,16 @@ abstract class Operation
         return $this;
     }
 
+    public function identifier()
+    {
+        return implode('.', [
+            $this->resource()->namespace,
+            'resources',
+            $this->resource()->name,
+            $this->name
+        ]);
+    }
+
     /////////////////////////////////
     /// Resource
     /////////////////////////////////
@@ -87,22 +95,13 @@ abstract class Operation
         return $this->genericGetSet('restricted', $value);
     }
 
-    public function getPermissionSlug()
-    {
-        return implode('.', [
-            $this->resource()->namespace,
-            $this->resource()->name,
-            $this->slug
-        ]);
-    }
-
     public function canExecute()
     {
         if (!$this->restricted) {
             return true;
         }
 
-        if (Auth::check() && Auth::user()->can($this->getPermissionSlug())) {
+        if (Auth::check() && Auth::user()->can($this->identifier())) {
             return true;
         }
 
@@ -116,8 +115,7 @@ abstract class Operation
     public function export()
     {
         return [
-            "name" => $this->name,
-            "slug" => $this->slug
+            "name" => $this->name
         ];
     }
 
@@ -136,21 +134,11 @@ abstract class Operation
 
     const ROUTE_METHOD = 'get';
 
-    public function getControllerMethodName()
-    {
-        return static::getName() . 'Operation';
-    }
-
-    public function matchesControllerMethod($method_name)
-    {
-        return $this->getControllerMethodName() === $method_name;
-    }
-
     public function getRoutePath()
     {
 
         $key = $this->resource->name;
-        $route_path = Str::plural($this->resource->name) . '/' . $this->slug . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
+        $route_path = Str::plural($this->resource->name) . '/' . $this->name . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
 
         return $route_path;
     }
@@ -158,12 +146,12 @@ abstract class Operation
     public function routes()
     {
 
-        $route_group_props = ['operation' => $this->slug, 'resource_namespace' => $this->resource()->namespace];
+        $route_group_props = ['operation' => $this->name, 'resource_namespace' => $this->resource()->namespace];
 
         $middlewares = [];
 
         if ($this->restricted) {
-            $middlewares[] = 'permission:' . $this->getPermissionSlug();
+            $middlewares[] = 'permission:' . $this->identifier();
         }
 
         if (!empty($middlewares)) {
@@ -172,11 +160,10 @@ abstract class Operation
 
         Route::group($route_group_props, function () {
 
-            $route_name = $this->resource()->namespace . '.resources.' . $this->resource->name . '.' . $this->slug;
             $route_path = $this->getRoutePath();
-            $route_controller = '\\' . ResourceController::class . '@' . $this->getControllerMethodName();
+            $route_controller = '\\' . ResourceController::class . '@executeOperation';
 
-            $route = Route::name($route_name);
+            $route = Route::name($this->identifier());
 
             $callable = [$route, static::ROUTE_METHOD];
 

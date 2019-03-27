@@ -10,7 +10,7 @@ abstract class Resource
 {
     use HasOperations;
 
-    protected $namespace;
+    public $namespace;
     public $name;
 
     public function __construct()
@@ -75,7 +75,6 @@ abstract class Resource
         $operation = $this->operation($operationSlug);
 
         $operation->resource($this);
-        $operation->namespace($this->namespace);
 
         if (method_exists($this, $method) && is_callable($callable)) {
             call_user_func($callable, $operation);

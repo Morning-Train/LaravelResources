@@ -2,32 +2,26 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-use MorningTrain\Laravel\Fields\Traits\ValidatesFields;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
 abstract class Operation
 {
-    use StaticCreate, ValidatesFields;
-
-    const ROUTE_METHOD = 'get';
+    use StaticCreate;
 
     protected $slug;
-    protected $resource;
-    protected $fields = [];
-    protected $columns = [];
-    protected $view = [];
+    protected $name;
+
     public $data = null;
-    protected $restricted = false;
 
     public function __construct($resource, $slug)
     {
         $this->resource = $resource;
         $this->slug = $slug;
+        $this->name = static::getName();
     }
 
     /////////////////////////////////
@@ -59,7 +53,7 @@ abstract class Operation
     }
 
     /////////////////////////////////
-    /// Getter/Setters
+    /// Helpers
     /////////////////////////////////
 
     public function genericGetSet($name, $value = null)
@@ -71,102 +65,32 @@ abstract class Operation
         return $this;
     }
 
+    /////////////////////////////////
+    /// Resource
+    /////////////////////////////////
+
+    protected $resource;
+
     public function resource($value = null)
     {
         return $this->genericGetSet('resource', $value);
-    }
-
-
-    public function restrict($value = true)
-    {
-        return $this->genericGetSet('restricted', $value);
-    }
-
-    public function columns($value = null)
-    {
-        return $this->genericGetSet('columns', $value);
-    }
-
-    public function fields($value = null)
-    {
-        return $this->genericGetSet('fields', $value);
-    }
-
-    public function namespace($value = null)
-    {
-        return $this->genericGetSet('namespace', $value);
-    }
-
-    /////////////////////////////////
-    /// Views
-    /////////////////////////////////
-
-    public function view($value = null)
-    {
-        return $this->genericGetSet('view', $value);
-    }
-
-    public function getView(string $val = null, $default = null)
-    {
-        $view = $this->view;
-
-        return $val === null ?
-            $view :
-            $view[$val] ?? $default;
-    }
-
-    public function constrainToView(Builder &$query)
-    {
-        $relations = $this->getView('with');
-        $with = [];
-
-        if (is_array($relations)) {
-            foreach ($relations as $key => $relation) {
-                if (is_array($relation)) {
-                    $relation = "{$key}:" . implode(',', $relation);
-                }
-
-                $with[] = $relation;
-            }
-        }
-
-        return empty($with) ?
-            $query :
-            $query->with($with);
-    }
-
-    public function transformToView(string $name, $model)
-    {
-        $appends = static::getView($name, 'appends', []);
-        $columns = static::getView($name, 'columns', []);
-        $with = static::getView($name, 'with', []);
-        $relations = [];
-
-        foreach ($with as $key => $val) {
-            $relations[] = is_array($val) ? $key : $val;
-        }
-
-        array_push($appends, 'permitted_actions');
-
-        $only = array_merge($appends, $columns, $relations);
-
-        $model = is_array($appends) ?
-            $model->append($appends) :
-            $model;
-
-        return empty($columns) ?
-            $model :
-            $model->only($only);
     }
 
     /////////////////////////////////
     /// Permissions
     /////////////////////////////////
 
+    protected $restricted = false;
+
+    public function restrict($value = true)
+    {
+        return $this->genericGetSet('restricted', $value);
+    }
+
     public function getPermissionSlug()
     {
         return implode('.', [
-            $this->namespace(),
+            $this->resource()->namespace,
             $this->resource()->name,
             $this->slug
         ]);
@@ -192,7 +116,8 @@ abstract class Operation
     public function export()
     {
         return [
-            "name" => static::getName()
+            "name" => $this->name,
+            "slug" => $this->slug
         ];
     }
 
@@ -208,6 +133,8 @@ abstract class Operation
     /////////////////////////////////
     /// Routes
     /////////////////////////////////
+
+    const ROUTE_METHOD = 'get';
 
     public function getControllerMethodName()
     {
@@ -231,7 +158,7 @@ abstract class Operation
     public function routes()
     {
 
-        $route_group_props = ['operation' => $this->slug, 'resource_namespace' => $this->namespace()];
+        $route_group_props = ['operation' => $this->slug, 'resource_namespace' => $this->resource()->namespace];
 
         $middlewares = [];
 
@@ -245,7 +172,7 @@ abstract class Operation
 
         Route::group($route_group_props, function () {
 
-            $route_name = $this->namespace() . '.resources.' . $this->resource->name . '.' . $this->slug;
+            $route_name = $this->resource()->namespace . '.resources.' . $this->resource->name . '.' . $this->slug;
             $route_path = $this->getRoutePath();
             $route_controller = '\\' . ResourceController::class . '@' . $this->getControllerMethodName();
 

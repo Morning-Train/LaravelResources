@@ -4,12 +4,8 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use MorningTrain\Laravel\Fields\Traits\ValidatesFields;
 use MorningTrain\Laravel\Filters\Filters\FilterCollection;
-use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
-use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
 abstract class EloquentOperation extends Operation
 {
@@ -67,6 +63,59 @@ abstract class EloquentOperation extends Operation
     public function applyFiltersToQuery(&$query)
     {
         FilterCollection::create($this->filters)->apply($query, request());
+    }
+
+    /////////////////////////////////
+    /// Fields
+    /////////////////////////////////
+
+    use ValidatesFields;
+
+    protected $fields = [];
+
+    public function fields($value = null)
+    {
+        return $this->genericGetSet('fields', $value);
+    }
+
+    /////////////////////////////////
+    /// Views
+    /////////////////////////////////
+
+    protected $view = [];
+
+    public function view($value = null)
+    {
+        return $this->genericGetSet('view', $value);
+    }
+
+    public function getView(string $val = null, $default = null)
+    {
+        $view = $this->view;
+
+        return $val === null ?
+            $view :
+            $view[$val] ?? $default;
+    }
+
+    public function constrainToView(Builder &$query)
+    {
+        $relations = $this->getView('with');
+        $with = [];
+
+        if (is_array($relations)) {
+            foreach ($relations as $key => $relation) {
+                if (is_array($relation)) {
+                    $relation = "{$key}:" . implode(',', $relation);
+                }
+
+                $with[] = $relation;
+            }
+        }
+
+        return empty($with) ?
+            $query :
+            $query->with($with);
     }
 
     /////////////////////////////////

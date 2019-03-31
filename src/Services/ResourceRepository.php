@@ -102,7 +102,7 @@ class ResourceRepository
 
                 $environment_data[$namespace][$name] = [
                     "name" => $name,
-                    "actions" => $resource->export()
+                    "operations" => $resource->export()
                 ];
 
             }

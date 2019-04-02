@@ -150,6 +150,10 @@ abstract class Operation
         $middlewares = [];
 
         if ($this->restricted) {
+            /// TODO - this assumes the Spatie middleware is registered
+            /// Either check if it is registered -
+            /// Or throw a more useful exception
+            /// throw new \Exception('A restricted operation requires the "permission" middleware to be registered in the application');
             $middlewares[] = 'permission:' . $this->identifier();
         }
 

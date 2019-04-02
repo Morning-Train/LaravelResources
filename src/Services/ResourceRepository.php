@@ -4,6 +4,7 @@ namespace MorningTrain\Laravel\Resources\Services;
 
 
 use MorningTrain\Laravel\Context\Context;
+use MorningTrain\Laravel\Resources\Support\Contracts\Resource;
 
 class ResourceRepository
 {
@@ -60,6 +61,64 @@ class ResourceRepository
     {
         $this->ensureNamespace($namespace);
         return $this->getResources($namespace)->isNotEmpty();
+    }
+
+    /**
+     * Returns a collection of all registered resource operations for the provided namespace
+     *
+     * @param string $namespace
+     * @return \Illuminate\Support\Collection
+     * @throws \Exception
+     */
+    public function getOperations(string $namespace)
+    {
+        if (!$this->hasResources($namespace)) {
+            return collect();
+        }
+
+        $this->boot($namespace);
+
+        $operations = collect();
+
+        /** @var Resource $resource */
+        foreach ($this->getResources($namespace) as $resource) {
+            $operations->put($resource::getName(), $resource->getOperations());
+        }
+
+        return $operations;
+    }
+
+    /**
+     * Returns a list of all permission identifiers for the provided namespace
+     *
+     * @param string $namespace
+     * @return array
+     * @throws \Exception
+     */
+    public function getPermissions(string $namespace)
+    {
+        return $this->getOperations($namespace)->flatten()
+            ->filter->restrict(null)
+            ->map->identifier()
+            ->all();
+    }
+
+    /**
+     * Returns a list of all permission identifiers for all registered namespaces
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getAllPermissions()
+    {
+        $namespaces = array_keys(config('resources', []));
+        $permissions = [];
+
+        foreach ($namespaces as $namespace) {
+            $permissions = array_merge($permissions, ResourceRepository::getPermissions($namespace));
+        }
+
+        return $permissions;
     }
 
     public function getModelKeyName()

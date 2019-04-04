@@ -4,6 +4,7 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Str;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
@@ -48,12 +49,13 @@ abstract class Operation
 
     public function identifier()
     {
-        return implode('.', [
-            $this->resource()->namespace,
-            'resources',
-            $this->resource()->name,
-            $this->name
-        ]);
+        return implode('.',
+            [
+                $this->resource()->namespace,
+                'resources',
+                $this->resource()->name,
+                $this->name,
+            ]);
     }
 
     /////////////////////////////////
@@ -114,7 +116,7 @@ abstract class Operation
     public function export()
     {
         return [
-            "name" => $this->name
+            "name" => $this->name,
         ];
     }
 
@@ -133,10 +135,21 @@ abstract class Operation
 
     const ROUTE_METHOD = 'get';
 
+    const VALID_ROUTE_METHODS = [
+        'ANY',
+        'GET',
+        'POST',
+        'PUT',
+        'PATCH',
+        'DELETE',
+        'OPTIONS',
+    ];
+
+
     public function getRoutePath()
     {
 
-        $key = $this->resource->name;
+        $key        = $this->resource->name;
         $route_path = Str::plural($this->resource->name) . '/' . $this->name . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
 
         return $route_path;
@@ -145,7 +158,8 @@ abstract class Operation
     public function routes()
     {
 
-        $route_group_props = ['operation' => $this->name, 'resource_namespace' => $this->resource()->namespace];
+        $route_group_props = ['operation'          => $this->name,
+                              'resource_namespace' => $this->resource()->namespace];
 
         $middlewares = [];
 
@@ -161,20 +175,23 @@ abstract class Operation
             $route_group_props['middleware'] = $middlewares;
         }
 
-        Route::group($route_group_props, function () {
+        Route::group($route_group_props,
+            function () {
 
-            $route_path = $this->getRoutePath();
-            $route_controller = '\\' . ResourceController::class . '@executeOperation';
+                $route_path       = $this->getRoutePath();
+                $route_controller = '\\' . ResourceController::class . '@executeOperation';
 
-            $route = Route::name($this->identifier());
+                $route = Route::name($this->identifier());
 
-            $callable = [$route, static::ROUTE_METHOD];
+                $callable = [$route, strtolower(static::ROUTE_METHOD)];
 
-            if (is_callable($callable)) {
+                if (!in_array(strtoupper(static::ROUTE_METHOD),
+                    static::VALID_ROUTE_METHODS)) {
+                    throw new \Exception('Invalid route method name provided');
+                }
+
                 call_user_func($callable, $route_path, $route_controller);
-            }
-
-        });
+            });
 
     }
 

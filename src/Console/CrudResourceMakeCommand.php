@@ -5,6 +5,7 @@ namespace MorningTrain\Laravel\Resources\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class CrudResourceMakeCommand extends GeneratorCommand
 {
@@ -20,14 +21,23 @@ class CrudResourceMakeCommand extends GeneratorCommand
         ];
     }
 
+    protected function getOptions()
+    {
+        return [
+            ['name', null, InputOption::VALUE_OPTIONAL, 'Resource name. Default will be model name.'],
+
+            ['namespace', null, InputOption::VALUE_OPTIONAL, 'Namespace name. Default: "api"', 'api'],
+        ];
+    }
+
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\Resources\Api';
+        return $rootNamespace . '\Resources\\' . ucfirst($this->option('namespace'));
     }
 
     protected function getNameInput()
     {
-        return class_basename(trim($this->argument('model')));
+        return $this->option('name') ?? class_basename(trim($this->argument('model')));
     }
 
     public function handle()
@@ -35,13 +45,20 @@ class CrudResourceMakeCommand extends GeneratorCommand
         // Check if config exists
             // err & exit: Please publish vendor
 
-        $this->info($this->getPath('test'));
-
         if (parent::handle() === false) {
             return false;
         }
 
         // Add to config
+    }
+
+    protected function buildClass($name)
+    {
+        $class = parent::buildClass($name);
+
+        $class = str_replace('DummyModel', $this->argument('model'), $class);
+
+        return $class;
     }
 
     /**
@@ -51,10 +68,7 @@ class CrudResourceMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        // TODO: Implement getStub() method.
         return __DIR__.'/stubs/crud-resource.stub';
-
-        throw new \Exception('STOP RIGHT THERE!!');
     }
 
 }

@@ -66,7 +66,11 @@ class Payload
             return $this->buildCollectionPayload($payload_data);
         }
 
-        return [$payload_data];
+        if(!is_object($payload_data) && !is_array($payload_data)){
+            $payload_data = [$payload_data];
+        }
+
+        return $payload_data;
     }
 
     public function response()

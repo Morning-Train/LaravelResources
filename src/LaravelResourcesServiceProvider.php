@@ -15,18 +15,6 @@ class LaravelResourcesServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../config/resources.php' => config_path('resources.php'),
-            ],
-                'laravel-resources-config');
-
-            $this->publishes([
-                __DIR__ . '/Resources/SampleCrudResource.php' => app_path('Resources/SampleCrudResource.php'),
-            ],
-                'laravel-resources-resources');
-        }
-
         $resources = config('resources');
 
         if (!empty($resources)) {
@@ -46,6 +34,16 @@ class LaravelResourcesServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/resources.php' => config_path('resources.php'),
+            ],
+                'laravel-resources-config');
+
+            $this->publishes([
+                __DIR__ . '/Resources/SampleCrudResource.php' => app_path('Resources/SampleCrudResource.php'),
+            ],
+                'laravel-resources-resources');
+
             $this->commands([
                 CrudResourceMakeCommand::class,
             ]);

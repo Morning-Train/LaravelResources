@@ -3,7 +3,7 @@
 namespace MorningTrain\Laravel\Resources\Services;
 
 
-use Illuminate\Database\Eloquent\Model;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use MorningTrain\Laravel\Context\Context;
@@ -94,7 +94,7 @@ class ResourceRepository
     }
 
     /////////////////////////////////
-    /// Operations and Permissions
+    /// Operations
     /////////////////////////////////
 
     protected $operations;
@@ -104,7 +104,7 @@ class ResourceRepository
      *
      * @param string $namespace
      * @return Collection
-     * @throws \Exception
+     * @throws Exception
      */
     public function getOperations(string $namespace)
     {
@@ -127,37 +127,114 @@ class ResourceRepository
     }
 
     /**
-     * Returns a list of all permission identifiers for the provided namespace
+     * Returns a list of all operation identifiers for the provided namespace
      *
      * @param string $namespace
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getPermissions(string $namespace)
+    public function getOperationIdentifiers(string $namespace)
     {
         return $this->getOperations($namespace)->flatten()
-            ->filter->restrict(null)
             ->map->identifier()
             ->all();
     }
 
     /**
-     * Returns a list of all permission identifiers for all registered namespaces
+     * Returns a list of all restricted operation identifiers for the provided namespace
+     *
+     * @param string $namespace
+     * @return array
+     * @throws Exception
+     */
+    public function getRestrictedOperationIdentifiers(string $namespace)
+    {
+        return $this->getOperations($namespace)->flatten()
+            ->filter->restrict(null)
+            ->map->identifier()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Returns a list of all non-restricted operation identifiers for the provided namespace
+     *
+     * @param string $namespace
+     * @return array
+     * @throws Exception
+     */
+    public function getUnrestrictedOperationIdentifiers(string $namespace)
+    {
+        return $this->getOperations($namespace)->flatten()
+            ->reject->restrict(null)
+            ->map->identifier()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Returns a list of all operation identifiers for all registered namespaces
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getAllPermissions()
+    public function getAllOperationIdentifiers()
     {
         $namespaces  = array_keys(config('resources', []));
         $permissions = [];
 
         foreach ($namespaces as $namespace) {
             $permissions = array_merge($permissions,
-                $this->getPermissions($namespace));
+                $this->getOperationIdentifiers($namespace));
         }
 
         return $permissions;
+    }
+
+    /**
+     * A list of all operations for the model
+     *
+     * @param string|object $model
+     * @return array
+     */
+    public function getModelOperationIdentifiers($model)
+    {
+        $key = is_object($model) ? get_class($model) : $model;
+
+        return data_get($this->getAllModelOperationIdentifiers(), $key, []);
+    }
+
+    /**
+     * A list of all model operations in the system.
+     *
+     * @return array
+     */
+    public function getAllModelOperationIdentifiers()
+    {
+        return Cache::rememberForever('model_operations',
+            function () {
+                $operations = collect();
+                $namespaces = array_keys(config('resources', []));
+
+                foreach ($namespaces as $namespace) {
+                    $this->getOperations($namespace)
+                        ->flatten()
+                        ->each(function ($operation) use ($operations) {
+                            if (method_exists($operation, 'model')) {
+                                $model      = $operation->model();
+                                $identifier = $operation->identifier();
+
+                                if (!$operations->has($model)) {
+                                    $operations->put($model, collect());
+                                }
+
+                                $operations->get($model)->push($identifier);
+                            }
+                        });
+                }
+
+                return $operations->toArray();
+            });
     }
 
     public function export(string $namespace)

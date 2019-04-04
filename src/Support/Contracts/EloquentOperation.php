@@ -4,8 +4,11 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Fields\Traits\ValidatesFields;
 use MorningTrain\Laravel\Filters\Filters\FilterCollection;
+use MorningTrain\Laravel\Resources\ResourceRepository;
 
 abstract class EloquentOperation extends Operation
 {
@@ -101,7 +104,7 @@ abstract class EloquentOperation extends Operation
     public function constrainToView(Builder &$query)
     {
         $relations = $this->getView('with');
-        $with = [];
+        $with      = [];
 
         if (is_array($relations)) {
             foreach ($relations as $key => $relation) {
@@ -145,8 +148,8 @@ abstract class EloquentOperation extends Operation
                 if (!empty($keys)) {
                     foreach ($keys as $key) {
                         $export[$key] = [
-                            "key" => $key,
-                            "value" => $filter->getDefaultValue($key)
+                            "key"   => $key,
+                            "value" => $filter->getDefaultValue($key),
                         ];
                     }
                 }
@@ -158,8 +161,8 @@ abstract class EloquentOperation extends Operation
             $key = $this->resource()->name;
 
             $export[$key] = [
-                "key" => $key,
-                "value" => null
+                "key"   => $key,
+                "value" => null,
             ];
 
         }
@@ -219,7 +222,7 @@ abstract class EloquentOperation extends Operation
         return array_merge(
             parent::export(),
             [
-                "key" => $this->getModelKeyName(),
+                "key"     => $this->getModelKeyName(),
                 "filters" => $this->exportFilters(),
             ]
         );
@@ -233,7 +236,10 @@ abstract class EloquentOperation extends Operation
     {
         return array_merge(
             parent::getMeta(),
-            $this->getFilterMeta()
+            [
+                'filters'     => $this->getFilterMeta(),
+                'permissions' => $this->getPermissionsMeta(),
+            ]
         );
     }
 
@@ -249,6 +255,30 @@ abstract class EloquentOperation extends Operation
         }
 
         return $export;
+    }
+
+    public function getPermissionsMeta()
+    {
+        if (!Auth::check()) {
+            return [];
+        }
+
+        $user       = Auth::user();
+        $data       = $this->data;
+        $collection = $data instanceof Collection ? $data : collect([$data]);
+
+        $res = $collection->mapWithKeys(function ($model) use ($user) {
+            return [$model->getKey() =>
+                collect(ResourceRepository::getModelOperationIdentifiers($model))
+                    ->filter(function ($operation) use ($model, $user) {
+                        return $user->can($operation, $model);
+                    })
+                    ->values()
+                    ->all(),
+            ];
+        });
+
+        return $res;
     }
 
 }

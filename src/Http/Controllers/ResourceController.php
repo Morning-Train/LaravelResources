@@ -33,8 +33,8 @@ class ResourceController
     {
         if ($this->resource === null) {
             $this->resource = ResourceRepository::get($this->resource_namespace, $this->resource_class);
-            $this->resource->boot($this->resource_namespace);
         }
+
         return $this->resource;
     }
 

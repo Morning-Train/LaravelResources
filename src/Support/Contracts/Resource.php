@@ -11,9 +11,10 @@ abstract class Resource
     public $namespace;
     public $name;
 
-    public function __construct()
+    public function __construct(string $namespace)
     {
-        $this->name = static::getName();
+        $this->namespace = $namespace;
+        $this->name      = static::getName();
     }
 
     /////////////////////////////////
@@ -26,21 +27,6 @@ abstract class Resource
     }
 
     /////////////////////////////////
-    /// Setup
-    /////////////////////////////////
-
-    protected $has_booted = false;
-
-    public function boot($namespace)
-    {
-        if (!$this->has_booted) {
-            $this->namespace = $namespace;
-            $this->configureOperations();
-            $this->has_booted = true;
-        }
-    }
-
-    /////////////////////////////////
     /// Export to JS
     /////////////////////////////////
 
@@ -48,13 +34,16 @@ abstract class Resource
     {
         $exportData = [];
 
-        if($this->hasOperations()){
-            foreach($this->getOperations() as $operation) {
+        if ($this->hasOperations()) {
+            foreach ($this->getOperations() as $operation) {
                 $exportData[$operation->name] = $operation->export();
             }
         }
 
-        return $exportData;
+        return [
+            "name"       => $this->name,
+            "operations" => $exportData,
+        ];
     }
 
     /////////////////////////////////
@@ -63,13 +52,14 @@ abstract class Resource
 
     public function routes()
     {
-        Route::group(['resource' => get_called_class()], function () {
-            if($this->hasOperations()) {
-                foreach($this->getOperations() as $operation) {
-                    $operation->routes();
+        Route::group(['resource' => get_called_class()],
+            function () {
+                if ($this->hasOperations()) {
+                    foreach ($this->getOperations() as $operation) {
+                        $operation->routes();
+                    }
                 }
-            }
-        });
+            });
     }
 
     /////////////////////////////////
@@ -134,6 +124,10 @@ abstract class Resource
                 throw new \Exception('Looking for operations on resource: ' . get_class($this) . ', but none was found!');
             }
 
+            foreach ($operations as $name => $operation) {
+                $this->bootOperation($name, $operation);
+            }
+
             static::$_cached_operations[get_class($this)] = $operations;
         }
 
@@ -150,30 +144,24 @@ abstract class Resource
         return isset($this->getOperations()[$operationName]);
     }
 
-    public function configureOperations()
+    public function bootOperation(string $name, Operation $operation)
     {
-        if ($this->hasOperations()) {
-            foreach ($this->getOperations() as $operationName => $operation) {
+        /// Set current resource on operation
+        $operation->resource($this);
+        $operation->name($name);
 
-                /// Set current resource on operation
-                $operation->resource($this);
-                $operation->name($operationName);
+        // Method to be called for this specific operation
+        $method   = Str::camel('configure_' . $operation->name . '_operation');
+        $callable = [$this, $method];
+        if (method_exists($this, $method) && is_callable($callable)) {
+            call_user_func($callable, $operation);
+        }
 
-                // Method to be called for this specific operation
-                $method = Str::camel('configure_' . $operation->name . '_operation');
-                $callable = [$this, $method];
-                if (method_exists($this, $method) && is_callable($callable)) {
-                    call_user_func($callable, $operation);
-                }
-
-                /// Generic function to always be called on the operation
-                $method = Str::camel('configure_operation');
-                $callable = [$this, $method];
-                if (method_exists($this, $method) && is_callable($callable)) {
-                    call_user_func($callable, $operation);
-                }
-
-            }
+        /// Generic function to always be called on the operation
+        $method   = Str::camel('configure_operation');
+        $callable = [$this, $method];
+        if (method_exists($this, $method) && is_callable($callable)) {
+            call_user_func($callable, $operation);
         }
     }
 

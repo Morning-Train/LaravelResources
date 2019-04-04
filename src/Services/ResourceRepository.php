@@ -3,89 +3,127 @@
 namespace MorningTrain\Laravel\Resources\Services;
 
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use MorningTrain\Laravel\Context\Context;
 use MorningTrain\Laravel\Resources\Support\Contracts\Resource;
 
 class ResourceRepository
 {
 
-    protected $resources;
-
     public function __construct()
     {
-        $this->resources = collect();
+        $this->resources  = collect();
+        $this->operations = collect();
     }
 
-    public function register($namespace, $resource)
-    {
-        $this->ensureNamespace($namespace);
-        $this->resources->get($namespace)->put($resource, new $resource);
-    }
+    /////////////////////////////////
+    /// Resource Repository
+    /////////////////////////////////
 
-    public function get($namespace, $resource)
+    protected $resources;
+
+    public function register(string $namespace, string $resource)
     {
         $this->ensureNamespace($namespace);
         if (!$this->resources->get($namespace)->has($resource)) {
-            $this->resources->get($namespace)->put($resource, new $resource);
+            $this->resources->get($namespace)
+                ->put($resource, new $resource($namespace));
         }
+    }
+
+    public function get(string $namespace, string $resource)
+    {
+        $this->register($namespace, $resource);
+
         return $this->resources->get($namespace)->get($resource);
     }
 
-    public function ensureNamespace($namespace)
+    public function ensureNamespace(string $namespace)
     {
         if (!$this->resources->has($namespace)) {
             $this->resources->put($namespace, collect());
         }
     }
 
-    public function routes($namespace)
+    /**
+     * Returns a collection of all resources for the namespace
+     *
+     * @param string $namespace
+     * @return Collection|Resource[]
+     */
+    public function getResources(string $namespace)
+    {
+        $this->ensureNamespace($namespace);
+
+        return $this->resources->get($namespace);
+    }
+
+    public function routes(string $namespace)
     {
         if (!$this->hasResources($namespace)) {
             return;
         }
-
-        $this->boot($namespace);
 
         foreach ($this->getResources($namespace) as $resource) {
             $resource->routes();
         }
     }
 
-    public function getResources($namespace)
-    {
-        $this->ensureNamespace($namespace);
-        return $this->resources->get($namespace);
-    }
-
-    public function hasResources($namespace)
+    /**
+     * Check if provided namespace has any resources
+     *
+     * @param string $namespace
+     * @return bool
+     */
+    public function hasResources(string $namespace): bool
     {
         $this->ensureNamespace($namespace);
         return $this->getResources($namespace)->isNotEmpty();
     }
 
+    public function getModelKeyName()
+    {
+        return null;
+    }
+
+    public function getEmptyModelInstance()
+    {
+        return null;
+    }
+
+    /////////////////////////////////
+    /// Operations and Permissions
+    /////////////////////////////////
+
+    protected $operations;
+
     /**
      * Returns a collection of all registered resource operations for the provided namespace
      *
      * @param string $namespace
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      * @throws \Exception
      */
     public function getOperations(string $namespace)
     {
-        if (!$this->hasResources($namespace)) {
-            return collect();
+        // Ensure namespace exists
+        if (!$this->operations->has($namespace)) {
+            $this->operations->put($namespace, collect());
         }
 
-        $this->boot($namespace);
-
-        $operations = collect();
-
-        /** @var Resource $resource */
-        foreach ($this->getResources($namespace) as $resource) {
-            $operations->put($resource::getName(), $resource->getOperations());
+        // Register operations
+        if ($this->hasResources($namespace)) {
+            foreach ($this->getResources($namespace) as $resource) {
+                if (!$this->operations->get($namespace)->has($resource->name)) {
+                    $this->operations->get($namespace)
+                        ->put($resource->name, $resource->getOperations());
+                }
+            }
         }
 
-        return $operations;
+        return $this->operations->get($namespace);
     }
 
     /**
@@ -111,40 +149,18 @@ class ResourceRepository
      */
     public function getAllPermissions()
     {
-        $namespaces = array_keys(config('resources', []));
+        $namespaces  = array_keys(config('resources', []));
         $permissions = [];
 
         foreach ($namespaces as $namespace) {
-            $permissions = array_merge($permissions, ResourceRepository::getPermissions($namespace));
+            $permissions = array_merge($permissions,
+                $this->getPermissions($namespace));
         }
 
         return $permissions;
     }
 
-    public function getModelKeyName()
-    {
-        return null;
-    }
-
-    public function getEmptyModelInstance()
-    {
-        return null;
-    }
-
-    public function boot($namespace)
-    {
-
-        //Boot individual resources
-        if ($this->hasResources($namespace)) {
-            foreach ($this->getResources($namespace) as $class => $resource) {
-                $resource->boot($namespace);
-            }
-
-        }
-
-    }
-
-    public function export($namespace)
+    public function export(string $namespace)
     {
 
         $environment_data = [];
@@ -153,26 +169,18 @@ class ResourceRepository
 
             $environment_data[$namespace] = [];
 
-            foreach ($this->getResources($namespace) as $class => $resource) {
-
-                $resource->boot($namespace);
-
-                $name = ($class)::getName();
-
-                $environment_data[$namespace][$name] = [
-                    "name" => $name,
-                    "operations" => $resource->export()
-                ];
-
+            foreach ($this->getResources($namespace) as $resource) {
+                $environment_data[$namespace][$resource->name] = $resource->export();
             }
 
         }
 
-        Context::localization()->provide('env', function () use ($environment_data) {
-            return [
-                'resources' => $environment_data
-            ];
-        });
+        Context::localization()->provide('env',
+            function () use ($environment_data) {
+                return [
+                    'resources' => $environment_data,
+                ];
+            });
 
     }
 

@@ -106,24 +106,30 @@ class ResourceRepository
      * @return Collection
      * @throws Exception
      */
-    public function getOperations(string $namespace)
+    public function getOperations(string $namespace = null)
     {
-        // Ensure namespace exists
-        if (!$this->operations->has($namespace)) {
-            $this->operations->put($namespace, collect());
-        }
+        $closure = function (string $namespace) {
+            // Ensure namespace exists
+            if (!$this->operations->has($namespace)) {
+                $this->operations->put($namespace, collect());
+            }
 
-        // Register operations
-        if ($this->hasResources($namespace)) {
-            foreach ($this->getResources($namespace) as $resource) {
-                if (!$this->operations->get($namespace)->has($resource->name)) {
-                    $this->operations->get($namespace)
-                        ->put($resource->name, $resource->getOperations());
+            // Register operations
+            if ($this->hasResources($namespace)) {
+                foreach ($this->getResources($namespace) as $resource) {
+                    if (!$this->operations->get($namespace)->has($resource->name)) {
+                        $this->operations->get($namespace)
+                            ->put($resource->name, $resource->getOperations());
+                    }
                 }
             }
-        }
+        };
 
-        return $this->operations->get($namespace);
+        is_null($namespace) ?
+            $this->forEachNamespace($closure) :
+            $closure($namespace);
+
+        return (is_null($namespace) ? $this->operations : $this->operations->get($namespace))->flatten();
     }
 
     /**
@@ -133,9 +139,9 @@ class ResourceRepository
      * @return array
      * @throws Exception
      */
-    public function getOperationIdentifiers(string $namespace)
+    public function getOperationIdentifiers(string $namespace = null)
     {
-        return $this->getOperations($namespace)->flatten()
+        return $this->getOperations($namespace)
             ->map->identifier()
             ->all();
     }
@@ -147,9 +153,9 @@ class ResourceRepository
      * @return array
      * @throws Exception
      */
-    public function getRestrictedOperationIdentifiers(string $namespace)
+    public function getRestrictedOperationIdentifiers(string $namespace = null)
     {
-        return $this->getOperations($namespace)->flatten()
+        return $this->getOperations($namespace)
             ->filter->restrict(null)
             ->map->identifier()
             ->values()
@@ -163,32 +169,13 @@ class ResourceRepository
      * @return array
      * @throws Exception
      */
-    public function getUnrestrictedOperationIdentifiers(string $namespace)
+    public function getUnrestrictedOperationIdentifiers(string $namespace = null)
     {
-        return $this->getOperations($namespace)->flatten()
+        return $this->getOperations($namespace)
             ->reject->restrict(null)
             ->map->identifier()
             ->values()
             ->all();
-    }
-
-    /**
-     * Returns a list of all operation identifiers for all registered namespaces
-     *
-     * @return array
-     * @throws Exception
-     */
-    public function getAllOperationIdentifiers()
-    {
-        $namespaces  = array_keys(config('resources', []));
-        $permissions = [];
-
-        foreach ($namespaces as $namespace) {
-            $permissions = array_merge($permissions,
-                $this->getOperationIdentifiers($namespace));
-        }
-
-        return $permissions;
     }
 
     /**
@@ -261,4 +248,12 @@ class ResourceRepository
 
     }
 
+    protected function forEachNamespace(\Closure $closure)
+    {
+        $namespaces = config('resources', []);
+
+        foreach ($namespaces as $namespace => $resources) {
+            $closure($namespace, $resources);
+        }
+    }
 }

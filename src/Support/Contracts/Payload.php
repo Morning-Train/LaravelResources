@@ -66,7 +66,7 @@ class Payload
             return $this->buildCollectionPayload($payload_data);
         }
 
-        return $payload_data;
+        return [$payload_data];
     }
 
     public function response()

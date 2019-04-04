@@ -42,14 +42,23 @@ class CrudResourceMakeCommand extends GeneratorCommand
 
     public function handle()
     {
-        // Check if config exists
-            // err & exit: Please publish vendor
-
         if (parent::handle() === false) {
             return false;
         }
 
-        // Add to config
+        $this->addToConfig();
+    }
+
+    protected function addToConfig()
+    {
+        // Check if config exists // TODO - check for actuall file
+        if (!is_array(config('resources'))) {
+            $this->error('Could not find "resources" config file. Make sure you run vendor:publish.');
+
+            return false;
+        }
+
+        // Add to config // TODO
     }
 
     protected function buildClass($name)

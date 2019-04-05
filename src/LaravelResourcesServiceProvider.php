@@ -39,11 +39,6 @@ class LaravelResourcesServiceProvider extends ServiceProvider
             ],
                 'laravel-resources-config');
 
-            $this->publishes([
-                __DIR__ . '/Resources/SampleCrudResource.php' => app_path('Resources/SampleCrudResource.php'),
-            ],
-                'laravel-resources-resources');
-
             $this->commands([
                 CrudResourceMakeCommand::class,
             ]);

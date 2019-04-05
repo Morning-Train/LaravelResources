@@ -11,8 +11,5 @@ return [
     |
     */
 
-    'api' => [
-        \App\Resources\SampleCrudResource::class,
-    ],
 
 ];

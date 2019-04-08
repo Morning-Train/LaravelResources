@@ -37,7 +37,7 @@ class LaravelResourcesServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../config/resources.php' => config_path('resources.php'),
             ],
-                'config');
+                'mt-config');
 
             $this->commands([
                 CrudResourceMakeCommand::class,

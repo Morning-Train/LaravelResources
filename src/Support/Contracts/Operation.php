@@ -86,6 +86,17 @@ abstract class Operation
     }
 
     /////////////////////////////////
+    /// Middleware
+    /////////////////////////////////
+
+    protected $middlewares = [];
+
+    public function middlewares($value = null)
+    {
+        return $this->genericGetSet('middlewares', $value);
+    }
+
+    /////////////////////////////////
     /// Permissions
     /////////////////////////////////
 
@@ -161,7 +172,7 @@ abstract class Operation
         $route_group_props = ['operation'          => $this->name,
                               'resource_namespace' => $this->resource()->namespace];
 
-        $middlewares = [];
+        $middlewares = $this->middlewares();
 
         if ($this->restricted) {
             /// TODO - this assumes the Spatie middleware is registered

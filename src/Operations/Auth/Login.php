@@ -15,11 +15,6 @@ class Login extends Operation
 
     protected $middlewares = ['guest'];
 
-    public function username()
-    {
-        return 'username';
-    }
-
     public function handle($model_or_collection = null)
     {
         return $this->login(request());

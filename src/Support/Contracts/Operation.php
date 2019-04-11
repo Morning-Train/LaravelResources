@@ -161,7 +161,7 @@ abstract class Operation
     {
 
         $key        = $this->resource->name;
-        $route_path = Str::plural($this->resource->name) . '/' . $this->name . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
+        $route_path = $key . '/' . $this->name . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
 
         return $route_path;
     }

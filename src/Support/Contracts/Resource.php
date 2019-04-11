@@ -103,7 +103,7 @@ abstract class Resource
                     }
 
                     if (is_int($key)) {
-                        $key = Str::snake(strtolower(class_basename($operation)));
+                        $key = Str::snake(class_basename($operation));
                     }
                     $operations[$key] = new $operation;
                 }
@@ -114,7 +114,7 @@ abstract class Resource
             if (is_array($instance_operations) && !empty($instance_operations)) {
                 foreach ($instance_operations as $key => $operation) {
                     if (is_int($key)) {
-                        $key = Str::snake(strtolower(class_basename(get_class($operation))));
+                        $key = Str::snake(class_basename(get_class($operation)));
                     }
                     $operations[$key] = $operation;
                 }

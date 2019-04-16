@@ -2,6 +2,7 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
@@ -113,11 +114,16 @@ abstract class Operation
             return true;
         }
 
-        if (Auth::check() && Auth::user()->can($this->identifier())) {
-            return true;
+        if (!Auth::check()) {
+            return false;
         }
 
-        return false;
+        $data = $this->data instanceof Collection ?
+            $this->data : collect([$this->data]);
+
+        return $data->every(function ($model) {
+            return Auth::user()->can($this->identifier(), $model);
+        });
     }
 
     /////////////////////////////////

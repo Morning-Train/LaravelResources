@@ -76,6 +76,10 @@ class Payload
     public function response()
     {
 
+        if($this->data instanceof \Illuminate\Http\Response) {
+            return $this->data;
+        }
+
         if($this->data instanceof View) {
             return $this->data;
         }

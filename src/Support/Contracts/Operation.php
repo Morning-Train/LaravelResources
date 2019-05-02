@@ -186,6 +186,8 @@ abstract class Operation
             /// Or throw a more useful exception
             /// throw new \Exception('A restricted operation requires the "permission" middleware to be registered in the application');
             $middlewares[] = 'permission:' . $this->identifier();
+
+            $middlewares[] = 'auth:' . $this->resource()->namespace;
         }
 
         if (!empty($middlewares)) {

@@ -13,6 +13,13 @@ use MorningTrain\Laravel\Resources\ResourceRepository;
 abstract class EloquentOperation extends Operation
 {
 
+    protected $single = false;
+
+    public function single($value = true)
+    {
+        return $this->genericGetSet('single', $value);
+    }
+
     public function prepare($parameters)
     {
 
@@ -26,7 +33,11 @@ abstract class EloquentOperation extends Operation
         $query = $this->query();
 
         if ($this->expectsCollection()) {
-            $model_or_collection = $query->get();
+            if($this->single) {
+                $model_or_collection = $query->first();
+            } else {
+                $model_or_collection = $query->get();
+            }
         } else {
             if ($key_value !== null) {
                 $query->where($this->getModelKeyName(), '=', $key_value);

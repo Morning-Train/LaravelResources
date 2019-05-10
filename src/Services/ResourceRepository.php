@@ -211,6 +211,10 @@ class ResourceRepository
                                 $model      = $operation->model();
                                 $identifier = $operation->identifier();
 
+                                if($model === null) {
+                                    return;
+                                }
+
                                 if (!$operations->has($model)) {
                                     $operations->put($model, collect());
                                 }

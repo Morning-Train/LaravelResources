@@ -238,11 +238,8 @@ class ResourceRepository
         $environment_data = [];
 
         if ($this->hasResources($namespace)) {
-
-            $environment_data[$namespace] = [];
-
             foreach ($this->getResources($namespace) as $resource) {
-                $environment_data[$namespace][$resource->name] = $resource->export();
+                Arr::set($environment_data, "{$namespace}.{$resource->name}", $resource->export());
             }
 
         }

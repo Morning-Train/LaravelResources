@@ -26,11 +26,6 @@ class ResourceRepository
 
     protected $resources;
 
-    public function myTest()
-    {
-        dd($this->resources);
-    }
-
     public function register(string $namespace, string $resource)
     {
         $this->ensureNamespace($namespace);

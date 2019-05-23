@@ -169,7 +169,7 @@ abstract class EloquentOperation extends Operation
 
         if ($this->expectsCollection() === false) {
 
-            $key = $this->resource()->name;
+            $key = $this->resource()->base_name;
 
             $export[$key] = [
                 "key"   => $key,

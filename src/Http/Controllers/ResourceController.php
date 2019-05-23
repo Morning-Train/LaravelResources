@@ -12,7 +12,7 @@ class ResourceController
 {
 
     protected $resource_namespace;
-    protected $resource_class;
+    protected $resource_name;
     protected $operation_class;
     protected $resource = null;
     protected $operation = null;
@@ -21,7 +21,7 @@ class ResourceController
     {
         if ($current_route = Route::getCurrentRoute()) {
             $this->resource_namespace = $current_route->action['resource_namespace'];
-            $this->resource_class = $current_route->action['resource'];
+            $this->resource_name = $current_route->action['resource'];
             $this->operation_class = $current_route->action['operation'];
         }
     }
@@ -32,7 +32,7 @@ class ResourceController
     protected function resource()
     {
         if ($this->resource === null) {
-            $this->resource = ResourceRepository::get($this->resource_namespace, $this->resource_class);
+            $this->resource = ResourceRepository::get($this->resource_namespace, $this->resource_name);
         }
 
         return $this->resource;

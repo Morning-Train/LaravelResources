@@ -165,11 +165,12 @@ abstract class Operation
 
     public function getRoutePath()
     {
-
-        $key        = $this->resource->name;
-        $route_path = $key . '/' . $this->name . "/{" . $key . "?}"; // TODO <- abstract getter on Operation
-
-        return $route_path;
+        return join('/',
+            [
+                $this->resource->getBasePath(),
+                $this->name,
+                "{" . $this->resource->base_name . "?}",
+            ]);
     }
 
     public function routes()

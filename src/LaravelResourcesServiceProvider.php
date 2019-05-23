@@ -3,7 +3,9 @@
 namespace MorningTrain\Laravel\Resources;
 
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use MorningTrain\Laravel\Resources\Console\CrudResourceMakeCommand;
 
 class LaravelResourcesServiceProvider extends ServiceProvider
@@ -15,12 +17,12 @@ class LaravelResourcesServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $resources = config('resources');
+        $resources = ResourceRepository::config();
 
         if (!empty($resources)) {
             foreach ($resources as $namespace => $resources) {
-                foreach ($resources as $resource) {
-                    ResourceRepository::register($namespace, $resource);
+                foreach ($resources as $name => $resource) {
+                    ResourceRepository::register($namespace, $name);
                 }
             }
         }

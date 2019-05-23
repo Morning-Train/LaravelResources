@@ -4,8 +4,10 @@ namespace MorningTrain\Laravel\Resources\Services;
 
 
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use MorningTrain\Laravel\Context\Context;
 use MorningTrain\Laravel\Resources\Support\Contracts\Resource;
 
@@ -24,12 +26,19 @@ class ResourceRepository
 
     protected $resources;
 
+    public function myTest()
+    {
+        dd($this->resources);
+    }
+
     public function register(string $namespace, string $resource)
     {
         $this->ensureNamespace($namespace);
         if (!$this->resources->get($namespace)->has($resource)) {
+            $class = $this->config($namespace)[$resource];
+
             $this->resources->get($namespace)
-                ->put($resource, new $resource($namespace));
+                ->put($resource, new $class($namespace, $resource));
         }
     }
 
@@ -254,10 +263,59 @@ class ResourceRepository
 
     protected function forEachNamespace(\Closure $closure)
     {
-        $namespaces = config('resources', []);
+        $namespaces = $this->config();
 
         foreach ($namespaces as $namespace => $resources) {
             $closure($namespace, $resources);
         }
     }
+
+    /////////////////////////////////
+    /// Config helpers
+    /////////////////////////////////
+
+    protected $config;
+
+    public function config(string $namespace = null)
+    {
+        if (!$this->config) {
+            $config = config('resources', []);
+
+            $this->config = array_map(function ($items) {
+                return $this->dot($items);
+            }, $config);
+        }
+
+        return Arr::get($this->config, $namespace);
+    }
+
+    protected function dot($array, $prepend = '')
+    {
+        $results = [];
+
+        foreach ($array as $name => $value) {
+            if (is_int($name)) { // Assumption that key was not set
+                if (is_array($value)) {
+                    throw new \Exception('Nested arrays of resources need to have a key.');
+                }
+
+                $name = Str::snake(class_basename($value));
+            }
+
+            $key = $prepend.$name;
+
+            if (is_array($value) && ! empty($value)) {
+                $results = array_merge($results, $this->dot($value, $key.'.'));
+            } else {
+                if (isset($results[$key])) {
+                    throw new \Exception('Cannot have resources with duplicate name.');
+                }
+
+                $results[$key] = $value;
+            }
+        }
+
+        return $results;
+    }
+
 }

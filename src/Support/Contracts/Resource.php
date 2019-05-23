@@ -2,6 +2,7 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -10,20 +11,22 @@ abstract class Resource
 
     public $namespace;
     public $name;
+    public $base_name;
 
-    public function __construct(string $namespace)
+    public function __construct(string $namespace, string $name)
     {
         $this->namespace = $namespace;
-        $this->name      = static::getName();
+        $this->name      = $name;
+        $this->base_name = static::getBaseName($name);
     }
 
     /////////////////////////////////
     /// Basic helpers
     /////////////////////////////////
 
-    public static function getName()
+    public static function getBaseName(string $name)
     {
-        return Str::snake(class_basename(get_called_class()));
+        return Str::snake(Arr::last(explode('.', $name)));
     }
 
     /////////////////////////////////
@@ -52,7 +55,7 @@ abstract class Resource
 
     public function routes()
     {
-        Route::group(['resource' => get_called_class()],
+        Route::group(['resource' => $this->name],
             function () {
                 if ($this->hasOperations()) {
                     foreach ($this->getOperations() as $operation) {
@@ -60,6 +63,11 @@ abstract class Resource
                     }
                 }
             });
+    }
+
+    public function getBasePath()
+    {
+        return preg_replace('/\./', '/', $this->name);
     }
 
     /////////////////////////////////
@@ -89,7 +97,7 @@ abstract class Resource
 
     public function getOperations()
     {
-        if (!isset(static::$_cached_operations[get_class($this)])) {
+        if (!isset(static::$_cached_operations[$this->name])) {
 
             $raw_class_operations = static::$operations;
 
@@ -99,7 +107,7 @@ abstract class Resource
                 foreach ($raw_class_operations as $key => $operation) {
 
                     if (!class_exists($operation)) {
-                        throw new \Exception("Supplied operation ($operation) on resource (" . get_class($this) . "), but it is not a class!");
+                        throw new \Exception("Supplied operation ($operation) on resource (" . $this->name . "), but it is not a class!");
                     }
 
                     if (is_int($key)) {
@@ -121,17 +129,17 @@ abstract class Resource
             }
 
             if (empty($operations)) {
-                throw new \Exception('Looking for operations on resource: ' . get_class($this) . ', but none was found!');
+                throw new \Exception('Looking for operations on resource: ' . $this->name . ', but none was found!');
             }
 
             foreach ($operations as $name => $operation) {
                 $this->bootOperation($name, $operation);
             }
 
-            static::$_cached_operations[get_class($this)] = $operations;
+            static::$_cached_operations[$this->name] = $operations;
         }
 
-        return static::$_cached_operations[get_class($this)];
+        return static::$_cached_operations[$this->name];
     }
 
     public function hasOperations()

@@ -50,7 +50,7 @@ class Payload
         return $response;
     }
 
-    protected function modelResponse(Model $model)
+    protected function modelResponse($model)
     {
         return $model;
     }

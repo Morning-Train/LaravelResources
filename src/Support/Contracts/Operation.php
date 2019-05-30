@@ -53,7 +53,6 @@ abstract class Operation
         return implode('.',
             [
                 $this->resource()->namespace,
-                'resources',
                 $this->resource()->name,
                 $this->name,
             ]);

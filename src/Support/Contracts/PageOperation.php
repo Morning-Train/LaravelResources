@@ -50,4 +50,16 @@ abstract class PageOperation extends Operation
         return $this->path();
     }
 
+    /////////////////////////////////
+    /// Exporting
+    /////////////////////////////////
+
+    public function export()
+    {
+        return array_merge(
+            parent::export(),
+            $this->getPageEnvironment()
+        );
+    }
+
 }

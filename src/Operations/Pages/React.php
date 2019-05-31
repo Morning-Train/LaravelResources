@@ -29,4 +29,18 @@ class React extends PageOperation
         return $this->genericGetSet('component', $value);
     }
 
+    /////////////////////////////////
+    /// Exporting
+    /////////////////////////////////
+
+    public function export()
+    {
+        return array_merge(
+            parent::export(),
+            [
+                "component" => $this->component(),
+            ]
+        );
+    }
+
 }

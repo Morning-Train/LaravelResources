@@ -19,7 +19,7 @@ class React extends PageOperation
         return array_merge(
             parent::getPageEnvironment(),
             [
-                'component' => $this->component()
+                'component' => $this->resource()->namespace . '.' . $this->component(),
             ]
         );
     }
@@ -38,7 +38,7 @@ class React extends PageOperation
         return array_merge(
             parent::export(),
             [
-                "component" => $this->component(),
+                "component" => $this->resource()->namespace . '.' . $this->component(),
             ]
         );
     }

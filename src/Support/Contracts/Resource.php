@@ -24,6 +24,15 @@ abstract class Resource
     /// Basic helpers
     /////////////////////////////////
 
+    public function identifier()
+    {
+        return implode('.',
+            [
+                $this->namespace,
+                $this->name,
+            ]);
+    }
+
     public static function getBaseName(string $name)
     {
         return Str::snake(Arr::last(explode('.', $name)));
@@ -91,13 +100,13 @@ abstract class Resource
             return $this->getOperations()[$slug];
         }
 
-        throw new \Exception("Tried to get operation ($slug), but it is not found on resource (" . $this->name . ")");
+        throw new \Exception("Tried to get operation ($slug), but it is not found on resource (" . $this->identifier() . ")");
 
     }
 
     public function getOperations()
     {
-        if (!isset(static::$_cached_operations[$this->name])) {
+        if (!isset(static::$_cached_operations[$this->identifier()])) {
 
             $raw_class_operations = static::$operations;
 
@@ -107,7 +116,7 @@ abstract class Resource
                 foreach ($raw_class_operations as $key => $operation) {
 
                     if (!class_exists($operation)) {
-                        throw new \Exception("Supplied operation ($operation) on resource (" . $this->name . "), but it is not a class!");
+                        throw new \Exception("Supplied operation ($operation) on resource (" . $this->identifier() . "), but it is not a class!");
                     }
 
                     if (is_int($key)) {
@@ -129,17 +138,17 @@ abstract class Resource
             }
 
             if (empty($operations)) {
-                throw new \Exception('Looking for operations on resource: ' . $this->name . ', but none was found!');
+                throw new \Exception('Looking for operations on resource: ' . $this->identifier() . ', but none was found!');
             }
 
             foreach ($operations as $name => $operation) {
                 $this->bootOperation($name, $operation);
             }
 
-            static::$_cached_operations[$this->name] = $operations;
+            static::$_cached_operations[$this->identifier()] = $operations;
         }
 
-        return static::$_cached_operations[$this->name];
+        return static::$_cached_operations[$this->identifier()];
     }
 
     public function hasOperations()

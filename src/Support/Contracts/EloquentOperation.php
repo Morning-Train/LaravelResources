@@ -4,6 +4,7 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Fields\Traits\ValidatesFields;
@@ -233,6 +234,7 @@ abstract class EloquentOperation extends Operation
         return array_merge(
             parent::export(),
             [
+                "model"   => Str::snake(class_basename($this->model)),
                 "key"     => $this->getModelKeyName(),
                 "filters" => $this->exportFilters(),
             ]

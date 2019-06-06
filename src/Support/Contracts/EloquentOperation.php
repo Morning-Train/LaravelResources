@@ -51,6 +51,16 @@ abstract class EloquentOperation extends Operation
         $this->data = $model_or_collection;
     }
 
+    public function getRoutePath()
+    {
+        return join('/',
+            [
+                $this->resource->getBasePath(),
+                $this->name,
+                "{" . $this->getModelClassName() . "?}",
+            ]);
+    }
+
     /////////////////////////////////
     /// Query
     /////////////////////////////////
@@ -170,7 +180,7 @@ abstract class EloquentOperation extends Operation
 
         if ($this->expectsCollection() === false) {
 
-            $key = $this->resource()->base_name;
+            $key = $this->getModelClassName();
 
             $export[$key] = [
                 "key"   => $key,
@@ -200,6 +210,11 @@ abstract class EloquentOperation extends Operation
             return null;
         }
         return $this->getEmptyModelInstance()->getKeyName();
+    }
+
+    public function getModelClassName()
+    {
+        return Str::snake(class_basename($this->model));
     }
 
     public function getEmptyModelInstance()
@@ -234,7 +249,7 @@ abstract class EloquentOperation extends Operation
         return array_merge(
             parent::export(),
             [
-                "model"   => Str::snake(class_basename($this->model)),
+                "model"   => $this->getModelClassName(),
                 "key"     => $this->getModelKeyName(),
                 "filters" => $this->exportFilters(),
             ]

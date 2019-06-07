@@ -53,12 +53,19 @@ abstract class EloquentOperation extends Operation
 
     public function getRoutePath()
     {
-        return join('/',
-            [
-                $this->resource->getBasePath(),
-                $this->name,
-                "{" . $this->getModelClassName() . "?}",
-            ]);
+
+        $route_fragments = [
+            $this->resource->getBasePath(),
+            $this->name,
+        ];
+
+        $model_class_name = $this->getModelClassName();
+
+        if (!empty($model_class_name)) {
+            array_push($route_fragments, "{" . $this->getModelClassName() . "?}");
+        }
+
+        return join('/', $route_fragments);
     }
 
     /////////////////////////////////

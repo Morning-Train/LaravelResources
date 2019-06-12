@@ -48,6 +48,8 @@ abstract class EloquentOperation extends Operation
             }
         }
 
+        $this->transformToView($model_or_collection);
+
         $this->data = $model_or_collection;
     }
 
@@ -115,10 +117,16 @@ abstract class EloquentOperation extends Operation
     /////////////////////////////////
 
     protected $view = [];
+    protected $appends = false;
 
     public function view($value = null)
     {
         return $this->genericGetSet('view', $value);
+    }
+
+    public function appends($value = null)
+    {
+        return $this->genericGetSet('appends', $value);
     }
 
     public function getView(string $val = null, $default = null)
@@ -128,6 +136,32 @@ abstract class EloquentOperation extends Operation
         return $val === null ?
             $view :
             $view[$val] ?? $default;
+    }
+
+    public function transformToView(&$data)
+    {
+
+        $appends = $this->appends();
+
+        if (is_array($appends)) {
+
+            $appends = array_map('Str::snake', $appends);
+
+            if ($data instanceof Model) {
+                $data->setAppends($appends);
+            }
+
+            if ($data instanceof Collection) {
+                $data->transform(function ($item) use ($appends) {
+                    if ($item instanceof Model) {
+                        $item->setAppends($appends);
+                    }
+                    return $item;
+                });
+            }
+
+        }
+
     }
 
     public function constrainToView(Builder &$query)
@@ -303,6 +337,11 @@ abstract class EloquentOperation extends Operation
         $collection = $data instanceof Collection ? $data : collect([$data]);
 
         $res = $collection->mapWithKeys(function ($model) use ($user) {
+
+            if($model === null || !($model instanceof Model)){
+                return [];
+            }
+
             return [$model->getKey() =>
                 collect(ResourceRepository::getModelOperationIdentifiers($model))
                     ->filter(function ($operation) use ($model, $user) {

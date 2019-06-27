@@ -207,15 +207,7 @@ abstract class EloquentOperation extends Operation
 
         if (!empty($this->filters)) {
             foreach ($this->filters as $filter) {
-                $keys = $filter->getAllKeys();
-                if (!empty($keys)) {
-                    foreach ($keys as $key) {
-                        $export[$key] = [
-                            "key"   => $key,
-                            "value" => $filter->getDefaultValue($key),
-                        ];
-                    }
-                }
+                $export = array_merge($export, $filter->export());
             }
         }
 

@@ -23,6 +23,7 @@ abstract class EloquentOperation extends Operation
 
     public function prepare($parameters)
     {
+        parent::prepare($parameters);
 
         $model_or_collection = null;
 

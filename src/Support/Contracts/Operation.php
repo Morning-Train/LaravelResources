@@ -22,7 +22,8 @@ abstract class Operation
 
     public function prepare($parameters)
     {
-        //
+        $this->resetMessage();
+        $this->resetStatusCode();
     }
 
     public function execute()
@@ -33,6 +34,48 @@ abstract class Operation
     public function handle($model_or_collection = null)
     {
         return $model_or_collection;
+    }
+
+    /////////////////////////////////
+    /// Message helpers
+    /////////////////////////////////
+
+    protected $message = null;
+
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
+
+    public function resetMessage()
+    {
+        $this->setMessage(null);
+    }
+
+    /////////////////////////////////
+    /// Status code helpers
+    /////////////////////////////////
+
+    protected $status_code = 200;
+
+    public function getStatusCode()
+    {
+        return $this->status_code;
+    }
+
+    public function setStatusCode($status_code)
+    {
+        $this->status_code = $status_code;
+    }
+
+    public function resetStatusCode()
+    {
+        $this->setStatusCode(200);
     }
 
     /////////////////////////////////

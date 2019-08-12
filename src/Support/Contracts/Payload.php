@@ -84,12 +84,12 @@ class Payload
             return $this->data;
         }
 
-        $status = 200;
+        $status = $this->operation->getStatusCode();
         $headers = [];
         $options = 0;
 
         $res = $this->buildPayload($this->data);
-        $res['message'] = 'Success';
+        $res['message'] = $this->operation->getMessage();
 
         return response()->json($res, $status, $headers, $options);
     }

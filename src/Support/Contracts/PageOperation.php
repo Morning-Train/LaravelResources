@@ -9,6 +9,7 @@ abstract class PageOperation extends Operation
 
     protected $blade_view = null;
     public $title = null;
+    public $parent = null;
 
     public function handle($model = null)
     {

@@ -32,6 +32,7 @@ abstract class PageOperation extends Operation
             'title' => $this->title(),
             'path' => $this->path(),
             'route' => $this->identifier(),
+            'parent' => $this->parent(),
         ];
     }
 
@@ -43,6 +44,12 @@ abstract class PageOperation extends Operation
     public function title($value = null)
     {
         return $this->genericGetSet('title', $value);
+    }
+
+
+    public function parent($value = null)
+    {
+        return $this->genericGetSet('parent', $value);
     }
 
     public function getRoutePath()

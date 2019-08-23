@@ -30,10 +30,11 @@ abstract class PageOperation extends Operation
     public function getPageEnvironment()
     {
         return [
-            'title' => $this->title(),
-            'path' => $this->path(),
-            'route' => $this->identifier(),
-            'parent' => $this->parent(),
+            'title'     => $this->title(),
+            'path'      => $this->path(),
+            'route'     => $this->identifier(),
+            'parent'    => $this->parent(),
+            'namespace' => $this->resource()->namespace,
         ];
     }
 

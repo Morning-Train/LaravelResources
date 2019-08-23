@@ -62,11 +62,15 @@ abstract class Operation
     public function successMessage($messageOrClosure)
     {
         $this->success_message = $messageOrClosure;
+
+        return $this;
     }
 
     public function errorMessage($messageOrClosure)
     {
         $this->error_message = $messageOrClosure;
+
+        return $this;
     }
 
     /////////////////////////////////

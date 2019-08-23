@@ -41,6 +41,8 @@ abstract class Operation
     /////////////////////////////////
 
     protected $message = null;
+    protected $success_message = null;
+    protected $error_message = null;
 
     public function getMessage()
     {
@@ -55,6 +57,16 @@ abstract class Operation
     public function resetMessage()
     {
         $this->setMessage(null);
+    }
+
+    public function successMessage($messageOrClosure)
+    {
+        $this->success_message = $messageOrClosure;
+    }
+
+    public function errorMessage($messageOrClosure)
+    {
+        $this->error_message = $messageOrClosure;
     }
 
     /////////////////////////////////

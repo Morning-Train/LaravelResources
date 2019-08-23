@@ -37,6 +37,14 @@ class Store extends EloquentOperation
 
         }
 
+        if($this->success_message !== null) {
+            if($this->success_message instanceof \Closure) {
+                $this->setMessage($this->success_message($model));
+            } else {
+                $this->setMessage($this->success_message);
+            }
+        }
+
         return $model;
     }
 

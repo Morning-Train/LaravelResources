@@ -13,7 +13,9 @@ use PermissionsService;
 
 class Register extends Operation
 {
-    use RegistersUsers;
+	use RegistersUsers {
+		registered as traitRegistered;
+	}
 
     const ROUTE_METHOD = 'post';
 
@@ -71,7 +73,7 @@ class Register extends Operation
      */
     protected function registered(Request $request, $user)
     {
-        parent::registered($request, $user);
+        $this->traitRegistered($request, $user);
 
         return [
             'user' => $user,

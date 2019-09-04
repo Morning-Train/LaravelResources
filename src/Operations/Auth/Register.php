@@ -4,7 +4,6 @@ namespace MorningTrain\Laravel\Resources\Operations\Auth;
 
 
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -26,9 +25,7 @@ class Register extends Operation
 
         $this->validator($request->all())->validate();
 
-        event(new Registered($user = $this->createUser($request->all())));
-
-        $this->guard()->login($user);
+        $user = $this->createUser($request->all());
 
         return $this->registered($request, $user)
             ?: redirect($this->redirectPath());
@@ -74,6 +71,8 @@ class Register extends Operation
      */
     protected function registered(Request $request, $user)
     {
+        parent::registered($request, $user);
+
         return [
             'user' => $user,
             'csrf' => csrf_token(),

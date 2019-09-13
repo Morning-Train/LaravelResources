@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Auth\Access\Gate;
 use MorningTrain\Laravel\Context\Context;
 use MorningTrain\Laravel\Resources\Support\Contracts\Resource;
 
@@ -230,6 +231,49 @@ class ResourceRepository
 
                 return $operations->toArray();
             });
+    }
+
+    /**
+     * Returns a list of operation/permission names
+     * Which have policy methods NOT requiring an instance of the Model.
+     * This is used to execute can() methods on f.ex. "create" operations
+     * Which usually do not require a Model instance.
+     *
+     * @return mixed
+     */
+    public function getOperationPolicyParameters()
+    {
+        return Cache::rememberForever('policy_parameters', function () {
+            $gate = app(Gate::class);
+
+            return collect($this->getAllModelOperationIdentifiers())
+                ->flatMap(function ($operations, $model) use ($gate) {
+                    $policy = $gate->getPolicyFor($model);
+
+                    if ($policy !== null) {
+                        $policy = new \ReflectionClass(get_class($policy));
+                    }
+
+                    return collect($operations)
+                        ->mapWithKeys(function ($operation) use ($model, $policy) {
+                            $params = null;
+
+                            if ($policy !== null) {
+                                $parts = explode('.', $operation);
+                                $name  = array_pop($parts);
+
+                                // Here we assume that since the permission method only requires 1 parameter
+                                // It does not require a Model instance.
+                                if ($policy->hasMethod($name)
+                                    && $policy->getMethod($name)->getNumberOfParameters() === 1) {
+                                    $params = $model;
+                                }
+                            }
+
+                            return [$operation => $params];
+                        });
+                })->filter();
+        });
     }
 
     public function export(string $namespace)

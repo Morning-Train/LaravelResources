@@ -44,8 +44,18 @@ class Store extends EloquentOperation
                 $this->setMessage($this->success_message);
             }
         }
+        else {
+            $this->setMessage(
+                __('messages.model_saved_successfully',
+                ['model' => trans_choice(
+                    'models.' . get_class($model) . '.specified',
+                    1
+                )])
+            );
+        }
 
         return $model;
     }
 
 }
+

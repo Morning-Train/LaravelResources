@@ -21,7 +21,10 @@ class Action extends Read
             return $item;
         }
 
-        return $item->{$this->trigger()}();
+        return $this->trigger() instanceof \Closure ?
+            $this->trigger()($item) :
+            $item->{$this->trigger()}();
     }
 
 }
+

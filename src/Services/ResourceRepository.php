@@ -183,6 +183,12 @@ class ResourceRepository
             ->all();
     }
 
+    /**
+     * Return a list of all permissions tied to the model.
+     *
+     * @param $model
+     * @return array
+     */
     public function getModelPermissions($model)
     {
         $class = is_object($model) ? get_class($model) : $model;

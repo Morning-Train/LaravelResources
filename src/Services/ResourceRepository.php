@@ -183,6 +183,20 @@ class ResourceRepository
             ->all();
     }
 
+    public function getModelPermissions($model)
+    {
+        $class = is_object($model) ? get_class($model) : $model;
+
+        if (isset($class::$customPermissions)) {
+            return array_merge(
+                $class::$customPermissions,
+                $this->getModelOperationIdentifiers($model)
+            );
+        }
+
+        return $this->getModelOperationIdentifiers($model);
+    }
+
     /**
      * A list of all operations for the model
      *

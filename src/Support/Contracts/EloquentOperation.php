@@ -336,7 +336,7 @@ abstract class EloquentOperation extends Operation
             }
 
             return [$model->getKey() =>
-                collect(ResourceRepository::getModelOperationIdentifiers($model))
+                collect(ResourceRepository::getModelPermissions($model))
                     ->filter(function ($operation) use ($model, $user) {
                         return $user->can($operation, $model);
                     })

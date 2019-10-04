@@ -3,9 +3,8 @@
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Str;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
@@ -161,6 +160,9 @@ abstract class Operation
 
     protected $restricted = false;
 
+    /**
+     * @deprecated
+     */
     public function restrict($value = true)
     {
         return $this->genericGetSet('restricted', $value);
@@ -168,19 +170,11 @@ abstract class Operation
 
     public function canExecute()
     {
-        if (!$this->restricted) {
-            return true;
-        }
-
-        if (!Auth::check()) {
-            return false;
-        }
-
         $data = $this->data instanceof Collection ?
             $this->data : collect([$this->data]);
 
         return $data->every(function ($model) {
-            return Auth::user()->can($this->identifier(), $model);
+            return Gate::allows($this->identifier(), $model);
         });
     }
 
@@ -244,7 +238,9 @@ abstract class Operation
             /// Either check if it is registered -
             /// Or throw a more useful exception
             /// throw new \Exception('A restricted operation requires the "permission" middleware to be registered in the application');
-            $middlewares[] = 'permission:' . $this->identifier();
+
+            /// TODO = we do all our check manually in canExecute
+            /// $middlewares[] = 'permission:' . $this->identifier();
 
             $middlewares[] = 'auth:' . $this->resource()->namespace;
         }

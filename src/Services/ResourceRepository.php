@@ -151,6 +151,11 @@ class ResourceRepository
             ->all();
     }
 
+    public function operationIdentifierIsRestricted(string $identifier)
+    {
+        return in_array($identifier, $this->getRestrictedOperationIdentifiers());
+    }
+
     /**
      * Returns a list of all restricted operation identifiers for the provided namespace
      *

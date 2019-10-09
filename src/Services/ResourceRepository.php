@@ -141,14 +141,12 @@ class ResourceRepository
      * Returns a list of all operation identifiers for the provided namespace
      *
      * @param string $namespace
-     * @return array
+     * @return Collection
      * @throws Exception
      */
     public function getOperationIdentifiers(string $namespace = null)
     {
-        return $this->getOperations($namespace)
-            ->map->identifier()
-            ->all();
+        return $this->getOperations($namespace)->map->identifier();
     }
 
     public function operationIdentifierIsRestricted(string $identifier)
@@ -165,11 +163,11 @@ class ResourceRepository
      */
     public function getRestrictedOperationIdentifiers(string $namespace = null)
     {
-        return $this->getOperations($namespace)
-            ->filter->restrict(null)
-            ->map->identifier()
-            ->values()
-            ->all();
+        $key = $namespace === null ? '' : "_{$namespace}";
+
+        return Cache::rememberForever('restricted_operations'.$key, function () use ($namespace) {
+            return $this->getFilteredOperationIdentifiers($namespace, true);
+        });
     }
 
     /**
@@ -181,11 +179,24 @@ class ResourceRepository
      */
     public function getUnrestrictedOperationIdentifiers(string $namespace = null)
     {
-        return $this->getOperations($namespace)
-            ->reject->restrict(null)
-            ->map->identifier()
-            ->values()
-            ->all();
+        $key = $namespace === null ? '' : "_{$namespace}";
+
+        return Cache::rememberForever('unrestricted_operations'.$key, function () use ($namespace) {
+            return $this->getFilteredOperationIdentifiers($namespace, false);
+        });
+    }
+
+    private function getFilteredOperationIdentifiers(string $namespace = null, bool $restricted = true)
+    {
+        $permissions = config('permissions.permission_roles', []);
+
+        return $this->getOperationIdentifiers($namespace)
+            ->filter(function ($identifier) use ($restricted, $permissions) {
+                $isRestricted = Arr::get($permissions, $identifier, null) !== null;
+
+                return $restricted ? $isRestricted : !$isRestricted;
+            })
+            ->values()->all();
     }
 
     /**

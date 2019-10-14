@@ -4,10 +4,8 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\Response;
 
 class Payload
 {
@@ -78,11 +76,7 @@ class Payload
 
     public function response()
     {
-
-        if($this->data instanceof Response
-            || $this->data instanceof RedirectResponse
-            || $this->data instanceof JsonResponse
-            || $this->data instanceof View) {
+        if($this->data instanceof Response || $this->data instanceof View) {
             return $this->data;
         }
 

@@ -22,6 +22,8 @@ class ResetPassword extends Operation
 
     protected function sendResetResponse(Request $request, $response)
     {
+        $this->setMessage(trans($response));
+
         return [
             'user' => Auth::user(),
             'csrf' => csrf_token(),
@@ -30,6 +32,8 @@ class ResetPassword extends Operation
 
     protected function sendResetFailedResponse(Request $request, $response)
     {
+        $this->setStatusCode(400);
+
         return ['errors' => [
             'email' => [trans($response)],
         ]];

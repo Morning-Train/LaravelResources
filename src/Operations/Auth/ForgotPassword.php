@@ -21,13 +21,17 @@ class ForgotPassword extends Operation
 
     protected function sendResetLinkResponse(Request $request, $response)
     {
-        return ['message' => trans($response)];
+        $this->setMessage(trans($response));
     }
 
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
-        return ['errors' => [
-            'email' => [trans($response)],
-        ]];
+        $this->setStatusCode(400);
+
+        return [
+            'errors' => [
+                'email' => [trans($response)],
+            ],
+        ];
     }
 }

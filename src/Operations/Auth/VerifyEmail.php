@@ -16,9 +16,12 @@ class VerifyEmail extends Operation
         $response = $this->verify(request());
         $success  = $response->getSession()->get('verified') === true;
 
-        return $response
-            ->with('verification_status', $success ? 200 : 400)
-            ->with('verification_message', $success ? $this->success_message : $this->error_message);
+        session()->push('flash_messages', [
+            'type'    => $success ? 'success' : 'error',
+            'message' => $success ? $this->success_message : $this->error_message,
+        ]);
+
+        return $response;
     }
 
     protected $redirectTo = null;

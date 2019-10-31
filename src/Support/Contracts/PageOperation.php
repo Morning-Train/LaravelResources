@@ -13,10 +13,11 @@ abstract class PageOperation extends Operation
 
     public function handle($model = null)
     {
-
         Context::localization()->provide('env', function () {
             return [
-                'page' => $this->getPageEnvironment()
+                'page' => array_merge($this->getPageEnvironment(), [
+                    'flash_messages' => request()->getSession()->pull('flash_messages', []),
+                ]),
             ];
         });
 

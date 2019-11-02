@@ -149,56 +149,6 @@ class ResourceRepository
         return $this->getOperations($namespace)->map->identifier();
     }
 
-    public function operationIdentifierIsRestricted(string $identifier)
-    {
-        return in_array($identifier, $this->getRestrictedOperationIdentifiers());
-    }
-
-    /**
-     * Returns a list of all restricted operation identifiers for the provided namespace
-     *
-     * @param string $namespace
-     * @return array
-     * @throws Exception
-     */
-    public function getRestrictedOperationIdentifiers(string $namespace = null)
-    {
-        $key = $namespace === null ? '' : "_{$namespace}";
-
-        return Cache::rememberForever('restricted_operations'.$key, function () use ($namespace) {
-            return $this->getFilteredOperationIdentifiers($namespace, true);
-        });
-    }
-
-    /**
-     * Returns a list of all non-restricted operation identifiers for the provided namespace
-     *
-     * @param string $namespace
-     * @return array
-     * @throws Exception
-     */
-    public function getUnrestrictedOperationIdentifiers(string $namespace = null)
-    {
-        $key = $namespace === null ? '' : "_{$namespace}";
-
-        return Cache::rememberForever('unrestricted_operations'.$key, function () use ($namespace) {
-            return $this->getFilteredOperationIdentifiers($namespace, false);
-        });
-    }
-
-    private function getFilteredOperationIdentifiers(string $namespace = null, bool $restricted = true)
-    {
-        $permissions = config('permissions.permission_roles', []);
-
-        return $this->getOperationIdentifiers($namespace)
-            ->filter(function ($identifier) use ($restricted, $permissions) {
-                $isRestricted = Arr::get($permissions, $identifier, null) !== null;
-
-                return $restricted ? $isRestricted : !$isRestricted;
-            })
-            ->values()->all();
-    }
-
     /**
      * Return a list of all permissions tied to the model.
      *

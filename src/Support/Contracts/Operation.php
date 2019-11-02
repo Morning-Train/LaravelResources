@@ -235,16 +235,10 @@ abstract class Operation
 
         $middlewares = $this->middlewares();
 
-        if ($this->restricted) {
-            /// TODO - this assumes the Spatie middleware is registered
-            /// Either check if it is registered -
-            /// Or throw a more useful exception
-            /// throw new \Exception('A restricted operation requires the "permission" middleware to be registered in the application');
-
-            /// TODO = we do all our check manually in canExecute
-            /// $middlewares[] = 'permission:' . $this->identifier();
-
-            $middlewares[] = 'auth:' . $this->resource()->namespace;
+        if(static::hasMacro('isRestricted') || method_exists($this, 'isRestricted')) {
+            if($this->isRestricted($this->identifier())) {
+                $middlewares[] = 'auth:' . $this->resource()->namespace;
+            }
         }
 
         if (!empty($middlewares)) {

@@ -83,7 +83,7 @@ class ResourceController
         }
 
         /// We are ready to execute the operation
-        return $operation->execute()->response();
+        return $operation->execute();
     }
 
 }

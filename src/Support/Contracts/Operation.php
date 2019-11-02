@@ -2,12 +2,15 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
+use MorningTrain\Laravel\Resources\Support\Pipes\Pipe;
+use MorningTrain\Laravel\Resources\Support\Pipes\ToResponse;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
 abstract class Operation
@@ -25,11 +28,6 @@ abstract class Operation
     {
         $this->resetMessage();
         $this->resetStatusCode();
-    }
-
-    public function execute()
-    {
-        return new Payload($this, $this->handle($this->data));
     }
 
     public function handle($model_or_collection = null)
@@ -132,6 +130,32 @@ abstract class Operation
     public static function getName()
     {
         return Str::snake(class_basename(get_called_class()));
+    }
+
+    /////////////////////////////////
+    /// Pipelines
+    /////////////////////////////////
+
+    public function pipeline()
+    {
+        return app(Pipeline::class);
+    }
+
+    protected function pipes()
+    {
+        return [
+            ToResponse::class
+        ];
+    }
+
+    public function execute()
+    {
+        Pipe::setOperation($this);
+
+        return $this->pipeline()
+            ->send($this->handle($this->data))
+            ->through($this->pipes())
+            ->thenReturn();
     }
 
     /////////////////////////////////

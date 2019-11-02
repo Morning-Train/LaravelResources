@@ -1,23 +1,15 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Support\Contracts;
+namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
-use Illuminate\Contracts\View\View;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Contracts\View\View;
 
-class Payload
+class ToResponse extends Pipe
 {
-
-    protected $operation;
-    protected $data;
-
-    public function __construct($operation, $response_data)
-    {
-        $this->operation = $operation;
-        $this->data = $response_data;
-    }
 
     protected function buildModelPayload(Model $model)
     {
@@ -26,7 +18,7 @@ class Payload
         ];
 
         /// Add filter metadata to response
-        $metadata = ["meta" => $this->operation->getMeta()];
+        $metadata = ["meta" => $this->operation()->getMeta()];
 
         $response = array_merge($response, $metadata);
 
@@ -42,7 +34,7 @@ class Payload
         ];
 
         /// Add filter metadata to response
-        $metadata = ["meta" => $this->operation->getMeta()];
+        $metadata = ["meta" => $this->operation()->getMeta()];
 
         if (is_array($metadata)) {
             $response = array_merge($response, $metadata);
@@ -74,21 +66,28 @@ class Payload
         return $payload_data;
     }
 
-    public function response()
+    protected function isResponseable($maybeResponse)
     {
-        if($this->data instanceof Response || $this->data instanceof View) {
-            return $this->data;
+        return $maybeResponse instanceof Response || $maybeResponse instanceof View;
+    }
+
+    public function handle($data, Closure $next)
+    {
+
+        if ($this->isResponseable($data)) {
+            return $next($data);
         }
 
-        $status = $this->operation->getStatusCode();
+        $status = $this->operation()->getStatusCode();
         $headers = [];
         $options = 0;
 
-        $res = $this->buildPayload($this->data);
-        $res['message'] = $this->operation->getMessage();
+        $res = $this->buildPayload($data);
+        $res['message'] = $this->operation()->getMessage();
 
-        return response()->json($res, $status, $headers, $options);
+        $response = response()->json($res, $status, $headers, $options);
+
+        return $next($response);
     }
-
 
 }

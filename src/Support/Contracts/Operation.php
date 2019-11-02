@@ -141,20 +141,46 @@ abstract class Operation
         return app(Pipeline::class);
     }
 
+    protected function beforePipes()
+    {
+        return [];
+    }
+
     protected function pipes()
+    {
+        return [];
+    }
+
+    protected function afterPipes()
+    {
+        return [];
+    }
+
+    protected function responsePipes()
     {
         return [
             ToResponse::class
         ];
     }
 
-    public function execute()
+    protected function buildPipes()
     {
         Pipe::setOperation($this);
 
+        return array_merge(
+            $this->beforePipes(),
+            $this->pipes(),
+            $this->afterPipes(),
+            $this->responsePipes()
+        );
+    }
+
+    public function execute()
+    {
+
         return $this->pipeline()
             ->send($this->handle($this->data))
-            ->through($this->pipes())
+            ->through($this->buildPipes())
             ->thenReturn();
     }
 

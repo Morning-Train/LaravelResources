@@ -35,9 +35,9 @@ abstract class Operation
     /// Message helpers
     /////////////////////////////////
 
-    protected $message = null;
-    protected $success_message = null;
-    protected $error_message = null;
+    public $message = null;
+    public $success_message = null;
+    public $error_message = null;
 
     public function getMessage()
     {

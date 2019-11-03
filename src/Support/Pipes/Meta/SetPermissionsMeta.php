@@ -10,35 +10,20 @@ use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Pipes\Pipe;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
+use MorningTrain\Laravel\Resources\Support\Traits\PipesPayload;
 
 class SetPermissionsMeta extends Pipe
 {
 
     /////////////////////////////////
-    /// Helpers
+    /// Traits
     /////////////////////////////////
 
-    protected function payloadToCollection($payload)
-    {
+    use PipesPayload;
 
-        if($payload instanceof Model) {
-            return collect([$payload]);
-        }
-
-        if($payload instanceof Collection) {
-            return $payload;
-        }
-
-        if(is_array($payload) && isset($payload['collection'])) {
-            return $this->payloadToCollection($payload['collection']);
-        }
-
-        if(is_array($payload) && isset($payload['model'])) {
-            return $this->payloadToCollection($payload['model']);
-        }
-
-        return collect([$payload]);
-    }
+    /////////////////////////////////
+    /// Helpers
+    /////////////////////////////////
 
     protected function getPermissionsMeta($payload)
     {

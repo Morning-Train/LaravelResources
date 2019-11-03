@@ -4,6 +4,7 @@ namespace MorningTrain\Laravel\Resources\Support\Pipes\Meta;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Resources\ResourceRepository;
@@ -76,7 +77,9 @@ class SetPermissionsMeta extends Pipe
     public function handle($payload, Closure $next)
     {
 
-        $this->operation()->setMeta(['permissions' => $this->getPermissionsMeta($payload)]);
+        if(is_array($payload)) {
+            Arr::set($payload, 'meta.permissions', $this->getPermissionsMeta($payload));
+        }
 
         return $next($payload);
     }

@@ -2,17 +2,11 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use MorningTrain\Laravel\Resources\ResourceRepository;
-use MorningTrain\Laravel\Resources\Support\Pipes\Meta\ApplyMetaToPayload;
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetFiltersMeta;
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetPermissionsMeta;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\ToPayload;
-use MorningTrain\Laravel\Resources\Support\Pipes\ToResponse;
 use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
@@ -42,14 +36,12 @@ abstract class EloquentOperation extends Operation
         ];
     }
 
-    protected function responsePipes()
+    protected function afterPipes()
     {
         return [
             ToPayload::create(),
-            SetFiltersMeta::create()->filters($this->filters)->operation($this),
-            SetPermissionsMeta::create()->operation($this),
-            ApplyMetaToPayload::create()->operation($this),
-            ToResponse::create()->operation($this)
+            SetFiltersMeta::create()->filters($this->filters),
+            SetPermissionsMeta::create()
         ];
     }
 
@@ -132,25 +124,6 @@ abstract class EloquentOperation extends Operation
                 "key" => $this->getModelKeyName(),
                 "filters" => $this->exportFilters(),
             ]
-        );
-    }
-
-    /////////////////////////////////
-    /// Meta data for response payload
-    /////////////////////////////////
-
-    protected $meta = [];
-
-    public function setMeta($meta_data = [])
-    {
-        $this->meta = array_merge($this->meta, $meta_data);
-    }
-
-    public function getMeta()
-    {
-        return array_merge(
-            $this->meta,
-            parent::getMeta()
         );
     }
 

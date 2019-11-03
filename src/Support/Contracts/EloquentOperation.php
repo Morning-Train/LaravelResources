@@ -10,6 +10,7 @@ use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
+use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 
@@ -22,6 +23,7 @@ abstract class EloquentOperation extends Operation
 
     use HasModel;
     use HasFilters;
+    use HasFields;
 
     /////////////////////////////////
     /// Pipelines
@@ -35,17 +37,6 @@ abstract class EloquentOperation extends Operation
             TransformToView::create()->appends($this->appends),
             ValidatesFields::create()->fields($this->fields)
         ];
-    }
-
-    /////////////////////////////////
-    /// Fields
-    /////////////////////////////////
-
-    protected $fields = [];
-
-    public function fields($value = null)
-    {
-        return $this->genericGetSet('fields', $value);
     }
 
     /////////////////////////////////

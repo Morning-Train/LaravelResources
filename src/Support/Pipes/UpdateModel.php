@@ -5,35 +5,24 @@ namespace MorningTrain\Laravel\Resources\Support\Pipes;
 use Illuminate\Database\Eloquent\Model;
 use Closure;
 use MorningTrain\Laravel\Fields\Contracts\FieldContract;
+use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 
 class UpdateModel extends Pipe
 {
 
-    public $fields = null;
+    /////////////////////////////////
+    /// Traits
+    /////////////////////////////////
 
-    public function fields($fields = null)
-    {
-        if ($fields !== null) {
-            $this->fields = $fields;
+    use HasFields;
 
-            return $this;
-        }
-        return $this->fields;
-    }
-
-    protected function hasFields()
-    {
-        return !empty($this->fields);
-    }
-
-    protected function isUpdateable($data)
-    {
-        return $this->hasFields() && $data instanceof Model;
-    }
+    /////////////////////////////////
+    /// Handle
+    /////////////////////////////////
 
     public function handle($model, Closure $next)
     {
-        if ($this->isUpdateable($model)) {
+        if ($this->hasFields() && $model instanceof Model) {
 
             $request = request();
 

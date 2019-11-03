@@ -292,27 +292,56 @@ abstract class Operation
         'OPTIONS',
     ];
 
+    public function getRouteParameters()
+    {
+        return [
+            $this->resource->base_name => ['optional' => true]
+        ];
+    }
+
+    protected function buildRouteParameters()
+    {
+        $parameters = $this->getRouteParameters();
+        $compiled_parameters = [];
+
+        if (is_array($parameters) && !empty($parameters)) {
+            foreach ($parameters as $parameter_key => $parameter_options) {
+
+                $suffix = (isset($parameter_options['optional']) && $parameter_options['optional'] === true) ? '?' : '';
+
+                $compiled_parameters[] = '{' . $parameter_key . $suffix . '}';
+            }
+        }
+
+        return $compiled_parameters;
+    }
 
     public function getRoutePath()
     {
-        return join('/',
-            [
-                $this->resource->getBasePath(),
-                $this->name,
-                "{" . $this->resource->base_name . "?}",
-            ]);
+        return join(
+            '/',
+            array_merge(
+                [
+                    $this->resource->getBasePath(),
+                    $this->name
+                ],
+                $this->buildRouteParameters()
+            )
+        );
     }
 
     public function routes()
     {
 
-        $route_group_props = ['operation'          => $this->name,
-                              'resource_namespace' => $this->resource()->namespace];
+        $route_group_props = [
+            'operation' => $this->name,
+            'resource_namespace' => $this->resource()->namespace
+        ];
 
         $middlewares = $this->middlewares();
 
-        if(static::hasMacro('isRestricted') || method_exists($this, 'isRestricted')) {
-            if($this->isRestricted($this->identifier())) {
+        if (static::hasMacro('isRestricted') || method_exists($this, 'isRestricted')) {
+            if ($this->isRestricted($this->identifier())) {
                 $middlewares[] = 'auth:' . $this->resource()->namespace;
             }
         }

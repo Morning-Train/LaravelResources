@@ -5,6 +5,7 @@ namespace MorningTrain\Laravel\Resources\Operations\Crud;
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
 use MorningTrain\Laravel\Resources\Support\Pipes\EnsureModelInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\UpdateModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\Validates;
 
 class Store extends EloquentOperation
 {
@@ -40,6 +41,7 @@ class Store extends EloquentOperation
     {
         return [
             EnsureModelInstance::create()->model($this->model),
+            Validates::create()->fields($this->fields),
             UpdateModel::create()->fields($this->fields),
             function ($data, \Closure $next) {
                 return $next($this->handle($data));

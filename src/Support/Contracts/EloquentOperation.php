@@ -9,7 +9,7 @@ use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
-use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
+use MorningTrain\Laravel\Resources\Support\Pipes\Validates;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
@@ -35,7 +35,6 @@ abstract class EloquentOperation extends Operation
             QueryModel::create()->model($this->model)->filters($this->filters)->operation($this),
             QueryToInstance::create()->keyValue(request()->route()->parameter($this->getModelClassName()))->operation($this),
             TransformToView::create()->appends($this->appends),
-            ValidatesFields::create()->fields($this->fields)
         ];
     }
 
@@ -115,11 +114,6 @@ abstract class EloquentOperation extends Operation
     /////////////////////////////////
     /// Model
     /////////////////////////////////
-
-    public function onEmptyModel()
-    {
-        return null;
-    }
 
     public function expectsCollection()
     {

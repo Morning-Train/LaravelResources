@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use MorningTrain\Laravel\Fields\Traits\ValidatesFields as ValidatesFieldsTrait;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 
-class ValidatesFields extends Pipe
+class Validates extends Pipe
 {
 
     /////////////////////////////////

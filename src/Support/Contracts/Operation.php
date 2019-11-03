@@ -148,7 +148,11 @@ abstract class Operation
 
     protected function pipes()
     {
-        return [];
+        return [
+            function ($data, $next) {
+                return $next($this->handle($data));
+            }
+        ];
     }
 
     protected function afterPipes()
@@ -176,9 +180,8 @@ abstract class Operation
 
     public function execute()
     {
-
         return $this->pipeline()
-            ->send($this->handle($this->data))
+            ->send($this->data)
             ->through($this->buildPipes())
             ->thenReturn();
     }

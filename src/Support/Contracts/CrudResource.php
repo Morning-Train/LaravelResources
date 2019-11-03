@@ -11,15 +11,14 @@ abstract class CrudResource extends Resource
 {
 
     protected $model;
-    protected $restricted = true;
 
     public function operations()
     {
         return [
-            Index::create()->model($this->model)->restrict($this->restricted)->filters($this->getFilters()),
-            Read::create()->model($this->model)->restrict($this->restricted),
-            Store::create()->model($this->model)->restrict($this->restricted)->fields($this->getFields()),
-            Delete::create()->model($this->model)->restrict($this->restricted)
+            Index::create()->model($this->model)->filters($this->getFilters()),
+            Read::create()->model($this->model),
+            Store::create()->model($this->model)->fields($this->getFields()),
+            Delete::create()->model($this->model)
         ];
     }
 

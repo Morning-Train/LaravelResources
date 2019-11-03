@@ -3,11 +3,8 @@
 namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Validation\UnauthorizedException;
-use MorningTrain\Laravel\Filters\Filters\FilterCollection;
 
 class TransformToView extends Pipe
 {

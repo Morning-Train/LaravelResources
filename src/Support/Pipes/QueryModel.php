@@ -4,7 +4,7 @@ namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use MorningTrain\Laravel\Filters\Filters\FilterCollection;
+use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 
 class QueryModel extends Pipe
@@ -15,32 +15,7 @@ class QueryModel extends Pipe
     /////////////////////////////////
 
     use HasModel;
-
-    /////////////////////////////////
-    /// Filter helpers
-    /////////////////////////////////
-
-    public $filters = null;
-
-    public function filters($filters = null)
-    {
-        if ($filters !== null) {
-            $this->filters = $filters;
-
-            return $this;
-        }
-        return $this->filters;
-    }
-
-    public function hasFilters()
-    {
-        return is_array($this->filters) && !empty($this->filters);
-    }
-
-    public function applyFiltersToQuery(&$query)
-    {
-        FilterCollection::create($this->filters)->apply($query, request());
-    }
+    use HasFilters;
 
     /////////////////////////////////
     /// View helpers

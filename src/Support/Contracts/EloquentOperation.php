@@ -8,45 +8,23 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
 
 abstract class EloquentOperation extends Operation
 {
 
-    protected $single = false;
+    public $single = false;
 
     public function single($value = true)
     {
         return $this->genericGetSet('single', $value);
     }
 
-    public function prepare($query)
-    {
-
-        $data = null;
-
-        $key_value = request()->route()->parameter($this->getModelClassName());
-
-        if ($this->expectsCollection()) {
-            if($this->single) {
-                $data = $query->first();
-            } else {
-                $data = $query->get();
-            }
-        } else {
-            if ($key_value !== null) {
-                $query->whereKey($key_value);
-                $data = $query->firstOrFail();
-            } else {
-                $data = $this->onEmptyModel();
-            }
-        }
-
-        $this->data = $data;
-
-        return $data;
-    }
+    /////////////////////////////////
+    /// Routing
+    /////////////////////////////////
 
     public function getRouteParameters()
     {
@@ -62,8 +40,8 @@ abstract class EloquentOperation extends Operation
     protected function initialPipes()
     {
         return array_merge([
-            QueryModel::create()->model($this->model)->filters($this->filters)->operation($this)
-        ], parent::initialPipes(), [
+            QueryModel::create()->model($this->model)->filters($this->filters)->operation($this),
+            QueryToInstance::create()->keyValue(request()->route()->parameter($this->getModelClassName()))->operation($this),
             TransformToView::create()->appends($this->appends)
         ]);
     }

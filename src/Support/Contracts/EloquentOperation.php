@@ -27,10 +27,7 @@ abstract class EloquentOperation extends Operation
 
         $model_or_collection = null;
 
-        $key_value = null;
-        if (is_array($parameters) && isset($parameters[0])) {
-            $key_value = $parameters[0];
-        }
+        $key_value = request()->route()->parameter($this->getModelClassName());
 
         $query = $this->query();
 

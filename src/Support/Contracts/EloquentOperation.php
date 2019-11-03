@@ -35,7 +35,7 @@ abstract class EloquentOperation extends Operation
             }
         } else {
             if ($key_value !== null) {
-                $query->where($this->getModelKeyName(), '=', $key_value);
+                $query->whereKey($key_value);
                 $data = $query->firstOrFail();
             } else {
                 $data = $this->onEmptyModel();

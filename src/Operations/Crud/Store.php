@@ -5,6 +5,7 @@ namespace MorningTrain\Laravel\Resources\Operations\Crud;
 use Illuminate\Http\Request;
 use MorningTrain\Laravel\Fields\Contracts\FieldContract;
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
+use MorningTrain\Laravel\Resources\Support\Pipes\UpdateModel;
 
 class Store extends EloquentOperation
 {
@@ -17,25 +18,6 @@ class Store extends EloquentOperation
 
     public function handle($model = null)
     {
-
-        /** @var Request $request */
-        $request = request();
-
-        if (is_array($this->fields) && !empty($this->fields)) {
-
-            /** @var FieldContract $field */
-            foreach ($this->fields as $field) {
-                $field->update($model, $request, FieldContract::BEFORE_SAVE);
-            }
-
-            $model->save();
-
-            foreach ($this->fields as $field) {
-                $field->update($model, $request, FieldContract::AFTER_SAVE);
-            }
-
-        }
-
         if($this->success_message !== null) {
             if($this->success_message instanceof \Closure) {
                 $this->setMessage($this->success_message($model));
@@ -54,6 +36,20 @@ class Store extends EloquentOperation
         }
 
         return $model;
+    }
+
+    /////////////////////////////////
+    /// Pipelines
+    /////////////////////////////////
+
+    protected function pipes()
+    {
+        return [
+            UpdateModel::create()->fields($this->fields),
+            function($data, \Closure $next){
+                return $next($data);
+            }
+        ];
     }
 
 }

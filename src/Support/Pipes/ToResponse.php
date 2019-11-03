@@ -77,12 +77,12 @@ class ToResponse extends Pipe
         return $maybeException instanceof \Exception;
     }
 
+    /**
+     * @param \Exception $exception
+     * @throws \Exception
+     */
     protected function handleException(\Exception $exception)
     {
-        if ($exception instanceof UnauthorizedException) {
-            return response()->json(['message' => 'Unable to perform operation'], 403);
-        }
-
         throw $exception;
     }
 

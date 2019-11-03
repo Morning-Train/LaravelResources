@@ -4,33 +4,17 @@ namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\UnauthorizedException;
 use MorningTrain\Laravel\Filters\Filters\FilterCollection;
+use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 
 class QueryModel extends Pipe
 {
 
     /////////////////////////////////
-    /// Model helpers
+    /// Traits
     /////////////////////////////////
 
-    public $model = null;
-
-    public function model($model = null)
-    {
-        if ($model !== null) {
-            $this->model = $model;
-
-            return $this;
-        }
-        return $this->model;
-    }
-
-    public function hasModel()
-    {
-        return !!$this->model && (new $this->model instanceof Model);
-    }
+    use HasModel;
 
     /////////////////////////////////
     /// Filter helpers

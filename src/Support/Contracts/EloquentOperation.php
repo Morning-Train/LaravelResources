@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Resources\ResourceRepository;
-use MorningTrain\Laravel\Resources\Support\Pipes\ApplyMetaToPayload;
+use MorningTrain\Laravel\Resources\Support\Pipes\Meta\ApplyMetaToPayload;
+use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetFiltersMeta;
+use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetPermissionsMeta;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\ToPayload;
@@ -44,6 +46,8 @@ abstract class EloquentOperation extends Operation
     {
         return [
             ToPayload::create(),
+            SetFiltersMeta::create()->filters($this->filters)->operation($this),
+            SetPermissionsMeta::create()->operation($this),
             ApplyMetaToPayload::create()->operation($this),
             ToResponse::create()->operation($this)
         ];
@@ -104,13 +108,6 @@ abstract class EloquentOperation extends Operation
         return $export;
     }
 
-    public $single = false;
-
-    public function single($value = true)
-    {
-        return $this->genericGetSet('single', $value);
-    }
-
     /////////////////////////////////
     /// Routing
     /////////////////////////////////
@@ -120,15 +117,6 @@ abstract class EloquentOperation extends Operation
         return [
             $this->getModelClassName() => ['optional' => true]
         ];
-    }
-
-    /////////////////////////////////
-    /// Model
-    /////////////////////////////////
-
-    public function expectsCollection()
-    {
-        return false;
     }
 
     /////////////////////////////////
@@ -151,45 +139,35 @@ abstract class EloquentOperation extends Operation
     /// Meta data for response payload
     /////////////////////////////////
 
+    protected $meta = [];
+
+    public function setMeta($meta_data = [])
+    {
+        $this->meta = array_merge($this->meta, $meta_data);
+    }
+
     public function getMeta()
     {
         return array_merge(
-            parent::getMeta(),
-            [
-                'filters' => $this->getFilterMeta(),
-                'permissions' => $this->getPermissionsMeta(),
-            ]
+            $this->meta,
+            parent::getMeta()
         );
     }
 
-    public function getPermissionsMeta()
+    /////////////////////////////////
+    /// TO BE DEPRECATED
+    /////////////////////////////////
+
+    public function expectsCollection()
     {
-        if (!Auth::check()) {
-            return [];
-        }
+        return false;
+    }
 
-        $user = Auth::user();
-        $data = $this->data;
-        $collection = $data instanceof Collection ? $data : collect([$data]);
+    public $single = false;
 
-        $res = $collection->mapWithKeys(function ($model) use ($user) {
-
-            if ($model === null || !($model instanceof Model)) {
-                return [];
-            }
-
-            return [
-                $model->getKey() =>
-                    collect(ResourceRepository::getModelPermissions($model))
-                        ->filter(function ($operation) use ($model, $user) {
-                            return $user->can($operation, $model);
-                        })
-                        ->values()
-                        ->all(),
-            ];
-        });
-
-        return $res;
+    public function single($value = true)
+    {
+        return $this->genericGetSet('single', $value);
     }
 
 }

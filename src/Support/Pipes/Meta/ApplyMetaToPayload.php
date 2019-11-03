@@ -1,11 +1,16 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Support\Pipes;
+namespace MorningTrain\Laravel\Resources\Support\Pipes\Meta;
 
 use Closure;
+use MorningTrain\Laravel\Resources\Support\Pipes\Pipe;
 
 class ApplyMetaToPayload extends Pipe
 {
+
+    /////////////////////////////////
+    /// Handle
+    /////////////////////////////////
 
     public function handle($payload, Closure $next)
     {

@@ -80,7 +80,7 @@ class ToResponse extends Pipe
     protected function handleException(\Exception $exception)
     {
         if ($exception instanceof UnauthorizedException) {
-            return response()->json(['message' => 'Unable to perform action'], 400);
+            return response()->json(['message' => 'Unable to perform operation'], 403);
         }
 
         throw $exception;

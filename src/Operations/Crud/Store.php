@@ -42,7 +42,7 @@ class Store extends EloquentOperation
             EnsureModelInstance::create()->model($this->model),
             UpdateModel::create()->fields($this->fields),
             function ($data, \Closure $next) {
-                return $next($data);
+                return $next($this->handle($data));
             }
         ];
     }

@@ -37,18 +37,12 @@ abstract class EloquentOperation extends Operation
     /// Pipelines
     /////////////////////////////////
 
-    protected function initialPipes()
-    {
-        return array_merge([
-            QueryModel::create()->model($this->model)->filters($this->filters)->operation($this),
-            QueryToInstance::create()->keyValue(request()->route()->parameter($this->getModelClassName()))->operation($this),
-            TransformToView::create()->appends($this->appends)
-        ]);
-    }
-
     protected function beforePipes()
     {
         return [
+            QueryModel::create()->model($this->model)->filters($this->filters)->operation($this),
+            QueryToInstance::create()->keyValue(request()->route()->parameter($this->getModelClassName()))->operation($this),
+            TransformToView::create()->appends($this->appends),
             ValidatesFields::create()->fields($this->fields)
         ];
     }

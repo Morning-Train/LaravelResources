@@ -24,17 +24,9 @@ abstract class Operation
     /// Request helpers
     /////////////////////////////////
 
-    public function prepare($parameters)
+    public function handle($data)
     {
-        $this->resetMessage();
-        $this->resetStatusCode();
-
-        return $parameters;
-    }
-
-    public function handle($model_or_collection = null)
-    {
-        return $model_or_collection;
+        return $data;
     }
 
     /////////////////////////////////
@@ -143,15 +135,6 @@ abstract class Operation
         return app(Pipeline::class);
     }
 
-    protected function initialPipes()
-    {
-        return [
-            function ($data, $next) {
-                return $next($this->prepare($data));
-            }
-        ];
-    }
-
     protected function beforePipes()
     {
         return [];
@@ -181,7 +164,6 @@ abstract class Operation
     protected function buildPipes()
     {
         return array_merge(
-            $this->initialPipes(),
             $this->beforePipes(),
             [
                 /// We check to see if the current operation can be performed

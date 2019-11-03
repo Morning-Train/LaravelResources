@@ -5,7 +5,6 @@ namespace MorningTrain\Laravel\Resources\Support\Pipes;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Validation\UnauthorizedException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\View\View;
 

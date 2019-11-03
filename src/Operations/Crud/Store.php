@@ -20,8 +20,6 @@ class Store extends EloquentOperation
         /** @var Request $request */
         $request = request();
 
-        $this->performValidation($model, $request); // TODO patch value?
-
         if (is_array($this->fields) && !empty($this->fields)) {
 
             /** @var FieldContract $field */

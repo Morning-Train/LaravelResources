@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use MorningTrain\Laravel\Fields\Traits\ValidatesFields;
 use MorningTrain\Laravel\Filters\Filters\FilterCollection;
 use MorningTrain\Laravel\Resources\ResourceRepository;
+use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
 
 abstract class EloquentOperation extends Operation
 {
@@ -72,6 +72,17 @@ abstract class EloquentOperation extends Operation
     }
 
     /////////////////////////////////
+    /// Pipelines
+    /////////////////////////////////
+
+    protected function beforePipes()
+    {
+        return [
+            ValidatesFields::create()->fields($this->fields)
+        ];
+    }
+
+    /////////////////////////////////
     /// Query
     /////////////////////////////////
 
@@ -103,8 +114,6 @@ abstract class EloquentOperation extends Operation
     /////////////////////////////////
     /// Fields
     /////////////////////////////////
-
-    use ValidatesFields;
 
     protected $fields = [];
 

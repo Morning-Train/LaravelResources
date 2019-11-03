@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
+use MorningTrain\Laravel\Resources\Support\Pipes\ToPayload;
 use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Pipes\Validates;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
@@ -35,6 +36,13 @@ abstract class EloquentOperation extends Operation
             QueryModel::create()->model($this->model)->filters($this->filters)->operation($this),
             QueryToInstance::create()->keyValue(request()->route()->parameter($this->getModelClassName()))->operation($this),
             TransformToView::create()->appends($this->appends),
+        ];
+    }
+
+    protected function afterPipes()
+    {
+        return [
+            ToPayload::create()
         ];
     }
 
@@ -84,7 +92,7 @@ abstract class EloquentOperation extends Operation
             $key = $this->getModelClassName();
 
             $export[$key] = [
-                "key"   => $key,
+                "key" => $key,
                 "value" => null,
             ];
 
@@ -129,8 +137,8 @@ abstract class EloquentOperation extends Operation
         return array_merge(
             parent::export(),
             [
-                "model"   => $this->getModelClassName(),
-                "key"     => $this->getModelKeyName(),
+                "model" => $this->getModelClassName(),
+                "key" => $this->getModelKeyName(),
                 "filters" => $this->exportFilters(),
             ]
         );
@@ -145,7 +153,7 @@ abstract class EloquentOperation extends Operation
         return array_merge(
             parent::getMeta(),
             [
-                'filters'     => $this->getFilterMeta(),
+                'filters' => $this->getFilterMeta(),
                 'permissions' => $this->getPermissionsMeta(),
             ]
         );
@@ -171,23 +179,24 @@ abstract class EloquentOperation extends Operation
             return [];
         }
 
-        $user       = Auth::user();
-        $data       = $this->data;
+        $user = Auth::user();
+        $data = $this->data;
         $collection = $data instanceof Collection ? $data : collect([$data]);
 
         $res = $collection->mapWithKeys(function ($model) use ($user) {
 
-            if($model === null || !($model instanceof Model)){
+            if ($model === null || !($model instanceof Model)) {
                 return [];
             }
 
-            return [$model->getKey() =>
-                collect(ResourceRepository::getModelPermissions($model))
-                    ->filter(function ($operation) use ($model, $user) {
-                        return $user->can($operation, $model);
-                    })
-                    ->values()
-                    ->all(),
+            return [
+                $model->getKey() =>
+                    collect(ResourceRepository::getModelPermissions($model))
+                        ->filter(function ($operation) use ($model, $user) {
+                            return $user->can($operation, $model);
+                        })
+                        ->values()
+                        ->all(),
             ];
         });
 

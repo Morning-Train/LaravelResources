@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Filters\Filters\FilterCollection;
 use MorningTrain\Laravel\Resources\ResourceRepository;
+use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
 
 abstract class EloquentOperation extends Operation
@@ -21,15 +22,12 @@ abstract class EloquentOperation extends Operation
         return $this->genericGetSet('single', $value);
     }
 
-    public function prepare($parameters)
+    public function prepare($query)
     {
-        parent::prepare($parameters);
 
         $model_or_collection = null;
 
         $key_value = request()->route()->parameter($this->getModelClassName());
-
-        $query = $this->query();
 
         if ($this->expectsCollection()) {
             if($this->single) {
@@ -64,40 +62,18 @@ abstract class EloquentOperation extends Operation
     /// Pipelines
     /////////////////////////////////
 
+    protected function initialPipes()
+    {
+        return array_merge([
+            QueryModel::create()->model($this->model)->filters($this->filters)->operation($this)
+        ], parent::initialPipes());
+    }
+
     protected function beforePipes()
     {
         return [
             ValidatesFields::create()->fields($this->fields)
         ];
-    }
-
-    /////////////////////////////////
-    /// Query
-    /////////////////////////////////
-
-    public function query()
-    {
-
-        if (!$this->hasModel()) {
-            throw new \Exception('No model available for query building in action');
-        }
-
-        $query = ($this->model)::query();
-
-        if ($this->hasFilters()) {
-            $this->applyFiltersToQuery($query);
-        }
-
-        if (!empty($this->getView('with'))) {
-            $this->constrainToView($query);
-        }
-
-        return $query;
-    }
-
-    public function applyFiltersToQuery(&$query)
-    {
-        FilterCollection::create($this->filters)->apply($query, request());
     }
 
     /////////////////////////////////
@@ -161,26 +137,6 @@ abstract class EloquentOperation extends Operation
 
         }
 
-    }
-
-    public function constrainToView(Builder &$query)
-    {
-        $relations = $this->getView('with');
-        $with      = [];
-
-        if (is_array($relations)) {
-            foreach ($relations as $key => $relation) {
-                if (is_array($relation)) {
-                    $relation = "{$key}:" . implode(',', $relation);
-                }
-
-                $with[] = $relation;
-            }
-        }
-
-        return empty($with) ?
-            $query :
-            $query->with($with);
     }
 
     /////////////////////////////////

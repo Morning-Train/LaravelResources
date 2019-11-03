@@ -4,12 +4,15 @@ namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
+use MorningTrain\Laravel\Resources\Support\Traits\Respondable;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
 class Pipe
 {
 
     use StaticCreate;
+    use Respondable;
+
     public $_operation = null;
 
     /**

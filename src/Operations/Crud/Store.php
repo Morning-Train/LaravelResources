@@ -17,6 +17,7 @@ class Store extends EloquentOperation
 
     public function handle($model = null)
     {
+
         /** @var Request $request */
         $request = request();
 

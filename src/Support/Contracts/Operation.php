@@ -11,12 +11,14 @@ use Illuminate\Support\Traits\Macroable;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
 use MorningTrain\Laravel\Resources\Support\Pipes\IsPermitted;
 use MorningTrain\Laravel\Resources\Support\Pipes\ToResponse;
+use MorningTrain\Laravel\Resources\Support\Traits\Respondable;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
 abstract class Operation
 {
     use StaticCreate;
     use Macroable;
+    use Respondable;
 
     public $data = null;
 

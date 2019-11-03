@@ -2,19 +2,13 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
-use Illuminate\Http\Request;
-use MorningTrain\Laravel\Fields\Contracts\FieldContract;
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
+use MorningTrain\Laravel\Resources\Support\Pipes\EnsureModelInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\UpdateModel;
 
 class Store extends EloquentOperation
 {
     const ROUTE_METHOD = 'post';
-
-    public function onEmptyModel()
-    {
-        return $this->getEmptyModelInstance();
-    }
 
     public function handle($model = null)
     {
@@ -45,8 +39,9 @@ class Store extends EloquentOperation
     protected function pipes()
     {
         return [
+            EnsureModelInstance::create()->model($this->model),
             UpdateModel::create()->fields($this->fields),
-            function($data, \Closure $next){
+            function ($data, \Closure $next) {
                 return $next($data);
             }
         ];

@@ -26,4 +26,18 @@ trait HasFilters
         FilterCollection::create($this->filters)->apply($query, request());
     }
 
+    public function getFilterMeta()
+    {
+
+        $export = [];
+
+        if (!empty($this->filters)) {
+            foreach ($this->filters as $filter) {
+                $export = array_merge($export, $filter->getMetaData());
+            }
+        }
+
+        return $export;
+    }
+
 }

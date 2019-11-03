@@ -28,6 +28,8 @@ abstract class Operation
     {
         $this->resetMessage();
         $this->resetStatusCode();
+
+        return $parameters;
     }
 
     public function handle($model_or_collection = null)
@@ -141,6 +143,15 @@ abstract class Operation
         return app(Pipeline::class);
     }
 
+    protected function initialPipes()
+    {
+        return [
+            function ($data, $next) {
+                return $next($this->prepare($data));
+            }
+        ];
+    }
+
     protected function beforePipes()
     {
         return [];
@@ -170,7 +181,7 @@ abstract class Operation
     protected function buildPipes()
     {
         return array_merge(
-            //$this->initialPipes(),
+            $this->initialPipes(),
             $this->beforePipes(),
             [
                 /// We check to see if the current operation can be performed
@@ -188,7 +199,7 @@ abstract class Operation
     {
         try {
             return $this->pipeline()
-                ->send($this->data)
+                ->send(func_get_args())
                 ->through($this->buildPipes())
                 ->thenReturn();
         } catch (\Exception $exception) {

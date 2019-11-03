@@ -55,11 +55,8 @@ class ResourceController
      * @return \Illuminate\Http\JsonResponse|mixed
      * @throws \Exception
      */
-    public function executeOperation(Request $request, $parameter = null)
+    public function executeOperation()
     {
-
-        /// TODO - Better management of an uncertain amount of parameters - We should pass along everyting
-
         /// Magic method to catch all calls to this controller
         /// It allows us to dynamically route the request to a specific operation
         /// An operation in this case, is a sort of request -> response template
@@ -72,11 +69,8 @@ class ResourceController
             throw new \Exception("Tried to execute method, but it does not match an operation and is deemed invalid.");
         }
 
-        /// Prepare operation (It will retrieve data/model/collection) which will be used to perform validation checks
-        $operation->prepare([$parameter]);
-
         /// We are ready to execute the operation
-        return $operation->execute();
+        return $operation->execute(...func_get_args());
     }
 
 }

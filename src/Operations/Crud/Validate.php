@@ -28,6 +28,8 @@ class Validate extends EloquentOperation
     public function prepare($parameters)
     {
         $this->data = $this->onEmptyModel();
+
+        return $this->data;
     }
 
     public function strict(bool $val = null)

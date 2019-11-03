@@ -52,6 +52,8 @@ abstract class EloquentOperation extends Operation
         $this->transformToView($model_or_collection);
 
         $this->data = $model_or_collection;
+
+        return $this->data;
     }
 
     public function getRoutePath()

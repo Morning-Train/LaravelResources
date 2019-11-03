@@ -220,16 +220,6 @@ abstract class Operation
     /// Permissions
     /////////////////////////////////
 
-    protected $restricted = false;
-
-    /**
-     * @deprecated
-     */
-    public function restrict($value = true)
-    {
-        return $this->genericGetSet('restricted', $value);
-    }
-
     public function canExecute($data = null)
     {
         $data = $data instanceof Collection ?

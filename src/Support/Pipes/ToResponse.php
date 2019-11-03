@@ -49,7 +49,6 @@ class ToResponse extends Pipe
         $headers = [];
         $options = 0;
 
-        $payload['meta'] = $this->operation()->getMeta();
         $payload['message'] = $this->operation()->getMessage();
 
         $response = response()->json($payload, $status, $headers, $options);

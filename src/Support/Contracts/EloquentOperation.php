@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Resources\ResourceRepository;
+use MorningTrain\Laravel\Resources\Support\Pipes\ApplyMetaToPayload;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\ToPayload;
+use MorningTrain\Laravel\Resources\Support\Pipes\ToResponse;
 use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
@@ -38,10 +40,12 @@ abstract class EloquentOperation extends Operation
         ];
     }
 
-    protected function afterPipes()
+    protected function responsePipes()
     {
         return [
-            ToPayload::create()
+            ToPayload::create(),
+            ApplyMetaToPayload::create()->operation($this),
+            ToResponse::create()->operation($this)
         ];
     }
 

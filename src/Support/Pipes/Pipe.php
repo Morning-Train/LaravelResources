@@ -10,6 +10,10 @@ use MorningTrain\Laravel\Support\Traits\StaticCreate;
 class Pipe
 {
 
+    /////////////////////////////////
+    /// Traits
+    /////////////////////////////////
+
     use StaticCreate;
     use Respondable;
 

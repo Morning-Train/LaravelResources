@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
 
 abstract class EloquentOperation extends Operation
@@ -42,8 +43,6 @@ abstract class EloquentOperation extends Operation
             }
         }
 
-        $this->transformToView($data);
-
         $this->data = $data;
 
         return $data;
@@ -64,7 +63,9 @@ abstract class EloquentOperation extends Operation
     {
         return array_merge([
             QueryModel::create()->model($this->model)->filters($this->filters)->operation($this)
-        ], parent::initialPipes());
+        ], parent::initialPipes(), [
+            TransformToView::create()->appends($this->appends)
+        ]);
     }
 
     protected function beforePipes()
@@ -109,32 +110,6 @@ abstract class EloquentOperation extends Operation
         return $val === null ?
             $view :
             $view[$val] ?? $default;
-    }
-
-    public function transformToView(&$data)
-    {
-
-        $appends = $this->appends();
-
-        if (is_array($appends)) {
-
-            $appends = array_map('Str::snake', $appends);
-
-            if ($data instanceof Model) {
-                $data->setAppends($appends);
-            }
-
-            if ($data instanceof Collection) {
-                $data->transform(function ($item) use ($appends) {
-                    if ($item instanceof Model) {
-                        $item->setAppends($appends);
-                    }
-                    return $item;
-                });
-            }
-
-        }
-
     }
 
     /////////////////////////////////

@@ -3,6 +3,7 @@
 namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 
 class EnsureModelInstance extends Pipe
@@ -26,7 +27,7 @@ class EnsureModelInstance extends Pipe
     public function handle($model, Closure $next)
     {
 
-        if ($model === null) {
+        if ($model === null || !($model instanceof Model)) {
             if (class_exists($this->model)) {
                 $model = new $this->model;
             }

@@ -46,34 +46,31 @@ abstract class EloquentOperation extends Operation
     }
 
     /////////////////////////////////
-    /// Views
+    /// Routing
     /////////////////////////////////
 
-    protected $view = [];
-    protected $appends = false;
-
-    public function view($value = null)
+    public function getRouteParameters()
     {
-        return $this->genericGetSet('view', $value);
-    }
-
-    public function appends($value = null)
-    {
-        return $this->genericGetSet('appends', $value);
-    }
-
-    public function getView(string $val = null, $default = null)
-    {
-        $view = $this->view;
-
-        return $val === null ?
-            $view :
-            $view[$val] ?? $default;
+        return [
+            $this->getModelClassName() => ['optional' => true]
+        ];
     }
 
     /////////////////////////////////
-    /// Filters
+    /// Exporting
     /////////////////////////////////
+
+    public function export()
+    {
+        return array_merge(
+            parent::export(),
+            [
+                "model" => $this->getModelClassName(),
+                "key" => $this->getModelKeyName(),
+                "filters" => $this->exportFilters(),
+            ]
+        );
+    }
 
     protected function exportFilters()
     {
@@ -101,33 +98,6 @@ abstract class EloquentOperation extends Operation
     }
 
     /////////////////////////////////
-    /// Routing
-    /////////////////////////////////
-
-    public function getRouteParameters()
-    {
-        return [
-            $this->getModelClassName() => ['optional' => true]
-        ];
-    }
-
-    /////////////////////////////////
-    /// Export
-    /////////////////////////////////
-
-    public function export()
-    {
-        return array_merge(
-            parent::export(),
-            [
-                "model" => $this->getModelClassName(),
-                "key" => $this->getModelKeyName(),
-                "filters" => $this->exportFilters(),
-            ]
-        );
-    }
-
-    /////////////////////////////////
     /// TO BE DEPRECATED
     /////////////////////////////////
 
@@ -141,6 +111,28 @@ abstract class EloquentOperation extends Operation
     public function single($value = true)
     {
         return $this->genericGetSet('single', $value);
+    }
+
+    protected $view = [];
+    protected $appends = false;
+
+    public function view($value = null)
+    {
+        return $this->genericGetSet('view', $value);
+    }
+
+    public function appends($value = null)
+    {
+        return $this->genericGetSet('appends', $value);
+    }
+
+    public function getView(string $val = null, $default = null)
+    {
+        $view = $this->view;
+
+        return $val === null ?
+            $view :
+            $view[$val] ?? $default;
     }
 
 }

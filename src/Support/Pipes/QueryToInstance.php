@@ -39,8 +39,6 @@ class QueryToInstance extends Pipe
             if ($this->keyValue !== null) {
                 $query->whereKey($this->keyValue);
                 $data = $query->firstOrFail();
-            } else {
-                $data = $this->operation()->onEmptyModel();
             }
         }
 

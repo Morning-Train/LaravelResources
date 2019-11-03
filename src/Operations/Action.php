@@ -7,23 +7,42 @@ use MorningTrain\Laravel\Resources\Operations\Crud\Read;
 class Action extends Read
 {
 
+    /////////////////////////////////
+    /// Helpers
+    /////////////////////////////////
+
     protected $trigger = null;
 
-    public function trigger($value = null) {
-        return $this->genericGetSet('trigger', $value);
+    public function trigger($value = null)
+    {
+        $this->trigger = $value;
+
+        return $this;
     }
 
-    public function handle($model_or_collection = null)
+    public function performTrigger($model = null)
     {
-        $item = parent::handle($model_or_collection);
 
-        if($item === null || $this->trigger() === null) {
-            return $item;
+        if ($model === null || $this->trigger === null) {
+            return $model;
         }
 
-        return $this->trigger() instanceof \Closure ?
-            $this->trigger()($item) :
-            $item->{$this->trigger()}();
+        return $this->trigger instanceof \Closure ?
+            $this->trigger($model) :
+            $model->{$this->trigger}();
+    }
+
+    /////////////////////////////////
+    /// Pipelines
+    /////////////////////////////////
+
+    protected function pipes()
+    {
+        return array_merge(parent::pipes(), [
+            function ($model, \Closure $next) {
+                return $next($this->performTrigger($model));
+            }
+        ]);
     }
 
 }

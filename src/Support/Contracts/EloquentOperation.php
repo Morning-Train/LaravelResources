@@ -2,12 +2,10 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use MorningTrain\Laravel\Filters\Filters\FilterCollection;
 use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
@@ -25,30 +23,30 @@ abstract class EloquentOperation extends Operation
     public function prepare($query)
     {
 
-        $model_or_collection = null;
+        $data = null;
 
         $key_value = request()->route()->parameter($this->getModelClassName());
 
         if ($this->expectsCollection()) {
             if($this->single) {
-                $model_or_collection = $query->first();
+                $data = $query->first();
             } else {
-                $model_or_collection = $query->get();
+                $data = $query->get();
             }
         } else {
             if ($key_value !== null) {
                 $query->where($this->getModelKeyName(), '=', $key_value);
-                $model_or_collection = $query->firstOrFail();
+                $data = $query->firstOrFail();
             } else {
-                $model_or_collection = $this->onEmptyModel();
+                $data = $this->onEmptyModel();
             }
         }
 
-        $this->transformToView($model_or_collection);
+        $this->transformToView($data);
 
-        $this->data = $model_or_collection;
+        $this->data = $data;
 
-        return $this->data;
+        return $data;
     }
 
     public function getRouteParameters()

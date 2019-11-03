@@ -5,6 +5,7 @@ namespace MorningTrain\Laravel\Resources\Support\Pipes;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\UnauthorizedException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\View\View;
 
@@ -59,7 +60,7 @@ class ToResponse extends Pipe
             return $this->buildCollectionPayload($payload_data);
         }
 
-        if(!is_object($payload_data) && !is_array($payload_data)){
+        if (!is_object($payload_data) && !is_array($payload_data)) {
             $payload_data = [$payload_data];
         }
 
@@ -71,8 +72,26 @@ class ToResponse extends Pipe
         return $maybeResponse instanceof Response || $maybeResponse instanceof View;
     }
 
+    protected function isException($maybeException)
+    {
+        return $maybeException instanceof \Exception;
+    }
+
+    protected function handleException(\Exception $exception)
+    {
+        if ($exception instanceof UnauthorizedException) {
+            return response()->json(['message' => 'Unable to perform action'], 400);
+        }
+
+        throw $exception;
+    }
+
     public function handle($data, Closure $next)
     {
+
+        if ($this->isException($data)) {
+            return $this->handleException($data);
+        }
 
         if ($this->isResponseable($data)) {
             return $next($data);

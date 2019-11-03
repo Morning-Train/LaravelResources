@@ -75,13 +75,6 @@ class ResourceController
         /// Prepare operation (It will retrieve data/model/collection) which will be used to perform validation checks
         $operation->prepare([$parameter]);
 
-        /// We check to see if the current operation can be performed
-        /// It will factor in if the resource has been configured with the operation
-        /// It will also check to see if the current user has access to it
-        if (!$operation->canExecute()) {
-            return response()->json(['message' => 'Unable to perform action'], 400);
-        }
-
         /// We are ready to execute the operation
         return $operation->execute();
     }

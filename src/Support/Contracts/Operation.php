@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
-use MorningTrain\Laravel\Resources\Support\Pipes\Pipe;
+use MorningTrain\Laravel\Resources\Support\Pipes\IsPermitted;
 use MorningTrain\Laravel\Resources\Support\Pipes\ToResponse;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
@@ -172,6 +172,12 @@ abstract class Operation
         return array_merge(
             //$this->initialPipes(),
             $this->beforePipes(),
+            [
+                /// We check to see if the current operation can be performed
+                /// It will factor in if the resource has been configured with the operation
+                /// It will also check to see if the current user has access to it
+                IsPermitted::create()->operation($this)
+            ],
             $this->pipes(),
             $this->afterPipes(),
             $this->responsePipes()
@@ -180,10 +186,17 @@ abstract class Operation
 
     public function execute()
     {
-        return $this->pipeline()
-            ->send($this->data)
-            ->through($this->buildPipes())
-            ->thenReturn();
+        try {
+            return $this->pipeline()
+                ->send($this->data)
+                ->through($this->buildPipes())
+                ->thenReturn();
+        } catch (\Exception $exception) {
+            return $this->pipeline()
+                ->send($exception)
+                ->through($this->responsePipes())
+                ->thenReturn();
+        }
     }
 
     /////////////////////////////////
@@ -222,10 +235,10 @@ abstract class Operation
         return $this->genericGetSet('restricted', $value);
     }
 
-    public function canExecute()
+    public function canExecute($data = null)
     {
-        $data = $this->data instanceof Collection ?
-            $this->data : collect([$this->data]);
+        $data = $data instanceof Collection ?
+            $data : collect([$data]);
 
         return $data->every(function ($model) {
             return Gate::allows($this->identifier(), $model);

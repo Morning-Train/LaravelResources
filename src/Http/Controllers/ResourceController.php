@@ -2,7 +2,6 @@
 
 namespace MorningTrain\Laravel\Resources\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;

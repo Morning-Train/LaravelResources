@@ -159,15 +159,14 @@ abstract class Operation
     protected function responsePipes()
     {
         return [
-            ToResponse::class
+            ToResponse::create()->operation($this)
         ];
     }
 
     protected function buildPipes()
     {
-        Pipe::setOperation($this);
-
         return array_merge(
+            //$this->initialPipes(),
             $this->beforePipes(),
             $this->pipes(),
             $this->afterPipes(),

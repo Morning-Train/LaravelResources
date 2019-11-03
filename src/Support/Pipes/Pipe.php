@@ -3,20 +3,23 @@
 namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
+use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
 class Pipe
 {
 
-    public static $operation = null;
+    use StaticCreate;
 
-    public function operation()
-    {
-        return static::$operation;
-    }
+    public $_operation = null;
 
-    public static function setOperation($operation)
+    public function operation($operation = null)
     {
-        static::$operation = $operation;
+        if ($operation !== null) {
+            $this->_operation = $operation;
+
+            return $this;
+        }
+        return $this->_operation;
     }
 
     public function handle($content, Closure $next)

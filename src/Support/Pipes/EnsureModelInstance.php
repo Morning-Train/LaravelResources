@@ -28,7 +28,7 @@ class EnsureModelInstance extends Pipe
 
         if ($model === null) {
             if (class_exists($this->model)) {
-                return $model = new $this->model;
+                $model = new $this->model;
             }
         }
 

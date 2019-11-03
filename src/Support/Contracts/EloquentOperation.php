@@ -3,7 +3,6 @@
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Resources\ResourceRepository;
@@ -11,27 +10,18 @@ use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
+use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
+use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 
 abstract class EloquentOperation extends Operation
 {
 
-    public $single = false;
-
-    public function single($value = true)
-    {
-        return $this->genericGetSet('single', $value);
-    }
-
     /////////////////////////////////
-    /// Routing
+    /// Traits
     /////////////////////////////////
 
-    public function getRouteParameters()
-    {
-        return [
-            $this->getModelClassName() => ['optional' => true]
-        ];
-    }
+    use HasModel;
+    use HasFilters;
 
     /////////////////////////////////
     /// Pipelines
@@ -88,18 +78,6 @@ abstract class EloquentOperation extends Operation
     /// Filters
     /////////////////////////////////
 
-    protected $filters = [];
-
-    public function filters($value = null)
-    {
-        return $this->genericGetSet('filters', $value);
-    }
-
-    public function hasFilters()
-    {
-        return is_array($this->filters) && !empty($this->filters);
-    }
-
     protected function exportFilters()
     {
 
@@ -125,47 +103,31 @@ abstract class EloquentOperation extends Operation
         return $export;
     }
 
+    public $single = false;
+
+    public function single($value = true)
+    {
+        return $this->genericGetSet('single', $value);
+    }
+
+    /////////////////////////////////
+    /// Routing
+    /////////////////////////////////
+
+    public function getRouteParameters()
+    {
+        return [
+            $this->getModelClassName() => ['optional' => true]
+        ];
+    }
+
     /////////////////////////////////
     /// Model
     /////////////////////////////////
 
-    protected $model;
-
-    public function model($value = null)
-    {
-        return $this->genericGetSet('model', $value);
-    }
-
-    public function getModelKeyName()
-    {
-        $instance = $this->getEmptyModelInstance();
-        if ($instance === null) {
-            return null;
-        }
-        return $this->getEmptyModelInstance()->getKeyName();
-    }
-
-    public function getModelClassName()
-    {
-        return Str::snake(class_basename($this->model));
-    }
-
-    public function getEmptyModelInstance()
-    {
-        if (!class_exists($this->model)) {
-            return null;
-        }
-        return new $this->model;
-    }
-
     public function onEmptyModel()
     {
         return null;
-    }
-
-    public function hasModel()
-    {
-        return !!$this->model && (new $this->model instanceof Model);
     }
 
     public function expectsCollection()

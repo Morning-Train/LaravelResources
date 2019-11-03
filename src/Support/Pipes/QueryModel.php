@@ -52,7 +52,7 @@ class QueryModel extends Pipe
             throw new \Exception('No model available for query building in action');
         }
 
-        $query = ($this->model)::query();
+        $query = $this->newQueryFromModel();
 
         if ($this->hasFilters()) {
             $this->applyFiltersToQuery($query);

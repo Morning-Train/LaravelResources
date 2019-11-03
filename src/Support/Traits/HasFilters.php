@@ -11,12 +11,9 @@ trait HasFilters
 
     public function filters($filters = null)
     {
-        if ($filters !== null) {
-            $this->filters = $filters;
+        $this->filters = $filters;
 
-            return $this;
-        }
-        return $this->filters;
+        return $this;
     }
 
     public function hasFilters()

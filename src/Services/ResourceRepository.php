@@ -199,7 +199,7 @@ class ResourceRepository
                         ->flatten()
                         ->each(function ($operation) use ($operations) {
                             if (method_exists($operation, 'model')) {
-                                $model      = $operation->model();
+                                $model      = $operation->model;
                                 $identifier = $operation->identifier();
 
                                 if($model === null) {

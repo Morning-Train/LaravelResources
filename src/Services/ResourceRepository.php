@@ -274,12 +274,11 @@ class ResourceRepository
 
         }
 
-        Context::localization()->provide('env',
-            function () use ($environment_data) {
-                return [
-                    'resources' => $environment_data,
-                ];
-            });
+        Context::env(function () use ($environment_data) {
+            return [
+                'resources' => $environment_data,
+            ];
+        });
 
     }
 

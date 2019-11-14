@@ -4,17 +4,25 @@ namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
 
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
+use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 
 class Count extends EloquentOperation
 {
 
     const ROUTE_METHOD = 'get';
 
-    public function handle($model_or_collection = null)
+    protected function beforePipes()
+    {
+        return [
+            QueryModel::create()->model($this->model)->filters($this->filters)->operation($this),
+        ];
+    }
+
+    public function handle($query)
     {
         return [
             'model' => [
-                'count' => $this->query()->count(),
+                'count' => $query->count(),
             ],
         ];
     }

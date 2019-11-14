@@ -3,9 +3,8 @@
 namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
-use Illuminate\Database\Eloquent\Model;
-use MorningTrain\Laravel\Fields\Traits\ValidatesFields as ValidatesFieldsTrait;
-use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use MorningTrain\Laravel\Resources\Support\Traits\HasRules;
 
 class Validates extends Pipe
 {
@@ -14,8 +13,8 @@ class Validates extends Pipe
     /// Traits
     /////////////////////////////////
 
-    use ValidatesFieldsTrait;
-    use HasFields;
+    use ValidatesRequests;
+    use HasRules;
 
     /////////////////////////////////
     /// Handle
@@ -23,8 +22,9 @@ class Validates extends Pipe
 
     public function handle($data, Closure $next)
     {
-        if ($this->hasFields() && $data instanceof Model) {
-            $this->performValidation($data, request());
+
+        if(!empty($this->rules)) {
+            $this->validate(request(), $this->rules);
         }
 
         return $next($data);

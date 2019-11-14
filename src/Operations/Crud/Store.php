@@ -6,7 +6,7 @@ use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
 use MorningTrain\Laravel\Resources\Support\Pipes\EnsureModelInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\SetModelSuccessMessage;
 use MorningTrain\Laravel\Resources\Support\Pipes\UpdateModel;
-use MorningTrain\Laravel\Resources\Support\Pipes\Validates;
+use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
 
 class Store extends EloquentOperation
 {
@@ -20,7 +20,7 @@ class Store extends EloquentOperation
     {
         return [
             EnsureModelInstance::create()->model($this->model),
-            Validates::create()->fields($this->fields),
+            ValidatesFields::create()->fields($this->fields),
             UpdateModel::create()->fields($this->fields)
         ];
     }

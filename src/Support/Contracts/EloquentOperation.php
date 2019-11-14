@@ -51,9 +51,14 @@ abstract class EloquentOperation extends Operation
 
     public function getRouteParameters()
     {
-        return [
-            $this->getModelClassName() => ['optional' => true]
-        ];
+
+        $parameters = [];
+
+        if($this->model !== null && class_exists($this->model)) {
+            $parameters[$this->getModelClassName()] = ['optional' => true];
+        }
+
+        return $parameters;
     }
 
     /////////////////////////////////

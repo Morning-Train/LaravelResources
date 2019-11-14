@@ -37,7 +37,7 @@ class ToPayload extends Pipe
     public function handle($data, Closure $next)
     {
 
-        $payload = null;
+        $payload = $data;
 
         if ($data instanceof Model) {
             $payload = $this->buildModelPayload($data);

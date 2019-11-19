@@ -22,14 +22,15 @@ class Action extends Read
 
     public function performTrigger($model = null)
     {
+        $trigger = $this->trigger;
 
-        if ($model === null || $this->trigger === null) {
+        if ($model === null || $trigger === null) {
             return $model;
         }
 
-        return $this->trigger instanceof \Closure ?
-            $this->trigger($model) :
-            $model->{$this->trigger}();
+        return $trigger instanceof \Closure ?
+            $trigger($model) :
+            $model->{$trigger}();
     }
 
     /////////////////////////////////

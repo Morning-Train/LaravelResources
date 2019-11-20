@@ -31,7 +31,11 @@ abstract class EloquentOperation extends Operation
     {
         return [
             QueryModel::create()->model($this->model)->filters($this->filters)->operation($this),
-            QueryToInstance::create()->keyValue(request()->route()->parameter($this->getModelClassName()))->operation($this),
+            QueryToInstance::create()->keyValue(
+                (request()->route() !== null)
+                    ? request()->route()->parameter($this->getModelClassName())
+                    : null
+            )->operation($this),
             TransformToView::create()->appends($this->appends),
         ];
     }

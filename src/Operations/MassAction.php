@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Operations;
+namespace MorningTrain\Laravel\Resources\Operations;
 
 use Illuminate\Support\Collection;
 use MorningTrain\Laravel\Filters\Filters\Filter;
-use MorningTrain\Laravel\Resources\Operations\Action;
 use MorningTrain\Laravel\Resources\Support\Pipes\Collections\KeyBy;
 use MorningTrain\Laravel\Resources\Support\Pipes\Validates;
 use MorningTrain\Laravel\Resources\Support\Traits\HasRules;

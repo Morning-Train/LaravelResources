@@ -7,12 +7,18 @@ use MorningTrain\Laravel\Filters\Filters\FilterCollection;
 trait HasFilters
 {
 
-    public $filters = null;
+    public $filters = [];
 
-    public function filters($filters = null)
+    public function filters($filters = [], $merge = true)
     {
-        $this->filters = $filters;
-
+        if($merge === false) {
+            $this->filters = $filters;
+        } else {
+            $this->filters = array_merge(
+                $this->filters,
+                $filters
+            );
+        }
         return $this;
     }
 

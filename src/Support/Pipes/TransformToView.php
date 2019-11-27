@@ -5,6 +5,7 @@ namespace MorningTrain\Laravel\Resources\Support\Pipes;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class TransformToView extends Pipe
 {
@@ -36,7 +37,7 @@ class TransformToView extends Pipe
 
         if (is_array($appends)) {
 
-            $appends = array_map('Str::snake', $appends);
+            $appends = array_map([Str::class, 'snake'], $appends);
 
             if ($data instanceof Model) {
                 $data->setAppends($appends);

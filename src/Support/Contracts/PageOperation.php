@@ -31,11 +31,12 @@ abstract class PageOperation extends Operation
     public function getPageEnvironment()
     {
         return [
-            'title'     => $this->title(),
-            'path'      => $this->path(),
-            'route'     => $this->identifier(),
-            'parent'    => $this->parent(),
-            'namespace' => $this->resource()->namespace,
+            'title'         => $this->title(),
+            'path'          => $this->path(),
+            'route'         => $this->identifier(),
+            'parent'        => $this->parent(),
+            'namespace'     => $this->resource()->namespace,
+            'forceRedirect' => $this->forceRedirect ?? false,
         ];
     }
 
@@ -53,6 +54,13 @@ abstract class PageOperation extends Operation
     public function parent($value = null)
     {
         return $this->genericGetSet('parent', $value);
+    }
+
+    public $forceRedirect = null;
+
+    public function forceRedirect($value = null)
+    {
+        return $this->genericGetSet('forceRedirect', $value);
     }
 
     public function getRoutePath()

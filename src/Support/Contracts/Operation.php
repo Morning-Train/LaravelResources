@@ -304,7 +304,7 @@ abstract class Operation
         );
     }
 
-    public function routes()
+    public function routes($options = [])
     {
 
         $route_group_props = [
@@ -316,7 +316,10 @@ abstract class Operation
 
         if (static::hasMacro('isRestricted') || method_exists($this, 'isRestricted')) {
             if ($this->isRestricted($this->identifier())) {
-                $middlewares[] = 'auth:' . $this->resource()->namespace;
+
+                $guard = isset($options['guard']) ? $options['guard'] : $this->resource()->namespace;
+
+                $middlewares[] = 'auth:' . $guard;
             }
         }
 

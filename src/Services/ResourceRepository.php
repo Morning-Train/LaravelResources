@@ -65,14 +65,14 @@ class ResourceRepository
         return $this->resources->get($namespace);
     }
 
-    public function routes(string $namespace)
+    public function routes(string $namespace, $options = [])
     {
         if (!$this->hasResources($namespace)) {
             return;
         }
 
         foreach ($this->getResources($namespace) as $resource) {
-            $resource->routes();
+            $resource->routes($options);
         }
     }
 

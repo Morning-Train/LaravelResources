@@ -65,7 +65,7 @@ abstract class Resource
     public function routes($options = [])
     {
         Route::group(['resource' => $this->name],
-            function () {
+            function () use($options) {
                 if ($this->hasOperations()) {
                     foreach ($this->getOperations() as $operation) {
                         $operation->routes($options);

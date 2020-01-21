@@ -4,6 +4,7 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetFiltersMeta;
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetPermissionsMeta;
+use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetTimestampMeta;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\ToPayload;
@@ -45,7 +46,8 @@ abstract class EloquentOperation extends Operation
         return [
             ToPayload::create(),
             SetFiltersMeta::create()->filters($this->filters),
-            SetPermissionsMeta::create()
+            SetPermissionsMeta::create(),
+            SetTimestampMeta::create(),
         ];
     }
 

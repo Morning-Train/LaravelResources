@@ -230,6 +230,10 @@ abstract class Operation
 
     public function canExecute($data = null)
     {
+        if($this->is_public) {
+            return true;
+        }
+        
         $data = $data instanceof Collection ?
             $data : collect([$data]);
 

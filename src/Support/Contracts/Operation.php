@@ -116,6 +116,8 @@ abstract class Operation
 
     public function public() {
         $this->is_public = true;
+
+        return $this;
     }
 
     /////////////////////////////////

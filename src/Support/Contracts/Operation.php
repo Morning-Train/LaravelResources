@@ -104,12 +104,7 @@ abstract class Operation
 
     public function identifier()
     {
-        return implode('.',
-            [
-                $this->resource()->namespace,
-                $this->resource()->name,
-                $this->name,
-            ]);
+        return $this->resource()->identifier($this->name);
     }
 
     protected $is_public = false;
@@ -233,7 +228,7 @@ abstract class Operation
         if($this->is_public) {
             return true;
         }
-        
+
         $data = $data instanceof Collection ?
             $data : collect([$data]);
 

@@ -112,6 +112,12 @@ abstract class Operation
             ]);
     }
 
+    protected $is_public = false;
+
+    public function public() {
+        $this->is_public = true;
+    }
+
     /////////////////////////////////
     /// Name
     /////////////////////////////////
@@ -315,7 +321,7 @@ abstract class Operation
         $middlewares = $this->middlewares();
 
         if (static::hasMacro('isRestricted') || method_exists($this, 'isRestricted')) {
-            if ($this->isRestricted($this->identifier())) {
+            if ($this->isRestricted($this->identifier()) && !$this->is_public) {
 
                 $guard = isset($options['guard']) ? $options['guard'] : $this->resource()->namespace;
 

@@ -62,14 +62,7 @@ class SetPermissionsMeta extends Pipe
 
     public function handle(Payload $payload, Closure $next)
     {
-
-        $data = $payload->data;
-
-        if(is_array($data)) {
-            Arr::set($data, 'meta.permissions', $this->getPermissionsMeta($data));
-        }
-
-        $payload->data = $data;
+        $payload->set('meta.permissions', $this->getPermissionsMeta($payload->data));
 
         return $next($payload);
     }

@@ -159,13 +159,6 @@ abstract class Operation
         return [];
     }
 
-    protected function responsePipes()
-    {
-        return [
-            ToResponse::create()
-        ];
-    }
-
     protected function buildPipes()
     {
         return array_merge(
@@ -177,8 +170,7 @@ abstract class Operation
                 IsPermitted::create()
             ],
             $this->pipes(),
-            $this->afterPipes(),
-            $this->responsePipes()
+            $this->afterPipes()
         );
     }
 
@@ -197,7 +189,6 @@ abstract class Operation
         } catch (\Exception $exception) {
             return $this->pipeline()
                 ->send($exception)
-                ->through($this->responsePipes())
                 ->thenReturn();
         }
     }

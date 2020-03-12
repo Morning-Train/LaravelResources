@@ -23,13 +23,7 @@ class SetFiltersMeta extends Pipe
 
     public function handle(Payload $payload, Closure $next)
     {
-        $data = $payload->data;
-
-        if(is_array($data)) {
-            Arr::set($data, 'meta.filters', $this->getFilterMeta());
-        }
-
-        $payload->data = $data;
+        $payload->set('meta.filters', $this->getFilterMeta());
 
         return $next($payload);
     }

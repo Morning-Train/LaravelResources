@@ -2,9 +2,12 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
+use Symfony\Component\HttpFoundation\Response;
 
-class Payload
+class Payload implements Responsable
 {
 
     protected $_data = [];
@@ -29,6 +32,11 @@ class Payload
         return Arr::get($this->_data, $path, $default);
     }
 
+    public function has($path)
+    {
+        return Arr::has($this->_data, $path);
+    }
+
     public function __set($name, $value)
     {
         $this->set($name, $value);
@@ -37,6 +45,36 @@ class Payload
     public function __get($name)
     {
         return $this->get($name);
+    }
+
+    public function toResponse($request)
+    {
+
+        $response = $this->response;
+
+        if ($response instanceof \Exception) {
+            throw $response;
+        }
+
+        if ($response instanceof Response || $response instanceof View) {
+            return $response;
+        }
+
+        if (!is_array($response)) {
+            return $response;
+        }
+
+        $status = $this->operation->getStatusCode();
+        $headers = [];
+        $options = 0;
+
+        if($this->has('meta')) {
+            $response['meta'] = $this->meta;
+        }
+
+        $response['message'] = $this->operation->getMessage();
+
+        return response()->json($response, $status, $headers, $options);
     }
 
 }

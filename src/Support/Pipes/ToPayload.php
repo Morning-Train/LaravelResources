@@ -57,7 +57,7 @@ class ToPayload extends Pipe
             $data = [$data];
         }
 
-        $payload->set('data', $data);
+        $payload->response = $data;
 
         return $next($payload);
     }

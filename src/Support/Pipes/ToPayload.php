@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
+use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
 
 class ToPayload extends Pipe
 {
@@ -35,26 +36,28 @@ class ToPayload extends Pipe
         return $model;
     }
 
-    public function handle($data, Closure $next)
+    public function handle(Payload $payload, Closure $next)
     {
 
-        $payload = $data;
+        $data = $payload->get('data');
 
-        if(!isset($payload) || empty($payload) || $payload instanceof Operation) {
-            $payload = [];
+        if(!isset($data) || empty($data) || $data instanceof Operation) {
+            $data = [];
         }
 
         if ($data instanceof Model) {
-            $payload = $this->buildModelPayload($data);
+            $data = $this->buildModelPayload($data);
         }
 
         if ($data instanceof Collection) {
-            $payload = $this->buildCollectionPayload($data);
+            $data = $this->buildCollectionPayload($data);
         }
 
         if (!is_object($data) && !is_array($data)) {
-            $payload = [$data];
+            $data = [$data];
         }
+
+        $payload->set('data', $data);
 
         return $next($payload);
     }

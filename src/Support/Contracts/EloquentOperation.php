@@ -31,12 +31,12 @@ abstract class EloquentOperation extends Operation
     protected function beforePipes()
     {
         return [
-            QueryModel::create()->model($this->model)->filters($this->filters)->operation($this),
+            QueryModel::create()->model($this->model)->filters($this->filters),
             QueryToInstance::create()->keyValue(
                 (request()->route() !== null)
                     ? request()->route()->parameter($this->getModelClassName())
                     : null
-            )->operation($this),
+            ),
             TransformToView::create()->appends($this->appends),
         ];
     }
@@ -47,7 +47,7 @@ abstract class EloquentOperation extends Operation
             ToPayload::create(),
             SetFiltersMeta::create()->filters($this->filters),
             SetPermissionsMeta::create(),
-            SetTimestampMeta::create(),
+            //SetTimestampMeta::create(),
         ];
     }
 

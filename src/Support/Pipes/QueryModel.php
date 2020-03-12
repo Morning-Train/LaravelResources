@@ -4,6 +4,7 @@ namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 
@@ -45,7 +46,7 @@ class QueryModel extends Pipe
     /// Handle
     /////////////////////////////////
 
-    public function handle($data, Closure $next)
+    public function handle(Payload $payload, Closure $next)
     {
 
         if (!$this->hasModel()) {
@@ -58,11 +59,13 @@ class QueryModel extends Pipe
             $this->applyFiltersToQuery($query);
         }
 
-        if (!empty($this->operation()->getView('with'))) {
+        if (!empty($payload->operation->getView('with'))) {
             $this->constrainToView($query);
         }
 
-        return $next($query);
+        $payload->set('query', $query);
+
+        return $next($payload);
     }
 
 }

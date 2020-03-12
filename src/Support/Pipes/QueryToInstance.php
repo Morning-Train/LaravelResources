@@ -3,6 +3,7 @@
 namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
+use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
 
 class QueryToInstance extends Pipe
 {
@@ -24,13 +25,15 @@ class QueryToInstance extends Pipe
     /// Handle
     /////////////////////////////////
 
-    public function handle($query, Closure $next)
+    public function handle(Payload $payload, Closure $next)
     {
+
+        $query = $payload->get('query');
 
         $data = null;
 
-        if ($this->operation()->expectsCollection()) {
-            if($this->operation()->single) {
+        if ($payload->operation->expectsCollection()) {
+            if($payload->operation->single) {
                 $data = $query->first();
             } else {
                 $data = $query->get();
@@ -42,9 +45,11 @@ class QueryToInstance extends Pipe
             }
         }
 
-        $this->operation()->data = $data;
+        $payload->operation->data = $data;
 
-        return $next($data);
+        $payload->set('data', $data);
+
+        return $next($payload);
     }
 
 }

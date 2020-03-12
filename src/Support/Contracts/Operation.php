@@ -26,9 +26,9 @@ abstract class Operation
     /// Request helpers
     /////////////////////////////////
 
-    public function handle($data)
+    public function handle(Payload $payload)
     {
-        return $data;
+        return $payload;
     }
 
     /////////////////////////////////
@@ -162,7 +162,7 @@ abstract class Operation
     protected function responsePipes()
     {
         return [
-            ToResponse::create()->operation($this)
+            ToResponse::create()
         ];
     }
 
@@ -174,7 +174,7 @@ abstract class Operation
                 /// We check to see if the current operation can be performed
                 /// It will factor in if the resource has been configured with the operation
                 /// It will also check to see if the current user has access to it
-                IsPermitted::create()->operation($this)
+                IsPermitted::create()
             ],
             $this->pipes(),
             $this->afterPipes(),
@@ -184,9 +184,14 @@ abstract class Operation
 
     public function execute()
     {
+
+        $payload = new Payload($this);
+
+        $payload->setRequestArguments(func_get_args());
+
         try {
             return $this->pipeline()
-                ->send(func_get_args())
+                ->send($payload)
                 ->through($this->buildPipes())
                 ->thenReturn();
         } catch (\Exception $exception) {

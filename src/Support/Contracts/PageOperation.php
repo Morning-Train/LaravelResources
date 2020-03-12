@@ -11,7 +11,7 @@ abstract class PageOperation extends Operation
     public $title = null;
     public $parent = null;
 
-    public function handle($model = null)
+    public function handle(Payload $payload)
     {
         Context::env(function () {
             return [

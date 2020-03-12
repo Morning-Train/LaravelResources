@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
 
 class TransformToView extends Pipe
 {
@@ -30,8 +31,10 @@ class TransformToView extends Pipe
     /// Handle
     /////////////////////////////////
 
-    public function handle($data, Closure $next)
+    public function handle(Payload $payload, Closure $next)
     {
+
+        $data = $payload->get('data');
 
         $appends = $this->appends;
 
@@ -54,7 +57,9 @@ class TransformToView extends Pipe
 
         }
 
-        return $next($data);
+        $payload->set('data', $data);
+
+        return $next($payload);
     }
 
 }

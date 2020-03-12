@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Resources\ResourceRepository;
+use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
 use MorningTrain\Laravel\Resources\Support\Pipes\Pipe;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\PipesPayload;
@@ -59,12 +60,16 @@ class SetPermissionsMeta extends Pipe
     /// Handle
     /////////////////////////////////
 
-    public function handle($payload, Closure $next)
+    public function handle(Payload $payload, Closure $next)
     {
 
-        if(is_array($payload)) {
-            Arr::set($payload, 'meta.permissions', $this->getPermissionsMeta($payload));
+        $data = $payload->data;
+
+        if(is_array($data)) {
+            Arr::set($data, 'meta.permissions', $this->getPermissionsMeta($data));
         }
+
+        $payload->data = $data;
 
         return $next($payload);
     }

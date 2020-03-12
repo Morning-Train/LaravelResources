@@ -3,6 +3,7 @@
 namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
+use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\View\View;
 
@@ -28,28 +29,30 @@ class ToResponse extends Pipe
         throw $exception;
     }
 
-    public function handle($payload, Closure $next)
+    public function handle(Payload $payload, Closure $next)
     {
 
-        if ($this->isException($payload)) {
-            $this->handleException($payload);
+        $response = $payload->data;
+
+        if ($this->isException($response)) {
+            $this->handleException($response);
         }
 
-        if ($this->isResponseable($payload)) {
-            return $next($payload);
+        if ($this->isResponseable($response)) {
+            return $next($response);
         }
 
-        if (!is_array($payload)) {
-            return $next($payload);
+        if (!is_array($response)) {
+            return $next($response);
         }
 
-        $status = $this->operation()->getStatusCode();
+        $status = $payload->operation->getStatusCode();
         $headers = [];
         $options = 0;
 
-        $payload['message'] = $this->operation()->getMessage();
+        $response['message'] = $payload->operation->getMessage();
 
-        $response = response()->json($payload, $status, $headers, $options);
+        $response = response()->json($response, $status, $headers, $options);
 
         return $next($response);
     }

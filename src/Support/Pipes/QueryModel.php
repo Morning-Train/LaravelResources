@@ -24,7 +24,7 @@ class QueryModel extends Pipe
 
     public function constrainToView(Builder &$query)
     {
-        $relations = $this->operation()->getView('with');
+        $relations = $this->operation->getView('with');
         $with      = [];
 
         if (is_array($relations)) {
@@ -46,7 +46,7 @@ class QueryModel extends Pipe
     /// Handle
     /////////////////////////////////
 
-    public function handle(Payload $payload, Closure $next)
+    public function pipe()
     {
 
         if (!$this->hasModel()) {
@@ -59,13 +59,11 @@ class QueryModel extends Pipe
             $this->applyFiltersToQuery($query);
         }
 
-        if (!empty($payload->operation->getView('with'))) {
+        if (!empty($this->operation->getView('with'))) {
             $this->constrainToView($query);
         }
 
-        $payload->set('query', $query);
-
-        return $next($payload);
+        $this->query = $query;
     }
 
 }

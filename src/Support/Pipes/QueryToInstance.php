@@ -25,15 +25,15 @@ class QueryToInstance extends Pipe
     /// Handle
     /////////////////////////////////
 
-    public function handle(Payload $payload, Closure $next)
+    public function pipe()
     {
 
-        $query = $payload->get('query');
+        $query = $this->query;
 
         $data = null;
 
-        if ($payload->operation->expectsCollection()) {
-            if($payload->operation->single) {
+        if ($this->operation->expectsCollection()) {
+            if($this->operation->single) {
                 $data = $query->first();
             } else {
                 $data = $query->get();
@@ -45,11 +45,10 @@ class QueryToInstance extends Pipe
             }
         }
 
-        $payload->operation->data = $data;
+        $this->operation->data = $data;
 
-        $payload->set('data', $data);
-
-        return $next($payload);
+        $this->data = $data;
+        
     }
 
 }

@@ -2,44 +2,32 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
-
-use Illuminate\Http\Request;
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\ConstrainQueryToKey;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\EnsureModelInstance;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryToModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
+use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
 
 class Validate extends EloquentOperation
 {
     const ROUTE_METHOD = 'post';
 
-    protected $strict = false;
+    /////////////////////////////////
+    /// Pipelines
+    /////////////////////////////////
 
-    public function handle($model = null)
+    protected function pipes()
     {
-        /** @var Request $request */
-        $request = request();
-
-        $this->performValidation($model, $request, !$this->strict);
-
         return [
-            'model' => $request->all(),
+            QueryModel::create()->model($this->model)->filters($this->filters),
+            ConstrainQueryToKey::create()->model($this->model),
+            QueryToModel::create(),
+            EnsureModelInstance::create()->model($this->model),
+            TransformToView::create()->appends($this->appends),
+            ValidatesFields::create()->fields($this->fields),
         ];
-
-    }
-
-    public function prepare($parameters)
-    {
-        $this->data = $this->onEmptyModel();
-
-        return $this->data;
-    }
-
-    public function strict(bool $val = null)
-    {
-        return $this->genericGetSet('strict', $val);
-    }
-
-    public function onEmptyModel()
-    {
-        return $this->getEmptyModelInstance();
     }
 
 }

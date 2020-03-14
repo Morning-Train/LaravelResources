@@ -3,8 +3,8 @@
 namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
 use Closure;
-use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
 use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
+use MorningTrain\Laravel\Resources\Support\Traits\HasPipes;
 use MorningTrain\Laravel\Resources\Support\Traits\Respondable;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
@@ -19,11 +19,19 @@ class Pipe
 
     use StaticCreate;
     use Respondable;
+    use HasPipes;
 
     public function handle(Payload $payload, Closure $next)
     {
+
+        /// If our pipe has a nested pipeline, execute it.
+        /// If no additional pipes are defined, it will just return the payload back
+        $payload = $this->executePipeline($payload);
+
+        /// Set the payload for use in our pipe method
         $this->payload = $payload;
 
+        /// Make the actual pipe task
         $this->pipe();
 
         return $next($payload);
@@ -31,7 +39,7 @@ class Pipe
 
     protected function pipe()
     {
-
+        /// Here we can do our work...
     }
 
     public function __get($name)

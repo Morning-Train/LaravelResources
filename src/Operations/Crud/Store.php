@@ -4,6 +4,7 @@ namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\ConstrainQueryToKey;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\FetchesModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryToModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\EnsureModelInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryModel;

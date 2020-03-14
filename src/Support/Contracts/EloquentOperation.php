@@ -106,16 +106,10 @@ abstract class EloquentOperation extends Operation
     }
 
     protected $view = [];
-    protected $appends = false;
 
     public function view($value = null)
     {
         return $this->genericGetSet('view', $value);
-    }
-
-    public function appends($value = null)
-    {
-        return $this->genericGetSet('appends', $value);
     }
 
     public function getView(string $val = null, $default = null)

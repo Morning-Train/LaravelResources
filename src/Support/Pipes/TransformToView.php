@@ -7,25 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
+use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 
 class TransformToView extends Pipe
 {
 
-    /////////////////////////////////
-    /// Appends helpers
-    /////////////////////////////////
-
-    public $appends = null;
-
-    public function appends($appends = null)
-    {
-        if ($appends !== null) {
-            $this->appends = $appends;
-
-            return $this;
-        }
-        return $this->appends;
-    }
+    use HasModel;
 
     /////////////////////////////////
     /// Handle

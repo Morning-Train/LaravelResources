@@ -3,10 +3,7 @@
 namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
-use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\ConstrainQueryToKey;
-use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryToModel;
-use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryModel;
-use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\FetchesModel;
 
 class Read extends EloquentOperation
 {
@@ -16,10 +13,10 @@ class Read extends EloquentOperation
     protected function beforePipes()
     {
         return [
-            QueryModel::create()->model($this->model)->filters($this->filters),
-            ConstrainQueryToKey::create()->model($this->model),
-            QueryToModel::create(),
-            TransformToView::create()->appends($this->appends),
+            FetchesModel::create()
+                ->model($this->model)
+                ->filters($this->filters)
+                ->appends($this->appends),
         ];
     }
 

@@ -12,10 +12,18 @@ trait HasModel
      * @var Model
      */
     public $model = null;
+    public $appends = null;
 
     public function model($model = null)
     {
         $this->model = $model;
+
+        return $this;
+    }
+
+    public function appends($appends = null)
+    {
+        $this->appends = $appends;
 
         return $this;
     }

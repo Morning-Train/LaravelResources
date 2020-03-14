@@ -18,7 +18,7 @@ class Validate extends EloquentOperation
     /// Pipelines
     /////////////////////////////////
 
-    protected function pipes()
+    protected function beforePipes()
     {
         return [
             QueryModel::create()->model($this->model)->filters($this->filters),
@@ -26,6 +26,12 @@ class Validate extends EloquentOperation
             QueryToModel::create(),
             EnsureModelInstance::create()->model($this->model),
             TransformToView::create()->appends($this->appends),
+        ];
+    }
+
+    protected function pipes()
+    {
+        return [
             ValidatesFields::create()->fields($this->fields),
         ];
     }

@@ -4,11 +4,7 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetFiltersMeta;
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetPermissionsMeta;
-use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetTimestampMeta;
-use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
-use MorningTrain\Laravel\Resources\Support\Pipes\QueryToInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\ToPayload;
-use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;

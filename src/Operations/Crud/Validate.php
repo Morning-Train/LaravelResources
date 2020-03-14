@@ -6,7 +6,7 @@ use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\ConstrainQueryToKey;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\EnsureModelInstance;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryToModel;
-use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
 

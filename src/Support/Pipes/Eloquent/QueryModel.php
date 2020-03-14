@@ -1,10 +1,9 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Support\Pipes;
+namespace MorningTrain\Laravel\Resources\Support\Pipes\Eloquent;
 
-use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
+use MorningTrain\Laravel\Resources\Support\Pipes\Pipe;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 

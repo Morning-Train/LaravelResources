@@ -28,19 +28,6 @@ abstract class EloquentOperation extends Operation
     /// Pipelines
     /////////////////////////////////
 
-    protected function beforePipes()
-    {
-        return [
-            QueryModel::create()->model($this->model)->filters($this->filters),
-            QueryToInstance::create()->keyValue(
-                (request()->route() !== null)
-                    ? request()->route()->parameter($this->getModelClassName())
-                    : null
-            ),
-            TransformToView::create()->appends($this->appends),
-        ];
-    }
-
     protected function afterPipes()
     {
         return [

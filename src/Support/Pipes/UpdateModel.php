@@ -17,11 +17,14 @@ class UpdateModel extends Pipe
     use HasFields;
 
     /////////////////////////////////
-    /// Handle
+    /// Pipe
     /////////////////////////////////
 
-    public function handle($model, Closure $next)
+    public function pipe()
     {
+
+        $model = $this->data;
+
         if ($this->hasFields() && $model instanceof Model) {
 
             $request = request();
@@ -41,7 +44,8 @@ class UpdateModel extends Pipe
             }
         }
 
-        return $next($model);
+        $this->data = $model;
+
     }
 
 }

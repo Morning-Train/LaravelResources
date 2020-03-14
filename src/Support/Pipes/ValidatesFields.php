@@ -21,13 +21,15 @@ class ValidatesFields extends Pipe
     /// Handle
     /////////////////////////////////
 
-    public function handle($data, Closure $next)
+    public function pipe()
     {
+
+        $data = $this->data;
+
         if ($this->hasFields() && $data instanceof Model) {
             $this->performValidation($data, request());
         }
 
-        return $next($data);
     }
 
 }

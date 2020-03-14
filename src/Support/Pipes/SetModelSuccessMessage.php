@@ -23,19 +23,19 @@ class SetModelSuccessMessage extends Pipe
      * @param Closure $next
      * @return mixed
      */
-    public function handle($payload, Closure $next)
+    public function pipe()
     {
 
-        $model = $this->payloadToModel($payload);
+        $model = $this->data;
 
-        if ($this->operation()->success_message !== null) {
-            if ($this->operation()->success_message instanceof \Closure) {
-                $this->operation()->setMessage($this->operation()->success_message($model));
+        if ($this->operation->success_message !== null) {
+            if ($this->operation->success_message instanceof \Closure) {
+                $this->operation->setMessage($this->operation->success_message($model));
             } else {
-                $this->operation()->setMessage($this->operation()->success_message);
+                $this->operation->setMessage($this->operation->success_message);
             }
         } else {
-            $this->operation()->setMessage(
+            $this->operation->setMessage(
                 __('messages.model_saved_successfully',
                     [
                         'model' => trans_choice(
@@ -46,7 +46,6 @@ class SetModelSuccessMessage extends Pipe
             );
         }
 
-        return $next($payload);
     }
 
 }

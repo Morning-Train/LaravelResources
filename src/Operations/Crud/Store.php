@@ -3,8 +3,12 @@
 namespace MorningTrain\Laravel\Resources\Operations\Crud;
 
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
-use MorningTrain\Laravel\Resources\Support\Pipes\EnsureModelInstance;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\ConstrainQueryToKey;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryToModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\EnsureModelInstance;
+use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\SetModelSuccessMessage;
+use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Pipes\UpdateModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
 
@@ -19,7 +23,11 @@ class Store extends EloquentOperation
     protected function pipes()
     {
         return [
+            QueryModel::create()->model($this->model)->filters($this->filters),
+            ConstrainQueryToKey::create()->model($this->model),
+            QueryToModel::create(),
             EnsureModelInstance::create()->model($this->model),
+            TransformToView::create()->appends($this->appends),
             ValidatesFields::create()->fields($this->fields),
             UpdateModel::create()->fields($this->fields)
         ];
@@ -28,7 +36,7 @@ class Store extends EloquentOperation
     protected function afterPipes()
     {
         return array_merge(parent::afterPipes(), [
-            SetModelSuccessMessage::create()->operation($this)
+            SetModelSuccessMessage::create()
         ]);
     }
 

@@ -27,7 +27,6 @@ abstract class EloquentOperation extends Operation
     protected function afterPipes()
     {
         return [
-            ToPayload::create(),
             SetFiltersMeta::create()->filters($this->filters),
             SetPermissionsMeta::create(),
             //SetTimestampMeta::create(),

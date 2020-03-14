@@ -4,7 +4,9 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
 
 class Payload implements Responsable
@@ -51,6 +53,29 @@ class Payload implements Responsable
     {
 
         $response = $this->response;
+
+        if(!$response) {
+
+            $data = $this->data;
+
+            if(!isset($data) || empty($data) || $data instanceof Operation) {
+                $data = [];
+            }
+
+            if ($data instanceof Model) {
+                $data = ['model' => $data];
+            }
+
+            if ($data instanceof Collection) {
+                $data = ['collection' => $data];
+            }
+
+            if (!is_object($data) && !is_array($data)) {
+                $data = [$data];
+            }
+
+            $response = $data;
+        }
 
         if ($response instanceof \Exception) {
             throw $response;

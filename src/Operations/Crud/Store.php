@@ -20,7 +20,7 @@ class Store extends EloquentOperation
     /// Pipelines
     /////////////////////////////////
 
-    protected function pipes()
+    protected function beforePipes()
     {
         return [
             QueryModel::create()->model($this->model)->filters($this->filters),
@@ -28,6 +28,12 @@ class Store extends EloquentOperation
             QueryToModel::create(),
             EnsureModelInstance::create()->model($this->model),
             TransformToView::create()->appends($this->appends),
+        ];
+    }
+
+    protected function pipes()
+    {
+        return [
             ValidatesFields::create()->fields($this->fields),
             UpdateModel::create()->fields($this->fields)
         ];

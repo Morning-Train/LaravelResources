@@ -2,20 +2,14 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Pipes;
 
-use Closure;
-use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
-
 class IsPermitted extends Pipe
 {
 
-    public function handle(Payload $payload, Closure $next)
+    public function pipe()
     {
-
-        if (!$payload->operation->canExecute($payload->data)) {
+        if (!$this->operation->canExecute($this->data)) {
             $this->forbidden('Unable to perform operation');
         }
-
-        return $next($payload);
     }
 
 }

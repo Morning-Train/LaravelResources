@@ -12,7 +12,7 @@ class Index extends EloquentOperation
 
     const ROUTE_METHOD = 'get';
 
-    protected function pipes()
+    protected function beforePipes()
     {
         return [
             QueryModel::create()->model($this->model)->filters($this->filters),

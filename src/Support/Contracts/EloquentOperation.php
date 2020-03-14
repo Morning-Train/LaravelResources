@@ -4,7 +4,6 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetFiltersMeta;
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetPermissionsMeta;
-use MorningTrain\Laravel\Resources\Support\Pipes\ToPayload;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;

@@ -262,7 +262,7 @@ abstract class Operation
         );
     }
 
-    public function routes($options = [])
+    public function route($options = [])
     {
 
         $route_group_props = [

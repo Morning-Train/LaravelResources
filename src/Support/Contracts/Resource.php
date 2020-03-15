@@ -82,7 +82,7 @@ abstract class Resource
             function () use($options) {
                 if ($this->hasOperations()) {
                     foreach ($this->getOperations() as $operation) {
-                        $operation->routes($options);
+                        $operation->route($options);
                     }
                 }
             });

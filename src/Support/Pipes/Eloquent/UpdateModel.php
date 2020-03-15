@@ -1,10 +1,10 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Support\Pipes;
+namespace MorningTrain\Laravel\Resources\Support\Pipes\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
-use Closure;
 use MorningTrain\Laravel\Fields\Contracts\FieldContract;
+use MorningTrain\Laravel\Resources\Support\Pipes\Pipe;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 
 class UpdateModel extends Pipe

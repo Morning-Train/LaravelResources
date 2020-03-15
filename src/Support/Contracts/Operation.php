@@ -108,14 +108,6 @@ abstract class Operation
         return $this->resource()->identifier($this->name);
     }
 
-    protected $is_public = false;
-
-    public function public() {
-        $this->is_public = true;
-
-        return $this;
-    }
-
     /////////////////////////////////
     /// Name
     /////////////////////////////////
@@ -208,10 +200,6 @@ abstract class Operation
 
     public function canExecute($data = null)
     {
-        if($this->is_public) {
-            return true;
-        }
-
         $data = $data instanceof Collection ?
             $data : collect([$data]);
 
@@ -305,7 +293,7 @@ abstract class Operation
         $middlewares = $this->middlewares();
 
         if (static::hasMacro('isRestricted') || method_exists($this, 'isRestricted')) {
-            if ($this->isRestricted($this->identifier()) && !$this->is_public) {
+            if ($this->isRestricted($this->identifier())) {
 
                 $guard = isset($options['guard']) ? $options['guard'] : $this->resource()->namespace;
 

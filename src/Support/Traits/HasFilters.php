@@ -32,18 +32,22 @@ trait HasFilters
         FilterCollection::create($this->filters)->apply($query, request());
     }
 
-    public function getFilterMeta()
+    protected function getMetaForFilters($filters)
     {
-
         $export = [];
 
-        if (!empty($this->filters)) {
-            foreach ($this->filters as $filter) {
+        if (!empty($filters)) {
+            foreach ($filters as $filter) {
                 $export = array_merge($export, $filter->getMetaData());
             }
         }
 
         return $export;
+    }
+
+    public function getFilterMeta()
+    {
+        return $this->getMetaForFilters($this->filters);
     }
 
 }

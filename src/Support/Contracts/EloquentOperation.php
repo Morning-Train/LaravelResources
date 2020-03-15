@@ -4,6 +4,7 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetFiltersMeta;
 use MorningTrain\Laravel\Resources\Support\Pipes\Meta\SetPermissionsMeta;
+use MorningTrain\Laravel\Resources\Support\Pipes\Setup\SetupFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
@@ -23,10 +24,16 @@ abstract class EloquentOperation extends Operation
     /// Pipelines
     /////////////////////////////////
 
+    protected function setupPipes()
+    {
+        return [
+            SetupFilters::create()->filters($this->filters),
+        ];
+    }
+
     protected function afterPipes()
     {
         return [
-            SetFiltersMeta::create()->filters($this->filters),
             SetPermissionsMeta::create(),
             //SetTimestampMeta::create(),
         ];

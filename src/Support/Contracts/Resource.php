@@ -24,18 +24,27 @@ abstract class Resource
     /// Basic helpers
     /////////////////////////////////
 
+    protected $_identifiers = [];
+
     public function identifier($operationName = null)
     {
-        $parts = [
-            $this->namespace,
-            $this->name,
-        ];
 
-        if($operationName !== null) {
-            array_push($parts, $operationName);
+        if(!isset($this->_identifiers[$operationName])) {
+
+            $parts = [
+                $this->namespace,
+                $this->name,
+            ];
+
+            if($operationName !== null) {
+                array_push($parts, $operationName);
+            }
+
+            $this->_identifiers[$operationName] = implode('.', $parts);
+
         }
 
-        return implode('.', $parts);
+        return $this->_identifiers[$operationName];
     }
 
     public static function getBaseName(string $name)

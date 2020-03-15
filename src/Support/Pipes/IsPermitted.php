@@ -18,10 +18,10 @@ class IsPermitted extends Pipe
         $data = $data instanceof Collection ?
             $data : collect([$data]);
 
-        $operation_identifier = $this->operation->identifier();
+        $operationIdentifier = $this->operation->identifier();
 
-        $is_permitted = $data->every(function ($model) use($operation_identifier) {
-            return Gate::allows($operation_identifier, $model);
+        $is_permitted = $data->every(function ($model) use($operationIdentifier) {
+            return $this->isAllowed($operationIdentifier, $model);
         });
 
         if(!$is_permitted) {
@@ -48,6 +48,19 @@ class IsPermitted extends Pipe
     /// Helpers
     /////////////////////////////////
 
+    protected $is_allowed_cache = [];
+
+    protected function isAllowed($operationIdentifier, Model $model = null)
+    {
+
+        $cache_key = $operationIdentifier.(($model !== null)?$model->getKey().get_class($model):'');
+        
+        if(!isset($this->is_allowed_cache[$cache_key])) {
+            $this->is_allowed_cache[$cache_key] = Gate::allows($operationIdentifier, $model);
+        }
+        return $this->is_allowed_cache[$cache_key];
+    }
+
     protected function getPermissionsMeta($collection)
     {
 
@@ -60,8 +73,8 @@ class IsPermitted extends Pipe
             return [
                 $model->getKey() =>
                     collect(ResourceRepository::getModelPermissions($model))
-                        ->filter(function ($operation) use ($model) {
-                            return Gate::allows($operation, $model);
+                        ->filter(function ($operationIdentifier) use ($model) {
+                            return $this->isAllowed($operationIdentifier, $model);
                         })
                         ->values()
                         ->all(),

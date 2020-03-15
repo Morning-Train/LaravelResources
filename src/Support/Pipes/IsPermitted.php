@@ -12,7 +12,19 @@ class IsPermitted extends Pipe
 
     public function pipe()
     {
-        if (!$this->operation->canExecute($this->data)) {
+
+        $data = $this->data;
+
+        $data = $data instanceof Collection ?
+            $data : collect([$data]);
+
+        $operation_identifier = $this->operation->identifier();
+
+        $is_permitted = $data->every(function ($model) use($operation_identifier) {
+            return Gate::allows($operation_identifier, $model);
+        });
+
+        if(!$is_permitted) {
             $this->forbidden('Unable to perform operation');
         }
     }

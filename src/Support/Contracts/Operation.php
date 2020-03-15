@@ -2,7 +2,6 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -198,20 +197,6 @@ abstract class Operation
     public function middlewares($value = null)
     {
         return $this->genericGetSet('middlewares', $value);
-    }
-
-    /////////////////////////////////
-    /// Permissions
-    /////////////////////////////////
-
-    public function canExecute($data = null)
-    {
-        $data = $data instanceof Collection ?
-            $data : collect([$data]);
-
-        return $data->every(function ($model) {
-            return Gate::allows($this->identifier(), $model);
-        });
     }
 
     /////////////////////////////////

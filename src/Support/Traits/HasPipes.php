@@ -26,20 +26,15 @@ trait HasPipes
     {
         $pipes = $this->buildPipes();
 
-        if(empty($pipes)) {
+        if (empty($pipes)) {
             return $payload;
         }
 
-        try {
-            return $this->pipeline()
-                ->send($payload)
-                ->through($pipes)
-                ->thenReturn();
-        } catch (\Exception $exception) {
-            return $this->pipeline()
-                ->send($exception)
-                ->thenReturn();
-        }
+        return $this->pipeline()
+            ->send($payload)
+            ->through($pipes)
+            ->thenReturn();
+
     }
 
 }

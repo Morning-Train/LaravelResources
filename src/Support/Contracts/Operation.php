@@ -180,16 +180,11 @@ abstract class Operation
 
         $payload->setRequestArguments(func_get_args());
 
-        try {
-            return $this->pipeline()
-                ->send($payload)
-                ->through($this->buildPipes())
-                ->thenReturn();
-        } catch (\Exception $exception) {
-            return $this->pipeline()
-                ->send($exception)
-                ->thenReturn();
-        }
+        return $this->pipeline()
+            ->send($payload)
+            ->through($this->buildPipes())
+            ->thenReturn();
+
     }
 
     /////////////////////////////////

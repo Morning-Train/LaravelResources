@@ -128,6 +128,11 @@ abstract class Operation
     /// Pipelines
     /////////////////////////////////
 
+    protected function setupPipes()
+    {
+        return [];
+    }
+
     protected function beforePipes()
     {
         return [];
@@ -150,6 +155,7 @@ abstract class Operation
     protected function buildPipes()
     {
         return array_merge(
+            $this->setupPipes(),
             $this->beforePipes(),
             [
                 /// We check to see if the current operation can be performed

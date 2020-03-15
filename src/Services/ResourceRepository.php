@@ -262,9 +262,8 @@ class ResourceRepository
         });
     }
 
-    public function export(string $namespace)
+    protected function getExportForNamespace($namespace)
     {
-
         $environment_data = [];
 
         if ($this->hasResources($namespace)) {
@@ -274,9 +273,23 @@ class ResourceRepository
 
         }
 
-        Context::env(function () use ($environment_data) {
+        return $environment_data;
+    }
+
+    public function export(string $namespace)
+    {
+
+        if(config('app.env') === 'local') {
+            $export = $this->getExportForNamespace($namespace);
+        } else {
+            $export = Cache::rememberForever('resources_export_for_' . $namespace, function () use ($namespace) {
+                return $this->getExportForNamespace($namespace);
+            });
+        }
+
+        Context::env(function () use ($export) {
             return [
-                'resources' => $environment_data,
+                'resources' => $export,
             ];
         });
 

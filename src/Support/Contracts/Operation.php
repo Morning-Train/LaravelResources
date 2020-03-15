@@ -2,8 +2,6 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -208,15 +206,6 @@ abstract class Operation
         return [
             "name" => $this->name,
         ];
-    }
-
-    /////////////////////////////////
-    /// Meta data for response payload
-    /////////////////////////////////
-
-    public function getMeta()
-    {
-        return [];
     }
 
     /////////////////////////////////

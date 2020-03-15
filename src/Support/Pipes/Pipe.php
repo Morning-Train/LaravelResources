@@ -13,13 +13,13 @@ class Pipe
 
     protected $payload;
 
-    /////////////////////////////////
-    /// Traits
-    /////////////////////////////////
-
     use StaticCreate;
     use Respondable;
     use HasPipes;
+
+    /////////////////////////////////
+    /// Handle is the main method to be executed in the pipeline
+    /////////////////////////////////
 
     public function handle(Payload $payload, Closure $next)
     {
@@ -34,13 +34,30 @@ class Pipe
         /// Make the actual pipe task
         $this->pipe();
 
-        return $next($payload);
+        $this->payload = $next($payload);
+
+        $this->after();
+
+        return $this->payload;
     }
+
+    /////////////////////////////////
+    /// Life-cycle methods
+    /////////////////////////////////
 
     protected function pipe()
     {
         /// Here we can do our work...
     }
+
+    protected function after()
+    {
+        /// Handle work before we return the response
+    }
+
+    /////////////////////////////////
+    /// Getter/Setter to proxy payload
+    /////////////////////////////////
 
     public function __get($name)
     {

@@ -24,9 +24,9 @@ abstract class Operation
     /// Request helpers
     /////////////////////////////////
 
-    public function handle(Payload $payload)
+    public function handle()
     {
-        return $payload;
+        return null;
     }
 
     /////////////////////////////////
@@ -138,8 +138,11 @@ abstract class Operation
     protected function pipes()
     {
         return [
-            function ($data, $next) {
-                return $next($this->handle($data));
+            function (Payload $payload, $next) {
+
+                $payload->response = $this->handle();
+
+                return $next($payload);
             }
         ];
     }

@@ -3,6 +3,7 @@
 namespace MorningTrain\Laravel\Resources\Operations\Pages;
 
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
+use MorningTrain\Laravel\Resources\Support\Pipes\Context\SetEnv;
 use MorningTrain\Laravel\Resources\Support\Pipes\Pages\BladeView;
 
 /**
@@ -89,6 +90,7 @@ abstract class Page extends Operation
     protected function pipes()
     {
         return [
+            SetEnv::create()->environment(['page' => $this->getPageEnvironment()]),
             BladeView::create()->path($this->blade_view)->parameters($this->getViewParameters())
         ];
     }

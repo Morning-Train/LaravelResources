@@ -14,6 +14,16 @@ class React extends PageOperation
         return parent::handle($model)->with('component', $this->component());
     }
 
+    protected function getViewParameters()
+    {
+        return array_merge(
+            parent::getViewParameters(),
+            [
+                'component' => $this->component()
+            ]
+        );
+    }
+
     public function getPageEnvironment()
     {
         return array_merge(

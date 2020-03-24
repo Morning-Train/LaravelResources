@@ -2,75 +2,127 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
-use MorningTrain\Laravel\Context\Context;
+use MorningTrain\Laravel\Resources\Support\Pipes\Pages\BladeView;
 
+/**
+ * Class PageOperation
+ * @package MorningTrain\Laravel\Resources\Support\Contracts
+ */
 abstract class PageOperation extends Operation
 {
 
     protected $blade_view = null;
-    public $title = null;
-    public $parent = null;
 
-    public function handle(Payload $payload)
+    /////////////////////////////////
+    /// Setters
+    /////////////////////////////////
+
+    /**
+     * @var null
+     */
+    protected $title = null;
+
+    /**
+     * @param $title
+     * @return Operation
+     */
+    public function title($title): Operation
     {
-        Context::env(function () {
-            return [
-                'page' => array_merge($this->getPageEnvironment(), [
-                    'flash_messages' => request()->getSession()->pull('flash_messages', []),
-                ]),
-            ];
-        });
+        $this->title = $title;
 
-        if($this->blade_view === null) {
-            throw new \Exception('Tried to handle page operation, but no blade view name was supplied!');
-        }
-
-        return view($this->blade_view)->with('title', $this->title());
+        return $this;
     }
+
+    /**
+     * @var null
+     */
+    protected $path = null;
+
+    /**
+     * @param $path
+     * @return Operation
+     */
+    public function path($path): Operation
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * @var null
+     */
+    protected $parent = null;
+
+    /**
+     * @param $parent
+     * @return Operation
+     */
+    public function parent($parent): Operation
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * @var null
+     */
+    protected $forceRedirect = null;
+
+    /**
+     * @param $forceRedirect
+     * @return Operation
+     */
+    public function forceRedirect($forceRedirect): Operation
+    {
+        $this->forceRedirect = $forceRedirect;
+
+        return $this;
+    }
+
+    /////////////////////////////////
+    /// Pipeline
+    /////////////////////////////////
+
+    protected function pipes()
+    {
+        return [
+            BladeView::create()->path($this->blade_view)->parameters($this->getViewParameters())
+        ];
+    }
+
+    protected function getViewParameters()
+    {
+        return [
+            'title' => $this->title
+        ];
+    }
+
+    /////////////////////////////////
+    /// Route helpers
+    /////////////////////////////////
+
+    public function getRoutePath()
+    {
+        return $this->path;
+    }
+
+    /////////////////////////////////
+    /// Exporting & Environment
+    /////////////////////////////////
 
     public function getPageEnvironment()
     {
         return [
-            'title'         => $this->title(),
-            'path'          => $this->path(),
+            'title'         => $this->title,
+            'path'          => $this->path,
             'route'         => $this->identifier(),
-            'parent'        => $this->parent(),
+            'parent'        => $this->parent,
             'namespace'     => $this->resource()->namespace,
-            'forceRedirect' => $this->forceRedirect ?? false,
+            'forceRedirect' => $this->forceRedirect ?? false
         ];
     }
-
-    public function path($value = null)
-    {
-        return $this->genericGetSet('path', $value);
-    }
-
-    public function title($value = null)
-    {
-        return $this->genericGetSet('title', $value);
-    }
-
-
-    public function parent($value = null)
-    {
-        return $this->genericGetSet('parent', $value);
-    }
-
-    public $forceRedirect = null;
-
-    public function forceRedirect($value = null)
-    {
-        return $this->genericGetSet('forceRedirect', $value);
-    }
-
-    public function getRoutePath()
-    {
-        return $this->path();
-    }
-
-    /////////////////////////////////
-    /// Exporting
-    /////////////////////////////////
 
     public function export()
     {

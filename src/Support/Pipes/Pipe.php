@@ -32,7 +32,11 @@ class Pipe
         $this->payload = $payload;
 
         /// Make the actual pipe task
-        $this->pipe();
+        $maybe_response = $this->pipe();
+
+        if($maybe_response) {
+            $this->response = $maybe_response;
+        }
 
         $this->payload = $next($payload);
 

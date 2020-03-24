@@ -7,7 +7,7 @@ use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 
-abstract class EloquentOperation extends Operation
+class EloquentOperation extends Operation
 {
 
     /////////////////////////////////

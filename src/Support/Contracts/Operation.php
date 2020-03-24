@@ -11,12 +11,20 @@ use MorningTrain\Laravel\Resources\Support\Traits\HasPipes;
 use MorningTrain\Laravel\Resources\Support\Traits\Respondable;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
-abstract class Operation
+class Operation
 {
     use StaticCreate;
     use Macroable;
     use Respondable;
     use HasPipes;
+
+
+    protected $pipes = [];
+
+    function __construct($pipes = [])
+    {
+        $this->pipes = $pipes;
+    }
 
     public $data = null;
 
@@ -164,6 +172,7 @@ abstract class Operation
                 IsPermitted::create()
             ],
             $this->pipes(),
+            $this->pipes,
             $this->afterPipes()
         );
     }

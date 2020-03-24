@@ -15,7 +15,7 @@ class ResetPassword extends Operation
 
     protected $middlewares = ['guest'];
 
-    public function handle($model_or_collection = null)
+    public function handle()
     {
         return $this->reset(request());
     }

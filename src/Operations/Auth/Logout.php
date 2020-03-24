@@ -13,7 +13,7 @@ class Logout extends Operation
 
     const ROUTE_METHOD = 'post';
 
-    public function handle($model_or_collection = null)
+    public function handle()
     {
         return $this->logout(request());
     }

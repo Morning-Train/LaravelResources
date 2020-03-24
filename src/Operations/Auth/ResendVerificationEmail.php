@@ -13,7 +13,7 @@ class ResendVerificationEmail extends Operation
 
     protected $middlewares = ['auth', 'throttle:6,1'];
 
-    public function handle($model_or_collection = null)
+    public function handle()
     {
         $success = $this->resend(request())->getSession()->get('resent') === true;
 

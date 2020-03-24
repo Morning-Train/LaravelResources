@@ -11,7 +11,7 @@ class VerifyEmail extends Operation
 
     protected $middlewares = ['auth', 'signed', 'throttle:6,1'];
 
-    public function handle($model_or_collection = null)
+    public function handle()
     {
         $response = $this->verify(request());
         $success  = $response->getSession()->get('verified') === true;

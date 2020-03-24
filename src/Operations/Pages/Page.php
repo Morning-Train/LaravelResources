@@ -1,14 +1,15 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Support\Contracts;
+namespace MorningTrain\Laravel\Resources\Operations\Pages;
 
+use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
 use MorningTrain\Laravel\Resources\Support\Pipes\Pages\BladeView;
 
 /**
- * Class PageOperation
- * @package MorningTrain\Laravel\Resources\Support\Contracts
+ * Class Page
+ * @package MorningTrain\Laravel\Resources\Operations\Pages
  */
-abstract class PageOperation extends Operation
+abstract class Page extends Operation
 {
 
     protected $blade_view = null;

@@ -2,9 +2,7 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Pages;
 
-use MorningTrain\Laravel\Resources\Support\Contracts\PageOperation;
-
-class React extends PageOperation
+class React extends Page
 {
 
     protected $blade_view = 'pages.react';

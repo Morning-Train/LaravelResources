@@ -133,6 +133,25 @@ class Operation
     /// Pipelines
     /////////////////////////////////
 
+    protected $before_pipes = [];
+
+    public function before($before_pipes = [])
+    {
+        $this->before_pipes = $before_pipes;
+
+        return $this;
+    }
+
+
+    protected $after_pipes = [];
+
+    public function after($after_pipes = [])
+    {
+        $this->after_pipes = $after_pipes;
+
+        return $this;
+    }
+
     protected function setupPipes()
     {
         return [];
@@ -164,6 +183,7 @@ class Operation
     {
         return array_merge(
             $this->setupPipes(),
+            ($this->before_pipes instanceof \Closure)?($this->before_pipes)():$this->before_pipes,
             $this->beforePipes(),
             [
                 /// We check to see if the current operation can be performed
@@ -173,7 +193,8 @@ class Operation
             ],
             $this->pipes(),
             $this->pipes,
-            $this->afterPipes()
+            $this->afterPipes(),
+            ($this->after_pipes instanceof \Closure)?($this->after_pipes)():$this->after_pipes,
         );
     }
 

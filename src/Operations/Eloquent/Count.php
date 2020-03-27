@@ -2,9 +2,8 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Eloquent;
 
-
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
-use MorningTrain\Laravel\Resources\Support\Pipes\QueryModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryModel;
 
 class Count extends EloquentOperation
 {

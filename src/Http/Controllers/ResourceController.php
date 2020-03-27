@@ -12,7 +12,7 @@ class ResourceController
 
     protected $resource_namespace;
     protected $resource_name;
-    protected $operation_class;
+    protected $operation_name;
     protected $resource = null;
     protected $operation = null;
 
@@ -21,7 +21,7 @@ class ResourceController
         if ($current_route = Route::getCurrentRoute()) {
             $this->resource_namespace = $current_route->action['resource_namespace'];
             $this->resource_name = $current_route->action['resource'];
-            $this->operation_class = $current_route->action['operation'];
+            $this->operation_name = $current_route->action['operation'];
         }
     }
 
@@ -43,7 +43,7 @@ class ResourceController
     protected function operation()
     {
         if ($this->operation === null) {
-            $this->operation = $this->resource()->operation($this->operation_class);
+            $this->operation = $this->resource()->operation($this->operation_name);
         }
         return $this->operation;
     }

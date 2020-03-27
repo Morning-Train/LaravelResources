@@ -18,15 +18,12 @@ class Operation
     use Respondable;
     use HasPipes;
 
-
     protected $pipes = [];
 
     function __construct($pipes = [])
     {
         $this->pipes = $pipes;
     }
-
-    public $data = null;
 
     /////////////////////////////////
     /// Request helpers
@@ -35,64 +32,6 @@ class Operation
     public function handle()
     {
         return null;
-    }
-
-    /////////////////////////////////
-    /// Message helpers
-    /////////////////////////////////
-
-    public $message = null;
-    public $success_message = null;
-    public $error_message = null;
-
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    public function setMessage($message)
-    {
-        $this->message = $message;
-    }
-
-    public function resetMessage()
-    {
-        $this->setMessage(null);
-    }
-
-    public function successMessage($messageOrClosure)
-    {
-        $this->success_message = $messageOrClosure;
-
-        return $this;
-    }
-
-    public function errorMessage($messageOrClosure)
-    {
-        $this->error_message = $messageOrClosure;
-
-        return $this;
-    }
-
-    /////////////////////////////////
-    /// Status code helpers
-    /////////////////////////////////
-
-    protected $status_code = 200;
-
-    public function getStatusCode()
-    {
-        return $this->status_code;
-    }
-
-    public function setStatusCode($status_code)
-    {
-        $this->status_code = $status_code;
-    }
-
-    public function resetStatusCode()
-    {
-        $this->setStatusCode(200);
     }
 
     /////////////////////////////////

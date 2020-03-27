@@ -89,7 +89,7 @@ class Payload implements Responsable
             return $response;
         }
 
-        $status = $this->operation->getStatusCode();
+        $status = $this->get('status_code', 200);
         $headers = [];
         $options = 0;
 
@@ -97,7 +97,7 @@ class Payload implements Responsable
             $response['meta'] = $this->meta;
         }
 
-        $response['message'] = $this->operation->getMessage();
+        $response['message'] = $this->get('message', null);
 
         return response()->json($response, $status, $headers, $options);
     }

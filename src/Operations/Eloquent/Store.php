@@ -1,16 +1,18 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Operations\Crud;
+namespace MorningTrain\Laravel\Resources\Operations\Eloquent;
 
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\ConstrainQueryToKey;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\EnsureModelInstance;
-use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryToModel;
 use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryToModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\UpdateModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\SetModelSuccessMessage;
 use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
 use MorningTrain\Laravel\Resources\Support\Pipes\ValidatesFields;
 
-class Validate extends EloquentOperation
+class Store extends EloquentOperation
 {
     const ROUTE_METHOD = 'post';
 
@@ -33,7 +35,16 @@ class Validate extends EloquentOperation
     {
         return [
             ValidatesFields::create()->fields($this->fields),
+            UpdateModel::create()->fields($this->fields)
         ];
     }
 
+    protected function afterPipes()
+    {
+        return array_merge(parent::afterPipes(), [
+            SetModelSuccessMessage::create()
+        ]);
+    }
+
 }
+

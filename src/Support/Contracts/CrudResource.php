@@ -2,10 +2,10 @@
 
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
-use MorningTrain\Laravel\Resources\Operations\Crud\Delete;
-use MorningTrain\Laravel\Resources\Operations\Crud\Index;
-use MorningTrain\Laravel\Resources\Operations\Crud\Read;
-use MorningTrain\Laravel\Resources\Operations\Crud\Store;
+use MorningTrain\Laravel\Resources\Operations\Eloquent\Delete;
+use MorningTrain\Laravel\Resources\Operations\Eloquent\Index;
+use MorningTrain\Laravel\Resources\Operations\Eloquent\Read;
+use MorningTrain\Laravel\Resources\Operations\Eloquent\Store;
 
 abstract class CrudResource extends Resource
 {

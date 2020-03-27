@@ -1,6 +1,6 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Operations\Crud;
+namespace MorningTrain\Laravel\Resources\Operations\Eloquent;
 
 
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;

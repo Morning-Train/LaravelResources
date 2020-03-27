@@ -1,8 +1,6 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Operations;
-
-use MorningTrain\Laravel\Resources\Operations\Crud\Read;
+namespace MorningTrain\Laravel\Resources\Operations\Eloquent;
 
 class Action extends Read
 {

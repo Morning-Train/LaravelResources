@@ -19,11 +19,6 @@ class Payload implements Responsable
         $this->operation = $operation;
     }
 
-    public function setRequestArguments()
-    {
-        $this->args = func_get_args();
-    }
-
     public function set($path, $value)
     {
         Arr::set($this->_data, $path, $value);

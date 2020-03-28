@@ -26,7 +26,7 @@ class Pipe
 
         /// If our pipe has a nested pipeline, execute it.
         /// If no additional pipes are defined, it will just return the payload back
-        $payload = $this->executePipeline($payload);
+        $payload = $this->execute($payload);
 
         /// Set the payload for use in our pipe method
         $this->payload = $payload;

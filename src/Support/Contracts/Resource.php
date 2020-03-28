@@ -5,6 +5,7 @@ namespace MorningTrain\Laravel\Resources\Support\Contracts;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use ReflectionClass;
 
 abstract class Resource
 {
@@ -12,12 +13,14 @@ abstract class Resource
     public $namespace;
     public $name;
     public $base_name;
+    public $identifier;
 
     public function __construct(string $namespace, string $name)
     {
         $this->namespace = $namespace;
-        $this->name      = $name;
+        $this->name = $name;
         $this->base_name = static::getBaseName($name);
+        $this->identifier = $this->identifier();
     }
 
     /////////////////////////////////
@@ -29,14 +32,14 @@ abstract class Resource
     public function identifier($operationName = null)
     {
 
-        if(!isset($this->_identifiers[$operationName])) {
+        if (!isset($this->_identifiers[$operationName])) {
 
             $parts = [
                 $this->namespace,
                 $this->name,
             ];
 
-            if($operationName !== null) {
+            if ($operationName !== null) {
                 array_push($parts, $operationName);
             }
 
@@ -61,13 +64,16 @@ abstract class Resource
         $exportData = [];
 
         if ($this->hasOperations()) {
-            foreach ($this->getOperations() as $operation) {
+            foreach ($this->getOperations() as $operationName => $operationClass) {
+
+                $operation = $this->operation($operationName);
                 $exportData[$operation->name] = $operation->export();
+
             }
         }
 
         return [
-            "name"       => $this->name,
+            "name" => $this->name,
             "operations" => $exportData,
         ];
     }
@@ -78,11 +84,14 @@ abstract class Resource
 
     public function routes($options = [])
     {
-        Route::group(['resource' => $this->name],
-            function () use($options) {
+        Route::group(['resourceName' => $this->name],
+            function () use ($options) {
                 if ($this->hasOperations()) {
-                    foreach ($this->getOperations() as $operation) {
+                    foreach ($this->getOperations() as $operationName => $operationClass) {
+
+                        $operation = $this->operation($operationName);
                         $operation->route($options);
+
                     }
                 }
             });
@@ -102,67 +111,48 @@ abstract class Resource
     /// Should be overridden if providing operation class names
     protected static $operations = [];
 
-    public function operations()
+    public function operation($operationName)
     {
-        /// Should be overridden if providing operation instances instead of classes
-        return [];
-    }
-
-    public function operation($slug)
-    {
-        if ($this->hasOperation($slug)) {
-            return $this->getOperations()[$slug];
+        if ($this->hasOperation($operationName)) {
+            return $this->bootOperation($operationName);
         }
 
-        throw new \Exception("Tried to get operation ($slug), but it is not found on resource (" . $this->identifier() . ")");
-
+        throw new \Exception("Tried to get operation ($operationName), but it is not found on resource (" . $this->identifier() . ")");
     }
 
     public function getOperations()
     {
-        if (!isset(static::$_cached_operations[$this->identifier()])) {
+        $resource_identifier = $this->identifier;
+
+        if (!isset(static::$_cached_operations[$resource_identifier])) {
 
             $raw_class_operations = static::$operations;
 
             $operations = [];
 
             if (is_array($raw_class_operations) && !empty($raw_class_operations)) {
-                foreach ($raw_class_operations as $key => $operation) {
+                foreach ($raw_class_operations as $operationName => $operation) {
 
                     if (!class_exists($operation)) {
-                        throw new \Exception("Supplied operation ($operation) on resource (" . $this->identifier() . "), but it is not a class!");
+                        throw new \Exception("Supplied operation ($operation) on resource (" . $resource_identifier . "), but it is not a class!");
                     }
 
-                    if (is_int($key)) {
-                        $key = Str::snake(class_basename($operation));
+                    if (is_int($operationName)) {
+                        $operationName = Str::snake(class_basename($operation));
                     }
-                    $operations[$key] = new $operation;
-                }
-            }
 
-            $instance_operations = $this->operations();
-
-            if (is_array($instance_operations) && !empty($instance_operations)) {
-                foreach ($instance_operations as $key => $operation) {
-                    if (is_int($key)) {
-                        $key = Str::snake(class_basename(get_class($operation)));
-                    }
-                    $operations[$key] = $operation;
+                    $operations[$operationName] = $operation;
                 }
             }
 
             if (empty($operations)) {
-                throw new \Exception('Looking for operations on resource: ' . $this->identifier() . ', but none was found!');
+                throw new \Exception('Looking for operations on resource: ' . $resource_identifier . ', but none was found!');
             }
 
-            foreach ($operations as $name => $operation) {
-                $this->bootOperation($name, $operation);
-            }
-
-            static::$_cached_operations[$this->identifier()] = $operations;
+            static::$_cached_operations[$resource_identifier] = $operations;
         }
 
-        return static::$_cached_operations[$this->identifier()];
+        return static::$_cached_operations[$resource_identifier];
     }
 
     public function hasOperations()
@@ -175,25 +165,56 @@ abstract class Resource
         return isset($this->getOperations()[$operationName]);
     }
 
-    public function bootOperation(string $name, Operation $operation)
+    public function getOperation($operationName)
     {
-        /// Set current resource on operation
-        $operation->resource($this);
-        $operation->name($name);
+        return $this->getOperations()[$operationName];
+    }
+
+    public function bootOperations()
+    {
+
+        $operationNames = $this->getOperations();
+
+        if (!is_array($operationNames) || empty($operationNames)) {
+            return;
+        }
+
+        foreach ($operationNames as $operationName => $operationClass) {
+            $this->bootOperation($operationName);
+        }
+    }
+
+    protected $booted_operations = [];
+
+    public function bootOperation(string $operationName)
+    {
+
+        if(in_array($operationName, $this->booted_operations)) {
+            return $this->booted_operations[$operationName];
+        }
+
+        if (!$this->hasOperation($operationName)) {
+            throw new \Exception("Tried to boot operation $operationName in {$this->identifier}, but it is not configured.");
+        }
+
+        $operationClass = $this->getOperation($operationName);
+
+        if (!class_exists($operationClass)) {
+            throw new \Exception("Tried to boot operation $operationName in {$this->identifier}, but it does not exist.");
+        }
+
+        $operation = (new ReflectionClass($operationClass))->newInstanceArgs([$this, $operationName]);
 
         // Method to be called for this specific operation
-        $method   = Str::camel('configure_' . $operation->name . '_operation');
+        $method = Str::camel($operation->name . '_operation');
         $callable = [$this, $method];
         if (method_exists($this, $method) && is_callable($callable)) {
             call_user_func($callable, $operation);
         }
 
-        /// Generic function to always be called on the operation
-        $method   = Str::camel('configure_operation');
-        $callable = [$this, $method];
-        if (method_exists($this, $method) && is_callable($callable)) {
-            call_user_func($callable, $operation);
-        }
+        $this->booted_operations[$operationName] = $operation;
+
+        return $operation;
     }
 
 }

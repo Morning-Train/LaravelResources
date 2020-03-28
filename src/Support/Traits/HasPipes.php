@@ -3,9 +3,48 @@
 namespace MorningTrain\Laravel\Resources\Support\Traits;
 
 use Illuminate\Pipeline\Pipeline;
+use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
 
 trait HasPipes
 {
+
+    protected $before_pipes = [];
+
+    public function before($before_pipes = [])
+    {
+        $this->before_pipes = $before_pipes;
+
+        return $this;
+    }
+
+    protected $after_pipes = [];
+
+    public function after($after_pipes = [])
+    {
+        $this->after_pipes = $after_pipes;
+
+        return $this;
+    }
+
+    protected function setupPipes()
+    {
+        return [];
+    }
+
+    protected function beforePipes()
+    {
+        return [];
+    }
+
+    protected function afterPipes()
+    {
+        return [];
+    }
+
+    protected function authPipes()
+    {
+        return [];
+    }
 
     protected function pipes()
     {
@@ -19,11 +58,23 @@ trait HasPipes
 
     protected function buildPipes()
     {
-        return $this->pipes();
+        return array_merge(
+            $this->setupPipes(),
+            ($this->before_pipes instanceof \Closure) ? ($this->before_pipes)() : $this->before_pipes,
+            $this->beforePipes(),
+            $this->authPipes(),
+            $this->pipes(),
+            $this->afterPipes(),
+            ($this->after_pipes instanceof \Closure) ? ($this->after_pipes)() : $this->after_pipes,
+            );
     }
 
-    protected function executePipeline($payload)
+    public function execute($payload = null)
     {
+        if ($payload === null) {
+            $payload = new Payload($this);
+        }
+
         $pipes = $this->buildPipes();
 
         if (empty($pipes)) {

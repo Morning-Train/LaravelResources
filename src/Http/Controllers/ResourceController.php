@@ -20,8 +20,8 @@ class ResourceController
     {
         if ($current_route = Route::getCurrentRoute()) {
             $this->resource_namespace = $current_route->action['resource_namespace'];
-            $this->resource_name = $current_route->action['resource'];
-            $this->operation_name = $current_route->action['operation'];
+            $this->resource_name = $current_route->action['resourceName'];
+            $this->operation_name = $current_route->action['operationName'];
         }
     }
 
@@ -45,6 +45,7 @@ class ResourceController
         if ($this->operation === null) {
             $this->operation = $this->resource()->operation($this->operation_name);
         }
+
         return $this->operation;
     }
 

@@ -3,7 +3,6 @@
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use MorningTrain\Laravel\Resources\Http\Controllers\ResourceController;
 use MorningTrain\Laravel\Resources\Support\Pipes\IsPermitted;
@@ -18,11 +17,13 @@ class Operation
     use Respondable;
     use HasPipes;
 
-    protected $pipes = [];
+    protected Resource $resource;
+    public string $name;
 
-    function __construct($pipes = [])
+    function __construct(Resource $resource, string $name)
     {
-        $this->pipes = $pipes;
+        $this->resource = $resource;
+        $this->name = $name;
     }
 
     /////////////////////////////////
@@ -38,67 +39,23 @@ class Operation
     /// Helpers
     /////////////////////////////////
 
-    public function genericGetSet($name, $value = null)
-    {
-        if ($value === null) {
-            return $this->{$name};
-        }
-        $this->{$name} = $value;
-        return $this;
-    }
-
     public function identifier()
     {
-        return $this->resource()->identifier($this->name);
+        return $this->resource->identifier($this->name);
     }
 
     /////////////////////////////////
-    /// Name
+    /// Pipeline setup
     /////////////////////////////////
 
-    public $name;
-
-    public function name($value = null)
+    protected function authPipes()
     {
-        return $this->genericGetSet('name', $value);
-    }
-
-    public static function getName()
-    {
-        return Str::snake(class_basename(get_called_class()));
-    }
-
-    /////////////////////////////////
-    /// Pipelines
-    /////////////////////////////////
-
-    protected $before_pipes = [];
-
-    public function before($before_pipes = [])
-    {
-        $this->before_pipes = $before_pipes;
-
-        return $this;
-    }
-
-
-    protected $after_pipes = [];
-
-    public function after($after_pipes = [])
-    {
-        $this->after_pipes = $after_pipes;
-
-        return $this;
-    }
-
-    protected function setupPipes()
-    {
-        return [];
-    }
-
-    protected function beforePipes()
-    {
-        return [];
+        return [
+            /// We check to see if the current operation can be performed
+            /// It will factor in if the resource has been configured with the operation
+            /// It will also check to see if the current user has access to it
+            IsPermitted::create()
+        ];
     }
 
     protected function pipes()
@@ -113,60 +70,17 @@ class Operation
         ];
     }
 
-    protected function afterPipes()
-    {
-        return [];
-    }
-
-    protected function buildPipes()
-    {
-        return array_merge(
-            $this->setupPipes(),
-            ($this->before_pipes instanceof \Closure)?($this->before_pipes)():$this->before_pipes,
-            $this->beforePipes(),
-            [
-                /// We check to see if the current operation can be performed
-                /// It will factor in if the resource has been configured with the operation
-                /// It will also check to see if the current user has access to it
-                IsPermitted::create()
-            ],
-            $this->pipes(),
-            $this->pipes,
-            $this->afterPipes(),
-            ($this->after_pipes instanceof \Closure)?($this->after_pipes)():$this->after_pipes,
-        );
-    }
-
-    public function execute()
-    {
-
-        $payload = new Payload($this);
-
-        $payload->setRequestArguments(func_get_args());
-
-        return $this->executePipeline($payload);
-    }
-
-    /////////////////////////////////
-    /// Resource
-    /////////////////////////////////
-
-    protected $resource;
-
-    public function resource($value = null)
-    {
-        return $this->genericGetSet('resource', $value);
-    }
-
     /////////////////////////////////
     /// Middleware
     /////////////////////////////////
 
     protected $middlewares = [];
 
-    public function middlewares($value = null)
+    public function middlewares($middlewares = null)
     {
-        return $this->genericGetSet('middlewares', $value);
+        $this->middlewares = $middlewares;
+
+        return $this;
     }
 
     /////////////////////////////////
@@ -238,16 +152,16 @@ class Operation
     {
 
         $route_group_props = [
-            'operation' => $this->name,
-            'resource_namespace' => $this->resource()->namespace
+            'operationName' => $this->name,
+            'resource_namespace' => $this->resource->namespace
         ];
 
-        $middlewares = $this->middlewares();
+        $middlewares = $this->middlewares;
 
         if (static::hasMacro('isRestricted') || method_exists($this, 'isRestricted')) {
             if ($this->isRestricted($this->identifier())) {
 
-                $guard = isset($options['guard']) ? $options['guard'] : $this->resource()->namespace;
+                $guard = isset($options['guard']) ? $options['guard'] : $this->resource->namespace;
 
                 $middlewares[] = 'auth:' . $guard;
             }
@@ -260,7 +174,7 @@ class Operation
         Route::group($route_group_props,
             function () {
 
-                $route_path       = $this->getRoutePath();
+                $route_path = $this->getRoutePath();
                 $route_controller = '\\' . ResourceController::class . '@executeOperation';
 
                 $route = Route::name($this->identifier());

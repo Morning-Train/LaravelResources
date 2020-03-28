@@ -122,7 +122,7 @@ abstract class Page extends Operation
             'path'          => $this->path,
             'route'         => $this->identifier(),
             'parent'        => $this->parent,
-            'namespace'     => $this->resource()->namespace,
+            'namespace'     => $this->resource->namespace,
             'forceRedirect' => $this->forceRedirect ?? false
         ];
     }

@@ -124,7 +124,7 @@ class ResourceRepository
                 foreach ($this->getResources($namespace) as $resource) {
                     if (!$this->operations->get($namespace)->has($resource->name)) {
                         $this->operations->get($namespace)
-                            ->put($resource->name, $resource->getOperations());
+                            ->put($resource->name, $resource->getBootedOperations());
                     }
                 }
             }
@@ -146,7 +146,7 @@ class ResourceRepository
      */
     public function getOperationIdentifiers(string $namespace = null)
     {
-        return $this->getOperations($namespace)->map->identifier();
+        return $this->getOperations($namespace)->map->identifier;
     }
 
     /**
@@ -200,7 +200,7 @@ class ResourceRepository
                         ->each(function ($operation) use ($operations) {
                             if (method_exists($operation, 'model')) {
                                 $model      = $operation->model;
-                                $identifier = $operation->identifier();
+                                $identifier = $operation->identifier;
 
                                 if($model === null) {
                                     return;

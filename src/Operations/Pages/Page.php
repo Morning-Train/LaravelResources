@@ -120,7 +120,7 @@ abstract class Page extends Operation
         return [
             'title'         => $this->title,
             'path'          => $this->path,
-            'route'         => $this->identifier(),
+            'route'         => $this->identifier,
             'parent'        => $this->parent,
             'namespace'     => $this->resource->namespace,
             'forceRedirect' => $this->forceRedirect ?? false

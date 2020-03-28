@@ -117,7 +117,7 @@ abstract class Resource
             return $this->bootOperation($operationName);
         }
 
-        throw new \Exception("Tried to get operation ($operationName), but it is not found on resource (" . $this->identifier() . ")");
+        throw new \Exception("Tried to get operation ($operationName), but it is not found on resource (" . $this->identifier . ")");
     }
 
     public function getOperations()
@@ -170,6 +170,19 @@ abstract class Resource
         return $this->getOperations()[$operationName];
     }
 
+    public function getBootedOperations()
+    {
+        $operations = [];
+
+        if ($this->hasOperations()) {
+            foreach ($this->getOperations() as $operationName => $operationClass) {
+                $operations[] = $this->operation($operationName);
+            }
+        }
+
+        return $operations;
+    }
+
     public function bootOperations()
     {
 
@@ -189,7 +202,7 @@ abstract class Resource
     public function bootOperation(string $operationName)
     {
 
-        if(in_array($operationName, $this->booted_operations)) {
+        if (in_array($operationName, $this->booted_operations)) {
             return $this->booted_operations[$operationName];
         }
 

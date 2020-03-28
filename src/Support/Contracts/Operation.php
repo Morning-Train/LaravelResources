@@ -18,12 +18,14 @@ class Operation
     use HasPipes;
 
     protected Resource $resource;
+    public string $identifier;
     public string $name;
 
     function __construct(Resource $resource, string $name)
     {
         $this->resource = $resource;
         $this->name = $name;
+        $this->identifier = $this->resource->identifier($this->name);
     }
 
     /////////////////////////////////
@@ -33,15 +35,6 @@ class Operation
     public function handle()
     {
         return null;
-    }
-
-    /////////////////////////////////
-    /// Helpers
-    /////////////////////////////////
-
-    public function identifier()
-    {
-        return $this->resource->identifier($this->name);
     }
 
     /////////////////////////////////
@@ -159,7 +152,7 @@ class Operation
         $middlewares = $this->middlewares;
 
         if (static::hasMacro('isRestricted') || method_exists($this, 'isRestricted')) {
-            if ($this->isRestricted($this->identifier())) {
+            if ($this->isRestricted($this->identifier)) {
 
                 $guard = isset($options['guard']) ? $options['guard'] : $this->resource->namespace;
 
@@ -177,7 +170,7 @@ class Operation
                 $route_path = $this->getRoutePath();
                 $route_controller = '\\' . ResourceController::class . '@executeOperation';
 
-                $route = Route::name($this->identifier());
+                $route = Route::name($this->identifier);
 
                 $callable = [$route, strtolower(static::ROUTE_METHOD)];
 

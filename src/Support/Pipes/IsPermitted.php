@@ -18,7 +18,7 @@ class IsPermitted extends Pipe
         $data = $data instanceof Collection ?
             $data : collect([$data]);
 
-        $operationIdentifier = $this->operation->identifier();
+        $operationIdentifier = $this->operation->identifier;
 
         $is_permitted = $data->every(function ($model) use($operationIdentifier) {
             return $this->isAllowed($operationIdentifier, $model);

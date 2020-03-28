@@ -29,17 +29,15 @@ class Operation
     }
 
     /////////////////////////////////
-    /// Request helpers
+    /// Pipeline
     /////////////////////////////////
 
     public function handle()
     {
+        /// Extend the handle method to perform basic logic in operation
+        ///  -> Will be removed when everything can be moved to pipes
         return null;
     }
-
-    /////////////////////////////////
-    /// Pipeline setup
-    /////////////////////////////////
 
     protected function authPipes()
     {

@@ -70,7 +70,7 @@ class ResourceController
         }
 
         /// We are ready to execute the operation
-        return $operation->execute(...func_get_args());
+        return $operation->execute();
     }
 
 }

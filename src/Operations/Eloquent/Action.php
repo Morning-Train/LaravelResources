@@ -2,6 +2,8 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Eloquent;
 
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\TriggerOnModel;
+
 class Action extends Read
 {
 
@@ -18,30 +20,15 @@ class Action extends Read
         return $this;
     }
 
-    public function performTrigger($model = null)
-    {
-        $trigger = $this->trigger;
-
-        if ($model === null || $trigger === null) {
-            return $model;
-        }
-
-        return $trigger instanceof \Closure ?
-            $trigger($model) :
-            $model->{$trigger}();
-    }
-
     /////////////////////////////////
     /// Pipelines
     /////////////////////////////////
 
     protected function pipes()
     {
-        return array_merge(parent::pipes(), [
-            function ($model, \Closure $next) {
-                return $next($this->performTrigger($model));
-            }
-        ]);
+        return [
+            TriggerOnModel::create()->trigger($this->trigger)
+        ];
     }
 
 }

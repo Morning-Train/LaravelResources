@@ -354,7 +354,7 @@ as well as an is_public check when setting up the routes.
 
 - Page and React operations updated to provide title and page info to ENV exports.
 
-## [1.2.0 (2019-06-12)](https://github.com/Morning-Train/LaravelResources/compare/1.1.10...1.2.0)
+## [1.2.0 (2019-05-23)](https://github.com/Morning-Train/LaravelResources/compare/1.1.10...1.2.0)
 
 - Resource namespacing has been reworked.
 

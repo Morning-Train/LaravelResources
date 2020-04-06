@@ -1,4 +1,4 @@
-# Release Notes for 4.x
+# Release Notes
 
 ## [4.0.0 (2020-xx-xx)](https://github.com/Morning-Train/LaravelResources/compare/3.0.0...4.0.0)
 

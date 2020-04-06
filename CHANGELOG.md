@@ -176,11 +176,187 @@ as well as an is_public check when setting up the routes.
 - Logic for adding meta to payload moved to Pipe
 - EnsureModelInstance pipe will also return new Instance if model was not supplied
 
+## [2.2.0 (2019-11-03)](https://github.com/Morning-Train/LaravelResources/compare/2.1.0...2.2.0)
 
+- Basic logic from EloquentOperation moved to pipes (`QueryToInstance` and `TransformToView`)
 
+## [2.1.0 (2019-11-03)](https://github.com/Morning-Train/LaravelResources/compare/2.0.1...2.1.0)
 
+- StaticCreate trait has been added to Pipe to make them easier to create and configure
+- Method to set operation on pipe is changed to not being static.
+- In operation, handle is now called in pipe closure
+- Validation of fields is moved to pipe
+- Permission check moved from Resource controller to operation
+- Prepare methods moved to pipeline and initialPipes method added
+- Refactored route generation in eloquent and base operation to allow for dynamic parameters
+- In eloquent operation - more directly pull key value from route parameter
+- QueryModel pipe added to replace query logic in EloquentOperation
 
+## [2.0.1 (2019-11-02)](https://github.com/Morning-Train/LaravelResources/compare/2.0.0...2.0.1)
 
+- Pipes refactored in operation to make them more extendable. Added methods for 
+  `beforePipes`, `afterPipes`, `responsePipes` and a `buildPipes` method to merge the different pipes together.
+
+## [2.0.0 (2019-11-02)](https://github.com/Morning-Train/LaravelResources/compare/1.4.0...2.0.0)
+
+- Initial pipeline setup. Operation has pipelines
+- ResourceController updated its exectute part to match the pipeline setup in operations.
+- Added base Pipe class.
+
+## [1.4.0 (2019-11-02)](https://github.com/Morning-Train/LaravelResources/compare/1.3.6...1.4.0)
+
+- Macroable trait added to operations
+- When generating operation route - rely on isRestricted macro or method to check if auth middleware should be applied.
+- Permission related methods moved from ResourceRepository to morningtrain/laravel-permissions package
+
+## [1.3.6 (2019-10-31)](https://github.com/Morning-Train/LaravelResources/compare/1.3.5...1.3.6)
+
+- Updated how flash messages are handled (they are added to session) and used in PageOperation and VerifyEmail operation.
+
+## [1.3.5 (2019-10-30)](https://github.com/Morning-Train/LaravelResources/compare/1.3.4...1.3.5)
+
+- Added VerifyEmail operation using Laravel VerifiesEmails trait as base.
+- Added ResendVerificationEmail operation using Laravel VerifiesEmails trait as base.
+
+## [1.3.4 (2019-10-29)](https://github.com/Morning-Train/LaravelResources/compare/1.3.3...1.3.4)
+
+- Responses in ForgotPassword and ResetPassword operations updated to use setMessage and setStatusCode helpers.
+
+## [1.3.3 (2019-10-14)](https://github.com/Morning-Train/LaravelResources/compare/1.3.2...1.3.3)
+
+- Bugfix: Reverted older commits 
+
+## [1.3.2 (2019-10-14)](https://github.com/Morning-Train/LaravelResources/compare/1.3.1...1.3.2)
+
+- Payload updated to check for universal Symfony response instead of checking on individual Laravel responses.
+
+## [1.3.1 (2019-10-09)](https://github.com/Morning-Train/LaravelResources/compare/1.3.0...1.3.1)
+
+- Operations are now considered restricted if they are defined in permissions config
+
+## [1.3.0 (2019-10-04)](https://github.com/Morning-Train/LaravelResources/compare/1.2.28...1.3.0)
+
+- Permission handling updated to use Gate::allows instead of custom logic
+
+## [1.2.28 (2019-09-26)](https://github.com/Morning-Train/LaravelResources/compare/1.2.27...1.2.28)
+
+- Support added for custom model permissions
+
+## [1.2.27 (2019-09-19)](https://github.com/Morning-Train/LaravelResources/compare/1.2.26...1.2.27)
+
+- Accept closure as Action trigger
+
+## [1.2.26 (2019-09-18)](https://github.com/Morning-Train/LaravelResources/compare/1.2.25...1.2.26)
+
+- Store operation gets a default success message
+
+## [1.2.25 (2019-09-13)](https://github.com/Morning-Train/LaravelResources/compare/1.2.24...1.2.25)
+
+- Added getOperationPolicyParameters to ResourceRepository - Return a list of operation/permission names 
+  which have policy methods not requiring an instance of the Model.
+
+## [1.2.24 (2019-09-04)](https://github.com/Morning-Train/LaravelResources/compare/1.2.23...1.2.24)
+
+- Bugfix: Auth register operation uses overridden registered from trait instead of parent
+
+## [1.2.23 (2019-09-04)](https://github.com/Morning-Train/LaravelResources/compare/1.2.22...1.2.23)
+
+- Register operation updated to match Laravel 6.0.
+
+## [1.2.22 (2019-09-04)](https://github.com/Morning-Train/LaravelResources/compare/1.2.21...1.2.22)
+
+- Support Laravel 6 illuminate packages
+
+## [1.2.21 (2019-08-23)](https://github.com/Morning-Train/LaravelResources/compare/1.2.20...1.2.21)
+
+- In env for page operation, also export current resource namespace. It is used to assist frontend navigation.
+
+## [1.2.20 (2019-08-23)](https://github.com/Morning-Train/LaravelResources/compare/1.2.19...1.2.20)
+
+- Bugfix: successMessage and errorMessage are now chainable.
+
+## [1.2.19 (2019-08-23)](https://github.com/Morning-Train/LaravelResources/compare/1.2.18...1.2.19)
+
+- Default success and error message can be configured on operation.
+
+## [1.2.18 (2019-08-20)](https://github.com/Morning-Train/LaravelResources/compare/1.2.17...1.2.18)
+
+- In payload, factor in redirect and json response types
+
+## [1.2.17 (2019-08-12)](https://github.com/Morning-Train/LaravelResources/compare/1.2.16...1.2.17)
+
+- Status code and message in payload is now pulled from operation in default pathway
+
+## [1.2.16 (2019-08-12)](https://github.com/Morning-Train/LaravelResources/compare/1.2.15...1.2.16)
+
+- Bugfix: Parent is not set as a property on page operation.
+
+## [1.2.15 (2019-07-09)](https://github.com/Morning-Train/LaravelResources/compare/1.2.14...1.2.15)
+
+- Added helpers for setting parent in page operation.
+
+## [1.2.14 (2019-07-09)](https://github.com/Morning-Train/LaravelResources/compare/1.2.13...1.2.14)
+
+- Generic eloquent Count operation added.
+
+## [1.2.13 (2019-06-27)](https://github.com/Morning-Train/LaravelResources/compare/1.2.12...1.2.13)
+
+- Logic for exporting filter meta has been moved to filters from eloquent operation.
+
+## [1.2.12 (2019-06-12)](https://github.com/Morning-Train/LaravelResources/compare/1.2.11...1.2.12)
+
+- Added method to set appends on eloquent operation.
+
+## [1.2.11 (2019-06-07)](https://github.com/Morning-Train/LaravelResources/compare/1.2.10...1.2.11)
+
+- Only apply model class name to route path in eloquent operation if model is supplied
+
+## [1.2.10 (2019-06-06)](https://github.com/Morning-Train/LaravelResources/compare/1.2.9...1.2.10)
+
+- Added methods getModelClassName and getRoutePath to Eloquent operations. 
+  They are added to export and used to generate routes in the frontend.
+
+## [1.2.9 (2019-06-04)](https://github.com/Morning-Train/LaravelResources/compare/1.2.8...1.2.9)
+
+- In EloquentOperation, model name is exported.
+
+## [1.2.8 (2019-06-03)](https://github.com/Morning-Train/LaravelResources/compare/1.2.7...1.2.8)
+
+- Use namespace when caching operations on resources.
+- Identifier method has been added in resource class.
+
+## [1.2.7 (2019-05-31)](https://github.com/Morning-Train/LaravelResources/compare/1.2.6...1.2.7)
+
+- Page operation will export title to ENV exports.
+
+## [1.2.6 (2019-05-31)](https://github.com/Morning-Train/LaravelResources/compare/1.2.5...1.2.6)
+
+- React operation now adds namespace to component in ENV exports.
+
+## [1.2.5 (2019-05-31)](https://github.com/Morning-Train/LaravelResources/compare/1.2.4...1.2.5)
+
+- React operation will export component to ENV exports.
+- Eloquent(crud) Action operation added.
+
+## [1.2.4 (2019-05-30)](https://github.com/Morning-Train/LaravelResources/compare/1.2.3...1.2.4)
+
+- Payload updated to not require eloquent instance in modelResponse method.
+
+## [1.2.3 (2019-05-30)](https://github.com/Morning-Train/LaravelResources/compare/1.2.2...1.2.3)
+
+- Bugfix: Added title property to PageOperation
+
+## [1.2.2 (2019-05-30)](https://github.com/Morning-Train/LaravelResources/compare/1.2.1...1.2.2)
+
+- Removed "resources" as a static part of the operation and resource identifiers. 
+
+## [1.2.1 (2019-05-30)](https://github.com/Morning-Train/LaravelResources/compare/1.2.0...1.2.1)
+
+- Page and React operations updated to provide title and page info to ENV exports.
+
+## [1.2.0 (2019-06-12)](https://github.com/Morning-Train/LaravelResources/compare/1.1.10...1.2.0)
+
+- Resource namespacing has been reworked.
 
 
 

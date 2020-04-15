@@ -49,6 +49,10 @@ class ToResponse extends Pipe
 
         $payload['message'] = $this->operation()->getMessage();
 
+        if (request()->has('_request_uuid')) {
+            $payload['_request_uuid'] = request()->input('_request_uuid');
+        }
+
         $response = response()->json($payload, $status, $headers, $options);
 
         return $next($response);

@@ -140,6 +140,24 @@ abstract class Operation
         return app(Pipeline::class);
     }
 
+    protected $before_pipes = [];
+
+    public function before($before_pipes = [])
+    {
+        $this->before_pipes = $before_pipes;
+
+        return $this;
+    }
+
+    protected $after_pipes = [];
+
+    public function after($after_pipes = [])
+    {
+        $this->after_pipes = $after_pipes;
+
+        return $this;
+    }
+
     protected function beforePipes()
     {
         return [];
@@ -170,6 +188,7 @@ abstract class Operation
     {
         return array_merge(
             $this->beforePipes(),
+            ($this->before_pipes instanceof \Closure) ? ($this->before_pipes)() : $this->before_pipes,
             [
                 /// We check to see if the current operation can be performed
                 /// It will factor in if the resource has been configured with the operation
@@ -178,6 +197,7 @@ abstract class Operation
             ],
             $this->pipes(),
             $this->afterPipes(),
+            ($this->after_pipes instanceof \Closure) ? ($this->after_pipes)() : $this->after_pipes,
             $this->responsePipes()
         );
     }

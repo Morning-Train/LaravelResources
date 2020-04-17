@@ -2,6 +2,7 @@
 
 ## [4.0.0 (2020-xx-xx)](https://github.com/Morning-Train/LaravelResources/compare/3.0.0...4.0.0)
 
+- SetModelSuccessMessage pipe moved to Messages pipe namespace and renamed to ModelUpdatedMessage
 - ResourceController will no longer provide func_get_args to execute method on operation (which no longer accepts any)
 - Route actions `resource` and `operation` renamed to `resourceName` and `operationName`. 
   This and a similar update to the ResourceController is made to make more consistent naming across packages. 

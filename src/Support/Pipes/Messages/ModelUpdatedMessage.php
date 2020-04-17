@@ -1,10 +1,11 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Support\Pipes;
+namespace MorningTrain\Laravel\Resources\Support\Pipes\Messages;
 
 use Closure;
+use MorningTrain\Laravel\Resources\Support\Pipes\Pipe;
 
-class SetModelSuccessMessage extends Pipe
+class ModelUpdatedMessage extends Pipe
 {
 
     /**

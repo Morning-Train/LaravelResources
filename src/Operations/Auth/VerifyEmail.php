@@ -4,10 +4,12 @@ namespace MorningTrain\Laravel\Resources\Operations\Auth;
 
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
+use MorningTrain\Laravel\Resources\Support\Traits\HasMessage;
 
 class VerifyEmail extends Operation
 {
     use VerifiesEmails;
+    use HasMessage;
 
     protected $middlewares = ['auth', 'signed', 'throttle:6,1'];
 
@@ -43,5 +45,6 @@ class VerifyEmail extends Operation
                 "{hash}",
             ]);
     }
+
 }
 

@@ -3,11 +3,14 @@
 namespace MorningTrain\Laravel\Resources\Operations\Auth;
 
 use Illuminate\Foundation\Auth\VerifiesEmails;
+use Illuminate\Http\JsonResponse;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
+use MorningTrain\Laravel\Resources\Support\Traits\HasMessage;
 
 class ResendVerificationEmail extends Operation
 {
     use VerifiesEmails;
+    use HasMessage;
 
     const ROUTE_METHOD = 'post';
 
@@ -17,9 +20,11 @@ class ResendVerificationEmail extends Operation
     {
         $success = $this->resend(request())->getSession()->get('resent') === true;
 
-        $this->setStatusCode($success ? 200 : 400);
-        $this->setMessage($success ? $this->success_message : $this->error_message);
+        $status_code = ($success ? 200 : 400);
+        $message = ($success ? $this->success_message : $this->error_message);
 
-        return [];
+        return new JsonResponse([
+            'message' => $message
+        ], $status_code);
     }
 }

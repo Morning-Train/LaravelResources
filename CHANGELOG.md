@@ -1,7 +1,9 @@
 # Release Notes
 
-## [4.0.0 (2020-xx-xx)](https://github.com/Morning-Train/LaravelResources/compare/3.0.0...4.0.0)
+## [4.0.0 (2020-04-20)](https://github.com/Morning-Train/LaravelResources/compare/3.0.0...4.0.0)
 
+- Added support for __request_uuid mirroring to help protect against racing requests
+- Message pipe added with trans and transChoice helpers
 - SetModelSuccessMessage pipe moved to Messages pipe namespace and renamed to ModelUpdatedMessage
 - ResourceController will no longer provide func_get_args to execute method on operation (which no longer accepts any)
 - Route actions `resource` and `operation` renamed to `resourceName` and `operationName`. 

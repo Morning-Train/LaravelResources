@@ -92,6 +92,10 @@ class Payload implements Responsable
             $response['meta'] = $this->meta;
         }
 
+        if (request()->has('_request_uuid')) {
+            $payload['_request_uuid'] = request()->input('_request_uuid');
+        }
+
         $response['message'] = $this->get('message', null);
 
         return response()->json($response, $status, $headers, $options);

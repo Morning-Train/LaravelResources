@@ -1,5 +1,10 @@
 # Release Notes
 
+## [4.1.0 (2020-03-04)](https://github.com/Morning-Train/LaravelResources/compare/4.0.0...4.1.0)
+
+- Added HasMessage pipe to support old successMessage and errorMessage helpers
+- 
+
 ## [4.0.0 (2020-04-20)](https://github.com/Morning-Train/LaravelResources/compare/3.0.0...4.0.0)
 
 - Added support for __request_uuid mirroring to help protect against racing requests

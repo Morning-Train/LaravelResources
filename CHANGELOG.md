@@ -1,5 +1,9 @@
 # Release Notes
 
+## [4.2.0 (2020-07-20)](https://github.com/Morning-Train/LaravelResources/compare/4.1.0...4.2.0)
+
+- ResetPassword operation got a getResponseBody method to make it more extendable.
+
 ## [4.1.0 (2020-03-04)](https://github.com/Morning-Train/LaravelResources/compare/4.0.0...4.1.0)
 
 - Added HasMessage pipe to support old successMessage and errorMessage helpers

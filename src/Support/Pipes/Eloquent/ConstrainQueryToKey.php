@@ -12,20 +12,16 @@ class ConstrainQueryToKey extends Pipe
 
     public function pipe()
     {
-
         $keyValue = (request()->route() !== null)
             ? request()->route()->parameter($this->getModelClassName())
             : null;
 
+        $query = $this->query;
+        $query->whereKey($keyValue);
+        $this->query = $query;
+
         if ($keyValue !== null) {
-
-            $query = $this->query;
-
-            $query->whereKey($keyValue);
-
-            $this->query = $query;
             $this->requires_instance = true;
-
         }
 
     }

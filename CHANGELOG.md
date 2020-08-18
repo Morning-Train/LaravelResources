@@ -1,5 +1,9 @@
 # Release Notes
 
+## [4.2.1 (2020-07-20)](https://github.com/Morning-Train/LaravelResources/compare/4.2.0...4.2.1)
+
+- ConstrainQueryToKey will always attempt to constrain model (read will now not be able to first infiltered value).
+
 ## [4.2.0 (2020-07-20)](https://github.com/Morning-Train/LaravelResources/compare/4.1.0...4.2.0)
 
 - ResetPassword operation got a getResponseBody method to make it more extendable.

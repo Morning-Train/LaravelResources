@@ -106,7 +106,9 @@ class EloquentOperation extends Operation
 
     public function view($value = null)
     {
-        return $this->genericGetSet('view', $value);
+        $this->view = $value;
+
+        return $this;
     }
 
     public function getView(string $val = null, $default = null)

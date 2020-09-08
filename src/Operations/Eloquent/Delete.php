@@ -3,14 +3,40 @@
 namespace MorningTrain\Laravel\Resources\Operations\Eloquent;
 
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\FetchesModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\TriggerOnModel;
 
 class Delete extends EloquentOperation
 {
 
-    const ROUTE_METHOD = 'delete';
+    public const ROUTE_METHOD = 'delete';
 
-    public function handle($model = null)
+    protected function beforePipes(): array
     {
-        return $model->delete();
+        return [
+            FetchesModel::create()
+                ->model($this->model)
+                ->filters($this->filters)
+                ->appends($this->appends),
+        ];
+    }
+
+
+    protected function pipes(): array
+    {
+        return [
+            TriggerOnModel::create()->trigger('delete'),
+        ];
+    }
+
+    public function getRouteParameters(): array
+    {
+        $parameters = [];
+
+        if($this->model !== null && class_exists($this->model)) {
+            $parameters[$this->getModelClassName()] = ['optional' => false];
+        }
+
+        return $parameters;
     }
 }

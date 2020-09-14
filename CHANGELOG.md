@@ -1,5 +1,22 @@
 # Release Notes
 
+## [4.4.0 (2020-09-09)](https://github.com/Morning-Train/LaravelResources/compare/4.3.0...4.4.0)
+
+- Read operation updated to not implement FetchesModel but uses the pipes directly (will help make it more clear what happens)
+- Added FetchModel operation to fetch a single instance without requiring an instance
+
+## [4.3.0 (2020-09-09)](https://github.com/Morning-Train/LaravelResources/compare/4.2.3...4.3.0)
+
+- Laravel 8 update
+
+## [4.2.3 (2020-09-08)](https://github.com/Morning-Train/LaravelResources/compare/4.2.2...4.2.3)
+
+- updt Delete Operation to use pipes
+
+## [4.2.2 (2020-08-25)](https://github.com/Morning-Train/LaravelResources/compare/4.2.1...4.2.2)
+
+- bugfix: replace call to removed method, with simple setter for $view
+
 ## [4.2.1 (2020-07-20)](https://github.com/Morning-Train/LaravelResources/compare/4.2.0...4.2.1)
 
 - ConstrainQueryToKey will always attempt to constrain model (read will now not be able to first infiltered value).

@@ -25,13 +25,13 @@ class TriggerOnModel extends Pipe
 
         if ($model instanceof Model && $trigger !== null) {
 
-            $trigger instanceof \Closure ?
+            $trigger_response = $trigger instanceof \Closure ?
                 $trigger($model) :
                 $model->{$trigger}();
 
         }
 
-        $this->data = $model;
+        $this->data = (isset($trigger_response) && !empty($trigger_response)) ? $trigger_response : $model;
 
     }
 

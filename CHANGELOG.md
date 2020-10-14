@@ -1,5 +1,19 @@
 # Release Notes
 
+## [4.6.1 (2020-10-14)](https://github.com/Morning-Train/LaravelResources/compare/4.6.0...4.6.1)
+
+- Added missing Respondable trait to RespondWithPageEnv pipe
+
+## [4.6.0 (2020-10-14)](https://github.com/Morning-Train/LaravelResources/compare/4.5.0...4.6.0)
+
+- Added a respond method to Repondable trait - It will allow for early exists with a Laravel response
+- Added RespondWithPageEnv pipe - It will respond with page ENV on ajax requests
+- Implemented RespondWithPageEnv in Page operation
+
+## [4.5.0 (2020-09-29)](https://github.com/Morning-Train/LaravelResources/compare/4.4.0...4.5.0)
+
+- Updated TriggerOnModel to optionally use return value from trigger
+
 ## [4.4.0 (2020-09-09)](https://github.com/Morning-Train/LaravelResources/compare/4.3.0...4.4.0)
 
 - Read operation updated to not implement FetchesModel but uses the pipes directly (will help make it more clear what happens)

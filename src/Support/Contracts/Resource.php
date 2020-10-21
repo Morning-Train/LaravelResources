@@ -14,6 +14,7 @@ abstract class Resource
     public $name;
     public $base_name;
     public $identifier;
+    protected $_operations;
 
     public function __construct(string $namespace, string $name)
     {
@@ -21,6 +22,7 @@ abstract class Resource
         $this->name = $name;
         $this->base_name = static::getBaseName($name);
         $this->identifier = $this->identifier();
+        $this->_operations = static::$operations;
     }
 
     /////////////////////////////////
@@ -126,7 +128,7 @@ abstract class Resource
 
         if (!isset(static::$_cached_operations[$resource_identifier])) {
 
-            $raw_class_operations = static::$operations;
+            $raw_class_operations = $this->_operations;
 
             $operations = [];
 

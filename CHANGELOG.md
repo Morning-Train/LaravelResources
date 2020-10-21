@@ -1,5 +1,9 @@
 # Release Notes
 
+## [4.7.1 (2020-10-21)](https://github.com/Morning-Train/LaravelResources/compare/4.7.0...4.7.1)
+
+- Optionally flatten resources export
+
 ## [4.7.0 (2020-10-21)](https://github.com/Morning-Train/LaravelResources/compare/4.6.1...4.7.0)
 
 - Internally in Resource we are now applying static operations to instance operations variable

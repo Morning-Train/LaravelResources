@@ -1,5 +1,10 @@
 # Release Notes
 
+## [4.7.0 (2020-10-21)](https://github.com/Morning-Train/LaravelResources/compare/4.6.1...4.7.0)
+
+- Internally in Resource we are now applying static operations to instance operations variable
+- Added AdhocResource to support adding a single operation in resources.php config file
+
 ## [4.6.1 (2020-10-14)](https://github.com/Morning-Train/LaravelResources/compare/4.6.0...4.6.1)
 
 - Added missing Respondable trait to RespondWithPageEnv pipe

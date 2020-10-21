@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\Access\Gate;
 use MorningTrain\Laravel\Context\Context;
+use MorningTrain\Laravel\Resources\Support\Contracts\AdhocResource;
+use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
 use MorningTrain\Laravel\Resources\Support\Contracts\Resource;
 
 class ResourceRepository
@@ -33,8 +35,16 @@ class ResourceRepository
         if (!$this->resources->get($namespace)->has($resource)) {
             $class = $this->config($namespace)[$resource];
 
-            $this->resources->get($namespace)
-                ->put($resource, new $class($namespace, $resource));
+            $resourceInstance = null;
+
+            if(is_subclass_of($class, Operation::class)) {
+                $resourceInstance = new AdhocResource($namespace, $resource);
+                $resourceInstance->withOperation($class);
+            } else {
+                $resourceInstance = new $class($namespace, $resource);
+            }
+
+            $this->resources->get($namespace)->put($resource, $resourceInstance);
         }
     }
 

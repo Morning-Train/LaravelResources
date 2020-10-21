@@ -325,6 +325,10 @@ class ResourceRepository
         if (!$this->config) {
             $config = config('resources', []);
 
+            if(isset($config['settings'])) {
+                unset($config['settings']);
+            }
+
             $this->config = array_map(function ($items) {
                 return $this->dot($items);
             }, $config);

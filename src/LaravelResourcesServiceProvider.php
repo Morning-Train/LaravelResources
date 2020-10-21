@@ -3,10 +3,11 @@
 namespace MorningTrain\Laravel\Resources;
 
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
+use MorningTrain\Laravel\Context\Context;
+use MorningTrain\Laravel\Context\Events\ContextsBooting;
 use MorningTrain\Laravel\Resources\Console\CrudResourceMakeCommand;
+use Illuminate\Support\Facades\Event;
 
 class LaravelResourcesServiceProvider extends ServiceProvider
 {
@@ -45,6 +46,17 @@ class LaravelResourcesServiceProvider extends ServiceProvider
                 CrudResourceMakeCommand::class,
             ]);
         }
+
+        Event::listen(ContextsBooting::class, function ($event) {
+
+            Context::env([
+                'settings' => [
+                    'flatten_resources_export' => config('resources.settings.flatten_resources_export', false)
+                 ]
+            ]);
+
+        });
+
     }
 
 }

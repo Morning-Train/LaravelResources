@@ -41,4 +41,26 @@ class AdhocResource extends Resource
         return $this->_identifiers[$operationName];
     }
 
+    /**
+     * This is a override of the export method from the base resource class
+     * We will be flattening the export
+     * @return array
+     * @throws \Exception
+     */
+    public function export()
+    {
+
+        if ($this->hasOperations()) {
+            foreach ($this->getOperations() as $operationName => $operationClass) {
+
+                $operation = $this->operation($operationName);
+
+                return $operation->export();
+
+            }
+        }
+
+        return [];
+    }
+
 }

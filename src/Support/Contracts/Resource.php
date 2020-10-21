@@ -74,6 +74,10 @@ abstract class Resource
             }
         }
 
+        if(config('resources.settings.flatten_resources_export', false) === true) {
+            return $exportData;
+        }
+
         return [
             "name" => $this->name,
             "operations" => $exportData,

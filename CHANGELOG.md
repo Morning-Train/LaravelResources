@@ -1,5 +1,9 @@
 # Release Notes
 
+## [4.7.2 (2020-10-23)](https://github.com/Morning-Train/LaravelResources/compare/4.7.1...4.7.2)
+
+- Fixed _request_uuid not being proxied back
+
 ## [4.7.1 (2020-10-21)](https://github.com/Morning-Train/LaravelResources/compare/4.7.0...4.7.1)
 
 - Optionally flatten resources export

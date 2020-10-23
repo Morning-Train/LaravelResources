@@ -93,7 +93,7 @@ class Payload implements Responsable
         }
 
         if (request()->has('_request_uuid')) {
-            $payload['_request_uuid'] = request()->input('_request_uuid');
+            $response['_request_uuid'] = request()->input('_request_uuid');
         }
 
         $response['message'] = $this->get('message', null);

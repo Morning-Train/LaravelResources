@@ -58,12 +58,24 @@ abstract class Page extends Operation
     protected $parent = null;
 
     /**
+     * @var null
+     */
+    protected $parents = null;
+
+    /**
      * @param $parent
      * @return Operation
      */
     public function parent($parent): Operation
     {
         $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function parents($parents)
+    {
+        $this->parents = $parents;
 
         return $this;
     }
@@ -124,6 +136,7 @@ abstract class Page extends Operation
             'path'          => $this->path,
             'route'         => $this->identifier,
             'parent'        => $this->parent,
+            'parents'       => $this->parents,
             'namespace'     => $this->resource->namespace,
             'forceRedirect' => $this->forceRedirect ?? false
         ];

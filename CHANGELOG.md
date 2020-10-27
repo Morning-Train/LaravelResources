@@ -1,5 +1,9 @@
 # Release Notes
 
+## [4.8.0 (2020-10-27)](https://github.com/Morning-Train/LaravelResources/compare/4.7.2...4.8.0)
+
+- Updated page operation to allow setting parents
+
 ## [4.7.2 (2020-10-23)](https://github.com/Morning-Train/LaravelResources/compare/4.7.1...4.7.2)
 
 - Fixed _request_uuid not being proxied back

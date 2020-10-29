@@ -1,5 +1,10 @@
 # Release Notes
 
+## [4.9.0 (2020-10-29)](https://github.com/Morning-Train/LaravelResources/compare/4.8.0...4.9.0)
+
+- Fixed namespace of MassAction operation
+- Added a getParents method to Page operation to make it easier to extend
+
 ## [4.8.0 (2020-10-27)](https://github.com/Morning-Train/LaravelResources/compare/4.7.2...4.8.0)
 
 - Updated page operation to allow setting parents

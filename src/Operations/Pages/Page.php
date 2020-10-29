@@ -80,6 +80,11 @@ abstract class Page extends Operation
         return $this;
     }
 
+    protected function getParents()
+    {
+        return $this->parents;
+    }
+
     /**
      * @var null
      */
@@ -136,7 +141,7 @@ abstract class Page extends Operation
             'path'          => $this->path,
             'route'         => $this->identifier,
             'parent'        => $this->parent,
-            'parents'       => $this->parents,
+            'parents'       => $this->getParents(),
             'namespace'     => $this->resource->namespace,
             'forceRedirect' => $this->forceRedirect ?? false
         ];

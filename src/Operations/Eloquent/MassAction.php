@@ -1,6 +1,6 @@
 <?php
 
-namespace MorningTrain\Laravel\Resources\Operations;
+namespace MorningTrain\Laravel\Resources\Operations\Eloquent;
 
 use Illuminate\Support\Collection;
 use MorningTrain\Laravel\Filters\Filters\Filter;

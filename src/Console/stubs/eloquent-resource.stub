@@ -1,0 +1,25 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }} as Model;
+use MorningTrain\Laravel\Filters\Filters\Pagination;
+use MorningTrain\Laravel\Resources\Support\Contracts\EloquentResource;
+
+class {{ resource }} extends EloquentResource
+{
+    protected $model = Model::class;
+
+    protected function getFields()
+    {
+        return [];
+    }
+
+    protected function getFilters()
+    {
+        return [
+            Pagination::create(),
+        ];
+    }
+
+}

@@ -6,7 +6,7 @@ namespace MorningTrain\Laravel\Resources;
 use Illuminate\Support\ServiceProvider;
 use MorningTrain\Laravel\Context\Context;
 use MorningTrain\Laravel\Context\Events\ContextsBooting;
-use MorningTrain\Laravel\Resources\Console\CrudResourceMakeCommand;
+use MorningTrain\Laravel\Resources\Console\EloquentResourceMakeCommand;
 use Illuminate\Support\Facades\Event;
 
 class LaravelResourcesServiceProvider extends ServiceProvider
@@ -43,7 +43,7 @@ class LaravelResourcesServiceProvider extends ServiceProvider
                 'mt-config');
 
             $this->commands([
-                CrudResourceMakeCommand::class,
+                EloquentResourceMakeCommand::class,
             ]);
         }
 

@@ -4,6 +4,8 @@ namespace MorningTrain\Laravel\Resources\Console;
 
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -83,6 +85,7 @@ class EloquentResourceMakeCommand extends GeneratorCommand
             '{{model}}'               => $model,
             '{{ resource }}'          => $resource,
             '{{resource}}'            => $resource,
+            '{{ fields }}'            => $this->getFields($namespaceModel),
         ];
 
         return str_replace(
@@ -145,5 +148,36 @@ class EloquentResourceMakeCommand extends GeneratorCommand
         return [
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'The name of the model'],
         ];
+    }
+
+    /**
+     * Return the string template for Resource Fields, based on Model attributes
+     *
+     * @param string $model
+     * @return string
+     */
+    protected function getFields(string $model): string
+    {
+        if (!class_exists($model) || !($model = new $model) instanceof Model) {
+            return '';
+        }
+
+        $rows = rescue(fn() => DB::getDoctrineSchemaManager()
+            ->listTableDetails($model->getTable())
+            ->getColumns()
+        );
+
+        $unwanted = [$model->getKeyName(),
+            ...($model->usesTimestamps() ? [
+                $model->getCreatedAtColumn(),
+                $model->getUpdatedAtColumn(),
+            ] : []),
+        ];
+
+        return collect($rows)
+            ->keys()
+            ->diff($unwanted)
+            ->map(fn($key) => "            Field::create('{$key}')->validates(''),")
+            ->join(PHP_EOL);
     }
 }

@@ -3,6 +3,7 @@
 namespace {{ namespace }};
 
 use {{ namespacedModel }} as Model;
+use MorningTrain\Laravel\Fields\Fields\Field;
 use MorningTrain\Laravel\Filters\Filters\Pagination;
 use MorningTrain\Laravel\Resources\Support\Contracts\EloquentResource;
 
@@ -12,7 +13,9 @@ class {{ resource }} extends EloquentResource
 
     protected function getFields()
     {
-        return [];
+        return [
+{{ fields }}
+        ];
     }
 
     protected function getFilters()

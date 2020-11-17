@@ -57,6 +57,10 @@ class ResourceController
      */
     public function executeOperation()
     {
+        if(function_exists('start_measure')) {
+            start_measure('execute_operation', 'Executing operation');
+        }
+
         /// Magic method to catch all calls to this controller
         /// It allows us to dynamically route the request to a specific operation
         /// An operation in this case, is a sort of request -> response template
@@ -70,7 +74,13 @@ class ResourceController
         }
 
         /// We are ready to execute the operation
-        return $operation->execute();
+        $response = $operation->execute();
+
+        if(function_exists('stop_measure')) {
+            stop_measure('execute_operation');
+        }
+
+        return $response;
     }
 
 }

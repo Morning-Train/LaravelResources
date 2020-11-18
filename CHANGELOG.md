@@ -1,5 +1,15 @@
 # Release Notes
 
+## [4.11.0 (2020-11-19)](https://github.com/Morning-Train/LaravelResources/compare/4.10.0...4.11.0)
+
+- Added extra validation to ResourceRepository - do not attempt to create class if missing
+- Removed redundant enusreNamespace in hasResources in ResourceRepository
+- Added debugbar measures to is permitted pipe
+
+## [4.10.0 (2020-11-18)](https://github.com/Morning-Train/LaravelResources/compare/4.9.0...4.10.0)
+
+- Added debugbar measures to controller
+
 ## [4.9.0 (2020-10-29)](https://github.com/Morning-Train/LaravelResources/compare/4.8.0...4.9.0)
 
 - Fixed namespace of MassAction operation

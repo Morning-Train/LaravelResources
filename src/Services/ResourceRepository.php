@@ -98,7 +98,6 @@ class ResourceRepository
      */
     public function hasResources(string $namespace): bool
     {
-        $this->ensureNamespace($namespace);
         return $this->getResources($namespace)->isNotEmpty();
     }
 

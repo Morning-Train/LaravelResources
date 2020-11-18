@@ -9,9 +9,12 @@ use MorningTrain\Laravel\Resources\ResourceRepository;
 
 class IsPermitted extends Pipe
 {
-
+    
     public function pipe()
     {
+        if(function_exists('start_measure')) {
+            start_measure('is_permitted_pipe', 'Is Permitted pipe - Checking');
+        }
 
         $data = $this->data;
 
@@ -23,6 +26,10 @@ class IsPermitted extends Pipe
         $is_permitted = $data->every(function ($model) use($operationIdentifier) {
             return $this->isAllowed($operationIdentifier, $model);
         });
+
+        if(function_exists('stop_measure')) {
+            stop_measure('is_permitted_pipe');
+        }
 
         if(!$is_permitted) {
             $this->forbidden('Unable to perform operation');
@@ -54,7 +61,7 @@ class IsPermitted extends Pipe
     {
 
         $cache_key = $operationIdentifier.(($model !== null)?$model->getKey().get_class($model):'');
-        
+
         if(!isset($this->is_allowed_cache[$cache_key])) {
             $this->is_allowed_cache[$cache_key] = Gate::allows($operationIdentifier, $model);
         }

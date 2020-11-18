@@ -41,10 +41,14 @@ class ResourceRepository
                 $resourceInstance = new AdhocResource($namespace, $resource);
                 $resourceInstance->withOperation($class);
             } else {
-                $resourceInstance = new $class($namespace, $resource);
+                if(class_exists($class)) {
+                    $resourceInstance = new $class($namespace, $resource);
+                }
             }
 
-            $this->resources->get($namespace)->put($resource, $resourceInstance);
+            if($resourceInstance !== null) {
+                $this->resources->get($namespace)->put($resource, $resourceInstance);
+            }
         }
     }
 

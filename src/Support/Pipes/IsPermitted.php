@@ -9,10 +9,10 @@ use MorningTrain\Laravel\Resources\ResourceRepository;
 
 class IsPermitted extends Pipe
 {
-    
+
     public function pipe()
     {
-        if(function_exists('start_measure')) {
+        if (function_exists('start_measure')) {
             start_measure('is_permitted_pipe', 'Is Permitted pipe - Checking');
         }
 
@@ -23,15 +23,15 @@ class IsPermitted extends Pipe
 
         $operationIdentifier = $this->operation->identifier;
 
-        $is_permitted = $data->every(function ($model) use($operationIdentifier) {
+        $is_permitted = $data->every(function ($model) use ($operationIdentifier) {
             return $this->isAllowed($operationIdentifier, $model);
         });
 
-        if(function_exists('stop_measure')) {
+        if (function_exists('stop_measure')) {
             stop_measure('is_permitted_pipe');
         }
 
-        if(!$is_permitted) {
+        if (!$is_permitted) {
             $this->forbidden('Unable to perform operation');
         }
     }
@@ -41,11 +41,11 @@ class IsPermitted extends Pipe
 
         $data = $this->data;
 
-        if($data instanceof Model) {
+        if ($data instanceof Model) {
             $data = new Collection([$data]);
         }
 
-        if($data instanceof Collection) {
+        if ($data instanceof Collection) {
             $this->payload->set('meta.permissions', $this->getPermissionsMeta($data));
         }
 
@@ -60,9 +60,9 @@ class IsPermitted extends Pipe
     protected function isAllowed($operationIdentifier, Model $model = null)
     {
 
-        $cache_key = $operationIdentifier.(($model !== null)?$model->getKey().get_class($model):'');
+        $cache_key = $operationIdentifier . (($model !== null) ? $model->getKey() . get_class($model) : '');
 
-        if(!isset($this->is_allowed_cache[$cache_key])) {
+        if (!isset($this->is_allowed_cache[$cache_key])) {
             $this->is_allowed_cache[$cache_key] = Gate::allows($operationIdentifier, $model);
         }
         return $this->is_allowed_cache[$cache_key];
@@ -80,6 +80,9 @@ class IsPermitted extends Pipe
             return [
                 $model->getKey() =>
                     collect(ResourceRepository::getModelPermissions($model))
+                        ->reject(function($operationIdentifier) {
+                            return $this->only !== null && !in_array($operationIdentifier, $this->only);
+                        })
                         ->filter(function ($operationIdentifier) use ($model) {
                             return $this->isAllowed($operationIdentifier, $model);
                         })
@@ -89,6 +92,19 @@ class IsPermitted extends Pipe
         });
 
         return $res;
+    }
+
+    /////////////////////////////////
+    /// Only helpers
+    /////////////////////////////////
+
+    protected $only = null;
+
+    public function only($only)
+    {
+        $this->only = $only;
+
+        return $this;
     }
 
 }

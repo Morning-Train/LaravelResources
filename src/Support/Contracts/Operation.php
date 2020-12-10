@@ -45,7 +45,7 @@ class Operation
             /// We check to see if the current operation can be performed
             /// It will factor in if the resource has been configured with the operation
             /// It will also check to see if the current user has access to it
-            IsPermitted::create()
+            IsPermitted::create()->only($this->getPermissionsToCheck()),
         ];
     }
 
@@ -72,6 +72,24 @@ class Operation
         $this->middlewares = $middlewares;
 
         return $this;
+    }
+
+    /////////////////////////////////
+    /// Permissions
+    /////////////////////////////////
+
+    protected $permissions_to_check = null;
+
+    public function permissionsToCheck($permissions = [])
+    {
+        $this->permissions_to_check = $permissions;
+
+        return $this;
+    }
+
+    protected function getPermissionsToCheck()
+    {
+        return $this->permissions_to_check;
     }
 
     /////////////////////////////////

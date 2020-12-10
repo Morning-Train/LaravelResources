@@ -30,13 +30,21 @@ class TransformToView extends Pipe
             $appends = array_map([Str::class, 'snake'], $appends);
 
             if ($data instanceof Model) {
-                $data->append($appends);
+                if($this->overwrite_appends) {
+                    $data->setAppends($appends);
+                } else {
+                    $data->append($appends);
+                }
             }
 
             if ($data instanceof Collection) {
                 $data->transform(function ($item) use ($appends) {
                     if ($item instanceof Model) {
-                        $item->append($appends);
+                        if($this->overwrite_appends) {
+                            $item->setAppends($appends);
+                        } else {
+                            $item->append($appends);
+                        }
                     }
                     return $item;
                 });

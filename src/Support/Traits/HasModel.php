@@ -13,6 +13,7 @@ trait HasModel
      */
     public $model = null;
     public $appends = null;
+    public $overwrite_appends = false;
 
     public function model($model = null)
     {
@@ -21,9 +22,10 @@ trait HasModel
         return $this;
     }
 
-    public function appends($appends = null)
+    public function appends($appends = null, $overwrite = false)
     {
         $this->appends = $appends;
+        $this->overwrite_appends = $overwrite;
 
         return $this;
     }

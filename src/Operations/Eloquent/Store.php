@@ -27,7 +27,7 @@ class Store extends EloquentOperation
             ConstrainQueryToKey::create()->model($this->model),
             QueryToModel::create(),
             EnsureModelInstance::create()->model($this->model),
-            TransformToView::create()->appends($this->appends),
+            TransformToView::create()->appends($this->appends, $this->overwrite_appends),
         ];
     }
 

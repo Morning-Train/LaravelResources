@@ -17,7 +17,7 @@ class Index extends EloquentOperation
         return [
             QueryModel::create()->model($this->model)->filters($this->filters),
             QueryToCollection::create(),
-            TransformToView::create()->appends($this->appends),
+            TransformToView::create()->appends($this->appends, $this->overwrite_appends),
         ];
     }
 

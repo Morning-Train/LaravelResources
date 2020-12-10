@@ -19,7 +19,7 @@ class Read extends EloquentOperation
             QueryModel::create()->model($this->model)->filters($this->filters),
             ConstrainQueryToKey::create()->model($this->model),
             QueryToModel::create(),
-            TransformToView::create()->appends($this->appends),
+            TransformToView::create()->appends($this->appends, $this->overwrite_appends),
         ];
     }
 

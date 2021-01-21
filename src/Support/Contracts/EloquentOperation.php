@@ -79,6 +79,7 @@ class EloquentOperation extends Operation
             $export[$key] = [
                 "key" => $key,
                 "value" => null,
+                "required" => true,
             ];
 
         }

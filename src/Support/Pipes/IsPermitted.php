@@ -24,7 +24,7 @@ class IsPermitted extends Pipe
         $operationIdentifier = $this->operation->identifier;
 
         $is_permitted = $data->every(function ($model) use ($operationIdentifier) {
-            return $this->isAllowed($operationIdentifier, $model);
+            return ($model instanceof Model) ? $this->isAllowed($operationIdentifier, $model) : Gate::allows($operationIdentifier);
         });
 
         if (function_exists('stop_measure')) {

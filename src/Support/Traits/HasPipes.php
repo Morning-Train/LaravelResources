@@ -8,6 +8,16 @@ use MorningTrain\Laravel\Resources\Support\Contracts\Payload;
 trait HasPipes
 {
 
+
+    protected $finally_pipes = [];
+
+    public function finally($before_pipes = [])
+    {
+        $this->finally_pipes = $before_pipes;
+
+        return $this;
+    }
+
     protected $before_pipes = [];
 
     public function before($before_pipes = [])
@@ -59,6 +69,20 @@ trait HasPipes
     protected function buildPipes()
     {
         return array_merge(
+            [
+                function($payload, $next) {
+                    $payload = $next($payload);
+
+                    if(empty($this->finally_pipes)) {
+                        return $payload;
+                    }
+
+                    return $this->pipeline()
+                        ->send($payload)
+                        ->through($this->finally_pipes)
+                        ->thenReturn();
+                }
+            ],
             $this->setupPipes(),
             ($this->before_pipes instanceof \Closure) ? ($this->before_pipes)() : $this->before_pipes,
             $this->beforePipes(),
@@ -66,7 +90,7 @@ trait HasPipes
             $this->pipes(),
             $this->afterPipes(),
             ($this->after_pipes instanceof \Closure) ? ($this->after_pipes)() : $this->after_pipes,
-            );
+        );
     }
 
     public function execute($payload = null)

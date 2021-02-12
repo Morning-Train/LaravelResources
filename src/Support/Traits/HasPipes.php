@@ -18,6 +18,11 @@ trait HasPipes
         return $this;
     }
 
+    protected function finallyPipes()
+    {
+        return [];
+    }
+
     protected $before_pipes = [];
 
     public function before($before_pipes = [])
@@ -70,16 +75,21 @@ trait HasPipes
     {
         return array_merge(
             [
-                function($payload, $next) {
+                function ($payload, $next) {
                     $payload = $next($payload);
 
-                    if(empty($this->finally_pipes)) {
+                    $pipes = array_merge(
+                        $this->finallyPipes(),
+                        $this->finally_pipes
+                    );
+
+                    if (empty($pipes)) {
                         return $payload;
                     }
 
                     return $this->pipeline()
                         ->send($payload)
-                        ->through($this->finally_pipes)
+                        ->through($pipes)
                         ->thenReturn();
                 }
             ],
@@ -109,7 +119,6 @@ trait HasPipes
             ->send($payload)
             ->through($pipes)
             ->thenReturn();
-
     }
 
 }

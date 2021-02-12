@@ -3,9 +3,11 @@
 namespace MorningTrain\Laravel\Resources\Support\Contracts;
 
 use MorningTrain\Laravel\Resources\Support\Pipes\Setup\SetupFilters;
+use MorningTrain\Laravel\Resources\Support\Pipes\ToResourceView;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFields;
 use MorningTrain\Laravel\Resources\Support\Traits\HasFilters;
 use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
+use MorningTrain\Laravel\Resources\Support\Traits\HasResourceView;
 
 class EloquentOperation extends Operation
 {
@@ -17,6 +19,7 @@ class EloquentOperation extends Operation
     use HasModel;
     use HasFilters;
     use HasFields;
+    use HasResourceView;
 
     /////////////////////////////////
     /// Pipelines
@@ -26,6 +29,12 @@ class EloquentOperation extends Operation
     {
         return [
             SetupFilters::create()->filters($this->filters),
+        ];
+    }
+
+    protected function finallyPipes() {
+        return [
+            ToResourceView::create()->view($this->getResourceView())
         ];
     }
 

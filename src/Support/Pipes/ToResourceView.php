@@ -28,7 +28,7 @@ class ToResourceView extends Pipe
             $data = $this->data;
 
             if($data instanceof Collection) {
-                $this->data = $this->_view::collection($data)->toArray(request());
+                $this->data = ['collection' => $this->_view::collection($data)->toArray(request())];
             } elseif($data instanceof Model) {
                 $this->data = ['model' => (new $this->_view($data))->toArray(request())];
             }

@@ -15,7 +15,7 @@ class FetchModel extends EloquentOperation
     protected function beforePipes()
     {
         return [
-            QueryModel::create()->model($this->model)->filters($this->filters),
+            QueryModel::create()->model($this->model)->filters($this->getFilters()),
             QueryToModel::create(),
             TransformToView::create()->appends($this->appends),
         ];

@@ -16,7 +16,7 @@ class FetchesModel extends Pipe
     protected function pipes()
     {
         return [
-            QueryModel::create()->model($this->model)->filters($this->filters),
+            QueryModel::create()->model($this->model)->filters($this->getFilters()),
             ConstrainQueryToKey::create()->model($this->model),
             QueryToModel::create(),
             TransformToView::create()->appends($this->appends),

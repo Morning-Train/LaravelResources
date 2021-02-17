@@ -28,7 +28,7 @@ class EloquentOperation extends Operation
     protected function setupPipes()
     {
         return [
-            SetupFilters::create()->filters($this->filters),
+            SetupFilters::create()->filters($this->getFilters()),
         ];
     }
 
@@ -75,8 +75,10 @@ class EloquentOperation extends Operation
 
         $export = [];
 
-        if (!empty($this->filters)) {
-            foreach ($this->filters as $filter) {
+        $filters = $this->getFilters();
+
+        if (!empty($filters)) {
+            foreach ($filters as $filter) {
                 $export = array_merge($export, $filter->export());
             }
         }

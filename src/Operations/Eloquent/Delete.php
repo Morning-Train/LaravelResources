@@ -16,7 +16,7 @@ class Delete extends EloquentOperation
         return [
             FetchesModel::create()
                 ->model($this->model)
-                ->filters($this->filters)
+                ->filters($this->getFilters())
                 ->appends($this->appends),
         ];
     }

@@ -27,6 +27,11 @@ trait HasFilters
         return is_array($this->filters) && !empty($this->filters);
     }
 
+    protected function getFilters()
+    {
+        return $this->filters;
+    }
+
     public function applyFiltersToQuery(&$query)
     {
         FilterCollection::create($this->filters)->apply($query, request());

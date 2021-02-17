@@ -22,7 +22,7 @@ class SetupFilters extends Pipe
 
     public function pipe()
     {
-        $this->payload->filters = $this->filters;
+        $this->payload->filters = $this->getFilters();
     }
 
     public function after()

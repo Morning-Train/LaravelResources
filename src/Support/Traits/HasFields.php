@@ -19,4 +19,9 @@ trait HasFields
         return !empty($this->fields);
     }
 
+    protected function getFields()
+    {
+        return $this->fields;
+    }
+
 }

@@ -2,8 +2,8 @@
 
 namespace MorningTrain\Laravel\Resources\Operations\Eloquent;
 
-use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\TriggerOnModelsInCollection;
 use MorningTrain\Laravel\Filters\Filters\Filter;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\TriggerOnModelsInCollection;
 use MorningTrain\Laravel\Resources\Support\Pipes\Validates;
 
 class MassAction extends Index
@@ -22,20 +22,31 @@ class MassAction extends Index
 
     public function getFilters()
     {
-        return [
-            Filter::create()->when('ids', function ($q, $ids) {
-                $q->whereIn($this->getModelKeyName(), $ids);
-            })
-        ];
+        return array_merge(
+            $this->filters,
+            [
+                Filter::create()->when(
+                    'ids',
+                    function ($q, $ids) {
+                        $q->whereIn($this->getModelKeyName(), $ids);
+                    }
+                )
+            ]
+        );
     }
 
     public function beforePipes()
     {
-        return array_merge(parent::beforePipes(), [
-            Validates::create()->rules([
-                'ids' => 'required|array'
-            ])
-        ]);
+        return array_merge(
+            parent::beforePipes(),
+            [
+                Validates::create()->rules(
+                    [
+                        'ids' => 'required|array'
+                    ]
+                )
+            ]
+        );
     }
 
     protected function pipes()

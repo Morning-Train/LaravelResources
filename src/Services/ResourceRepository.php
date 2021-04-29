@@ -304,6 +304,30 @@ class ResourceRepository
         return $environment_data;
     }
 
+    protected function getExportForCurrentOperation()
+    {
+        $operation = $this->getOperationForCurrentRoute();
+
+        if($operation) {
+            $environment_data = [];
+            Arr::set($environment_data, "{$operation->getResource()->namespace}.{$operation->getResource()->name}.{$operation->name}", $operation->export());
+            return $environment_data;
+        }
+
+        return [];
+    }
+
+    public function exportCurrentRoute()
+    {
+        $export = $this->getExportForCurrentOperation();
+
+        Context::env(function () use ($export) {
+            return [
+                'resources' => $export,
+            ];
+        });
+    }
+
     public function export(string $namespace)
     {
 
@@ -320,7 +344,6 @@ class ResourceRepository
                 'resources' => $export,
             ];
         });
-
     }
 
     protected function forEachNamespace(\Closure $closure)

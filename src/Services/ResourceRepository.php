@@ -4,11 +4,12 @@ namespace MorningTrain\Laravel\Resources\Services;
 
 
 use Exception;
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Auth\Access\Gate;
 use MorningTrain\Laravel\Context\Context;
 use MorningTrain\Laravel\Resources\Support\Contracts\AdhocResource;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
@@ -57,6 +58,20 @@ class ResourceRepository
         $this->register($namespace, $resource);
 
         return $this->resources->get($namespace)->get($resource);
+    }
+
+    public function getOperationForCurrentRoute()
+    {
+        if ($current_route = Route::getCurrentRoute()) {
+            $resource_namespace = $current_route->action['resource_namespace'];
+            $resource_name = $current_route->action['resourceName'];
+            $operation_name = $current_route->action['operationName'];
+            $resource = $this->get($resource_namespace, $resource_name);
+            $operation = $resource->operation($operation_name);
+            return $operation;
+        }
+
+        return null;
     }
 
     public function ensureNamespace(string $namespace)

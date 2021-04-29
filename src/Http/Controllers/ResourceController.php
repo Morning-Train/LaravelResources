@@ -2,52 +2,11 @@
 
 namespace MorningTrain\Laravel\Resources\Http\Controllers;
 
-use Illuminate\Support\Facades\Route;
 use MorningTrain\Laravel\Resources\ResourceRepository;
 use MorningTrain\Laravel\Resources\Support\Contracts\Operation;
-use MorningTrain\Laravel\Resources\Support\Contracts\Resource;
 
 class ResourceController
 {
-
-    protected $resource_namespace;
-    protected $resource_name;
-    protected $operation_name;
-    protected $resource = null;
-    protected $operation = null;
-
-    public function __construct()
-    {
-        if ($current_route = Route::getCurrentRoute()) {
-            $this->resource_namespace = $current_route->action['resource_namespace'];
-            $this->resource_name = $current_route->action['resourceName'];
-            $this->operation_name = $current_route->action['operationName'];
-        }
-    }
-
-    /**
-     * @return Resource
-     */
-    protected function resource()
-    {
-        if ($this->resource === null) {
-            $this->resource = ResourceRepository::get($this->resource_namespace, $this->resource_name);
-        }
-
-        return $this->resource;
-    }
-
-    /**
-     * @return Operation
-     */
-    protected function operation()
-    {
-        if ($this->operation === null) {
-            $this->operation = $this->resource()->operation($this->operation_name);
-        }
-
-        return $this->operation;
-    }
 
     /**
      * @param string $method
@@ -65,7 +24,7 @@ class ResourceController
         /// It allows us to dynamically route the request to a specific operation
         /// An operation in this case, is a sort of request -> response template
         /// A certain operation might be used be different resources (A collection of operations)
-        $operation = $this->operation();
+        $operation = ResourceRepository::getOperationForCurrentRoute();
 
         /// First we should validate to see if the requested method is valid
         /// If that is not the case, then we might assume that something is misconfigured

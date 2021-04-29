@@ -24,7 +24,7 @@
         "illuminate/http": "^7.0|^8.0",
         "illuminate/support": "^7.0|^8.0",
         "illuminate/routing": "^7.0|^8.0",
-        "laravel/ui": "^2.0",
+        "laravel/ui": "^2.0|^3.0",
         "morningtrain/laravel-fields": "^1.0",
         "morningtrain/laravel-filters": "^1.0|^2.0",
         "morningtrain/laravel-context": "^2.0",

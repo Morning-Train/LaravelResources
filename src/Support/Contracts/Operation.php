@@ -28,6 +28,11 @@ class Operation
         $this->identifier = $this->resource->identifier($this->name);
     }
 
+    public function getResource()
+    {
+        return $this->resource;
+    }
+
     /////////////////////////////////
     /// Pipeline
     /////////////////////////////////
@@ -191,7 +196,7 @@ class Operation
                 $callable = [$route, strtolower(static::ROUTE_METHOD)];
 
                 if (!in_array(strtoupper(static::ROUTE_METHOD),
-                    static::VALID_ROUTE_METHODS)) {
+                              static::VALID_ROUTE_METHODS)) {
                     throw new \Exception('Invalid route method name provided');
                 }
 

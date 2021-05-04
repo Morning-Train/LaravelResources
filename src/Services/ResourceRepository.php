@@ -63,11 +63,22 @@ class ResourceRepository
     public function getOperationForCurrentRoute()
     {
         if ($current_route = Route::getCurrentRoute()) {
-            $resource_namespace = $current_route->action['resource_namespace'];
-            $resource_name = $current_route->action['resourceName'];
-            $operation_name = $current_route->action['operationName'];
+            $resource_namespace = data_get($current_route->action, 'resource_namespace');
+            $resource_name = data_get($current_route->action, 'resourceName');
+            $operation_name = data_get($current_route->action, 'operationName');
+
+            if(is_null($resource_namespace) || is_null($resource_name) || is_null($operation_name)) {
+                return null;
+            }
+
             $resource = $this->get($resource_namespace, $resource_name);
+
+            if(empty($resource) || !isset($resource)) {
+                return null;
+            }
+
             $operation = $resource->operation($operation_name);
+
             return $operation;
         }
 

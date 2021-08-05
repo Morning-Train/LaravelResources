@@ -108,7 +108,11 @@ abstract class Page extends Operation
     protected function pipes()
     {
         return [
-            SetEnv::create()->environment(['page' => $this->getPageEnvironment()]),
+            SetEnv::create()->environment(function(){
+                return [
+                    'page' => $this->getPageEnvironment()
+                ];
+            }),
             RespondWithPageEnv::create(),
             BladeView::create()->path($this->blade_view)->parameters($this->getViewParameters())
         ];

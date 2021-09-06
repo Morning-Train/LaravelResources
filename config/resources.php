@@ -12,7 +12,10 @@ return [
     */
 
     'settings' => [
-        'flatten_resources_export' => false
+        'flatten_resources_export' => false,
+        'namespaces_to_autoload' => [
+            //'app' => 'app/Http/Operations/App',
+        ],
     ],
 
     /*

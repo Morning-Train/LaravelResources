@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use MorningTrain\Laravel\Context\Context;
 use MorningTrain\Laravel\Resources\Support\Contracts\AdhocResource;
@@ -231,7 +232,7 @@ class ResourceRepository
         return Cache::rememberForever('model_operations',
             function () {
                 $operations = collect();
-                $namespaces = array_keys(config('resources', []));
+                $namespaces = array_keys($this->getRegisteredOperations());
 
                 foreach ($namespaces as $namespace) {
                     $this->getOperations($namespace)
@@ -372,10 +373,71 @@ class ResourceRepository
 
     protected $config;
 
+    public function getRegisteredOperations()
+    {
+        $operations = config('resources', []);
+        $namespaces_to_autoload = config('resources.settings.namespaces_to_autoload', []);
+
+        if(!empty($namespaces_to_autoload)) {
+            foreach($namespaces_to_autoload as $operations_namespace => $path) {
+
+                $ucfirst_operations_namespace = Str::ucfirst($operations_namespace);
+
+                $full_path = base_path("$path");
+
+                $namespaced_path = Str::ucfirst(str_replace( '/', '\\', $path));
+                $base_namespace = trim(implode('\\', array_slice(explode('\\', $namespaced_path), 0, -1)), '\\');
+
+                $files = Storage::allFiles($full_path);
+
+                $dir = new \RecursiveDirectoryIterator($full_path);
+                $ite = new \RecursiveIteratorIterator($dir);
+                $files = new \RegexIterator($ite, '#^(?:[A-Z]:)?(?:/(?!\.Trash)[^/]+)+/[^/]+\.(?:php|html)$#Di', \RegexIterator::GET_MATCH);
+                $fileList = array();
+                foreach($files as $file) {
+                    if(is_array($file)) {
+                        $file = $file[0];
+                    }
+
+                    $pathinfo = pathinfo($file);
+                    $filename = $pathinfo['filename'];
+                    $snaked_filename = Str::snake($filename);
+
+                    $relative_path = trim(str_replace($full_path, '', $file), '/');
+                    $namespaced_file_path = str_replace('/', '\\', $relative_path);
+                    $path_fragments = array_slice(explode('\\', $namespaced_file_path), 0, -1);
+                    $relavtive_namespace = trim(implode('\\', $path_fragments), '\\');
+
+                    array_unshift($path_fragments, $operations_namespace);
+                    array_push($path_fragments, $snaked_filename);
+
+                    $dotted_path = Str::lower(implode('.', $path_fragments));
+
+                    $namespace_fragments = array_filter(
+                        [
+                            $base_namespace,
+                            $ucfirst_operations_namespace,
+                            $relavtive_namespace,
+                            $filename
+                        ]
+                    );
+                    $full_namespace = implode('\\', $namespace_fragments);
+
+                    if(class_exists($full_namespace)) {
+                        data_set($operations, $dotted_path, $full_namespace);
+                    }
+                }
+
+            }
+        }
+
+        return $operations;
+    }
+
     public function config(string $namespace = null)
     {
         if (!$this->config) {
-            $config = config('resources', []);
+            $config = $this->getRegisteredOperations();
 
             if(isset($config['settings'])) {
                 unset($config['settings']);

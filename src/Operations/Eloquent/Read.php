@@ -16,7 +16,7 @@ class Read extends EloquentOperation
     protected function beforePipes()
     {
         return [
-            QueryModel::create()->model($this->model)->filters($this->getFilters()),
+            QueryModel::create()->model($this->model)->filters($this->getCachedFilters()),
             ConstrainQueryToKey::create()->model($this->model),
             QueryToModel::create(),
             TransformToView::create()->appends($this->appends, $this->overwrite_appends),

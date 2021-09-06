@@ -28,7 +28,7 @@ class EloquentOperation extends Operation
     protected function setupPipes()
     {
         return [
-            SetupFilters::create()->filters($this->getFilters()),
+            SetupFilters::create()->filters($this->getCachedFilters()),
         ];
     }
 

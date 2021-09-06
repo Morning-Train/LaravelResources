@@ -14,7 +14,7 @@ class Count extends EloquentOperation
     protected function beforePipes()
     {
         return [
-            QueryModel::create()->model($this->model)->filters($this->getFilters()),
+            QueryModel::create()->model($this->model)->filters($this->getCachedFilters()),
         ];
     }
 

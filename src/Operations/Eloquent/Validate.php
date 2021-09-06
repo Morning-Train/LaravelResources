@@ -21,7 +21,7 @@ class Validate extends EloquentOperation
     protected function beforePipes()
     {
         return [
-            QueryModel::create()->model($this->model)->filters($this->getFilters()),
+            QueryModel::create()->model($this->model)->filters($this->getCachedFilters()),
             ConstrainQueryToKey::create()->model($this->model),
             QueryToModel::create(),
             EnsureModelInstance::create()->model($this->model),

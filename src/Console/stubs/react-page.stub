@@ -1,0 +1,26 @@
+<?php
+
+namespace {{ namespace }};
+
+use MorningTrain\Laravel\Resources\Operations\Pages\React;
+
+class {{ class }} extends React
+{
+
+    /**
+     * React component to boot on page load.
+     * This should reference a component in the main JS file
+     *
+     * @var string $component
+     */
+    protected string $component = '{{ component }}';
+
+    /**
+     * Relative URL path of this page.
+     * This path is provided directly to the Laravel router, so parameters are supported.
+     *
+     * @var string $path
+     */
+    protected $path = '{{ path }}';
+
+}

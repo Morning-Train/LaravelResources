@@ -8,6 +8,7 @@ use MorningTrain\Laravel\Context\Context;
 use MorningTrain\Laravel\Context\Events\ContextsBooting;
 use MorningTrain\Laravel\Resources\Console\EloquentResourceMakeCommand;
 use Illuminate\Support\Facades\Event;
+use MorningTrain\Laravel\Resources\Console\ReactPageMakeCommand;
 
 class LaravelResourcesServiceProvider extends ServiceProvider
 {
@@ -44,6 +45,7 @@ class LaravelResourcesServiceProvider extends ServiceProvider
 
             $this->commands([
                 EloquentResourceMakeCommand::class,
+                ReactPageMakeCommand::class,
             ]);
         }
 

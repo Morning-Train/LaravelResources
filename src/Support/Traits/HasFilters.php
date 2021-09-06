@@ -9,6 +9,8 @@ trait HasFilters
 
     public $filters = [];
 
+    protected $_cached_filters = null;
+
     public function filters($filters = [], $merge = true)
     {
         if($merge === false) {
@@ -30,6 +32,15 @@ trait HasFilters
     protected function getFilters()
     {
         return $this->filters;
+    }
+
+    protected function getCachedFilters()
+    {
+        if($this->_cached_filters === null) {
+            $this->_cached_filters = $this->getFilters();
+        }
+
+        return $this->_cached_filters;
     }
 
     public function applyFiltersToQuery(&$query)

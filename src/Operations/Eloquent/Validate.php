@@ -32,7 +32,7 @@ class Validate extends EloquentOperation
     protected function pipes()
     {
         return [
-            ValidatesFields::create()->fields($this->getFields()),
+            ValidatesFields::create()->fields($this->getCachedFields()),
         ];
     }
 

@@ -7,6 +7,8 @@ trait HasFields
 
     public $fields = null;
 
+    protected $_cached_fields = null;
+
     public function fields($fields = null)
     {
         $this->fields = $fields;
@@ -22,6 +24,15 @@ trait HasFields
     protected function getFields()
     {
         return $this->fields;
+    }
+
+    protected function getCachedFields()
+    {
+        if($this->_cached_fields === null) {
+            $this->_cached_fields = $this->getFields();
+        }
+
+        return $this->_cached_fields;
     }
 
 }

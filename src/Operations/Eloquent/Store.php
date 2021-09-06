@@ -34,8 +34,8 @@ class Store extends EloquentOperation
     protected function pipes()
     {
         return [
-            ValidatesFields::create()->fields($this->getFields()),
-            UpdateModel::create()->fields($this->getFields()),
+            ValidatesFields::create()->fields($this->getCachedFields()),
+            UpdateModel::create()->fields($this->getCachedFields()),
             ModelUpdatedMessage::create()
         ];
     }

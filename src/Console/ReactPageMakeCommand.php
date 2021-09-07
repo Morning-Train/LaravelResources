@@ -66,16 +66,35 @@ class ReactPageMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        //$name = class_basename(Str::ucfirst($name));
+
+        $namespace = $this->getNamespace($name);
+        $root_namespace = $this->rootNamespace();
+        $base_namespace = $this->getDefaultNamespace(trim($root_namespace, '\\'));
+        $relative_namespace = trim(str_replace($base_namespace, '', $namespace), '\\');
+        $relative_namespace_fragments = explode('\\', $relative_namespace);
+        $class_name = str_replace($this->getNamespace($name).'\\', '', $name);
+        array_push($relative_namespace_fragments, $class_name);
+
+        $snaked_namespace_fragments = array_map(function($item) {
+            return Str::snake($item);
+        }, $relative_namespace_fragments);
 
         $component = $this->option('component');
         if(!$component) {
-            $component = 'Path.To.React.Component';
+            if(count($relative_namespace_fragments) > 0) {
+                $component = implode('.', $relative_namespace_fragments);
+            } else {
+                $component = 'Path.To.React.Component';
+            }
         }
 
         $path = $this->option('path');
         if(!$path) {
-            $path = '/path/to/page';
+            if(count($snaked_namespace_fragments) > 0) {
+                $path = Str::lower('/' . implode('/', $snaked_namespace_fragments));
+            } else {
+                $path = '/path/to/page';
+            }
         }
 
         $replace = [

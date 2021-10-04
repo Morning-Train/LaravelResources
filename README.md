@@ -22,7 +22,7 @@ $ php artisan vendor:publish --provider="MorningTrain\Laravel\Resources\LaravelR
 ```
 
 ## Configuration
-Register your resources in `config/resources.php`:
+Register your resources and operations in `config/resources.php`:
 
 The first level key corresponds to namespace, and value is an array of your resource classes.
 You can give resources custom names with array keys, and nest arrays of resources. Just make sure all items have unique keys.
@@ -33,29 +33,137 @@ This means if you have a class called `User` and another resource with the key `
 Example:
 ``` php
 'api' => [
-    \App\Resources\Api\User::class,
-    'custom_user' => \App\Resources\Api\User::class,
+    \App\Operations\Api\User::class,
+    'custom_user' => \App\Operations\Api\User::class,
     
     'nested' => [
-        \App\Resources\Api\User::class,
-        'custom_user' => \App\Resources\Api\User::class,
+        \App\Operations\Api\User::class,
+        'custom_user' => \App\Operations\Api\User::class,
         
         'deep_nested' => [
-            \App\Resources\Api\User::class,
-            'custom_user' => \App\Resources\Api\User::class,
+            \App\Operations\Api\User::class,
+            'custom_user' => \App\Operations\Api\User::class,
         ],
     
     /*
-     * These two will not work together - non-uniqu resource name:
-     *  \App\Resources\Api\MyResource::class,
-     *  'my_resource' => \App\Resources\Api\User::class,
+     * These two will not work together - non-unique resource name:
+     *  \App\Operations\Api\MyResource::class,
+     *  'my_resource' => \App\Operations\Api\User::class,
      */
 ],
 ```
 
 
-## Usage
-TODO
+## Examples
+
+
+### Index Operation
+The purpose of the `Index` operation is to retrieve a list of model entries and return the list as JSON.
+
+This code example is taken from the package and will illustrate how the Index operation is implemented.
+
+```php
+<?php
+
+namespace MorningTrain\Laravel\Resources\Operations\Eloquent;
+
+use MorningTrain\Laravel\Resources\Support\Contracts\EloquentOperation;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryToCollection;
+use MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\QueryModel;
+use MorningTrain\Laravel\Resources\Support\Pipes\TransformToView;
+
+class Index extends EloquentOperation
+{
+
+    const ROUTE_METHOD = 'get';
+
+    protected function beforePipes()
+    {
+        return [
+
+            /**
+             * Takes filters and model name as parameters and returns a new query object
+             */
+            QueryModel::create()->model($this->model)->filters($this->getCachedFilters()),
+
+            /**
+             * Trigger `get` on the query and returns the resulting collection
+             */
+            QueryToCollection::create(),
+
+            /**
+             * Transform the collection by applying any appends to each model in the entry
+             */
+            TransformToView::create()->appends($this->appends, $this->overwrite_appends),
+        ];
+    }
+
+}
+
+```
+
+On a project level, the Index class can be either implemented in a Resource or as a single Operation.
+
+The following example is an `EloquentResource` implementing a single `Index` operation.
+The operation is already added in the base class, so it is not really neccesary to have the static `$operations` property.
+
+In our example, users are returned with a pagination filter applied.
+
+```php
+<?php
+
+namespace App\Http\Operations\Api;
+
+use MorningTrain\Laravel\Resources\Support\Contracts\EloquentResource;
+use MorningTrain\Laravel\Resources\Operations\Eloquent\Index;
+use MorningTrain\Laravel\Filters\Filter;
+use App\Models\User as Model;
+
+class Users extends EloquentResource
+{
+
+    protected $model = Model::class;
+    
+    public static $operations = [
+        Index::class,
+    ];
+
+    public function getFilters(){
+        return [
+            Filter::paginate(),
+        ];
+    }
+
+}
+
+```
+
+The following example is similar to the one above, but will have the operation as a single class.
+
+```php
+<?php
+
+namespace App\Http\Operations\Api\Users;
+
+use MorningTrain\Laravel\Resources\Operations\Eloquent\Index as Operation;
+use MorningTrain\Laravel\Filters\Filter;
+use App\Models\User as Model;
+
+class IndexUsers extends Operation
+{
+
+    protected $model = Model::class;
+
+    public function getFilters(){
+        return [
+            Filter::paginate(),
+        ];
+    }
+
+}
+
+```
+
 
 ## Design principles
 Much of what we do with operations can be achieved using a traditional MVC approach. 
@@ -105,6 +213,16 @@ To make changes and adaptations to how an operation works, one would only have t
 In most cases, no addition code is required.  
 
 ## Credits
+This package is developed and actively maintained by [Morningtrain](https://morningtrain.dk).
 
-- [Morning Train](https://morningtrain.dk/)
+<!-- language: lang-none -->
+     _- _ -__ - -- _ _ - --- __ ----- _ --_  
+    (         Morningtrain, Denmark         )
+     `---__- --__ _ --- _ -- ___ - - _ --_ ´ 
+         o                                   
+        .  ____                              
+      _||__|  |  ______   ______   ______ 
+     (        | |      | |      | |      |
+     /-()---() ~ ()--() ~ ()--() ~ ()--() 
+    --------------------------------------
 

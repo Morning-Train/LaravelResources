@@ -15,8 +15,20 @@ class Index extends EloquentOperation
     protected function beforePipes()
     {
         return [
+
+            /**
+             * Takes filters and model name as parameters and returns a new query object
+             */
             QueryModel::create()->model($this->model)->filters($this->getCachedFilters()),
+
+            /**
+             * Trigger `get` on the query and returns the resulting collection
+             */
             QueryToCollection::create(),
+
+            /**
+             * Transform the collection by applying any appends to each model in the entry
+             */
             TransformToView::create()->appends($this->appends, $this->overwrite_appends),
         ];
     }

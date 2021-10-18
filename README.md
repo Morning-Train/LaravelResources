@@ -204,13 +204,104 @@ Every minor task is called a *Pipe* to reflect it being a part of an operation p
 
 Examples of pipes:
 
- - Validate: Validates the incoming http request using Laraval compliant validation rules
+ - Validate: Validates the incoming http request using Laravel compliant validation rules
  - Filter query: It allows for a DB query builder instance to be filtered based on HTTP request variables.
  - Prepare response payload: The return value of the main operation logic is uniformly transformed into a payload JSON object. 
  
 Having operations structured as a pipeline also keeps actual code/logic out of the operations themselves. What is left is more or less a configurable class.
 To make changes and adaptations to how an operation works, one would only have to copy/extend the operations and changes to the pipeline.
 In most cases, no addition code is required.  
+
+## Pipes
+
+### TriggerOnModel
+The *TriggerOnModel* pipe expects the data returned by the previous pipe to be a Eloquent Model.
+It will trigger a method on the model or the provided closure with the current model instance.
+
+It can be used like this:
+
+```php
+\MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\TriggerOnModel::create()
+    ->trigger('someModelMethod')
+```
+
+Or like this using a closure: 
+
+```php
+\MorningTrain\Laravel\Resources\Support\Pipes\Eloquent\TriggerOnModel::create()
+    ->trigger(
+        fn(Model $model) => $model->someModelMethod()
+    )
+```
+
+The *Action* eloquent operation is basically a *Read* operation with a TriggerOnModel pipe.
+
+### TriggerOnModelsInCollection
+The *TriggerOnModelsInCollection* pipe is similar to *TriggerOnModel*. 
+Instead of expecting a model, it expects a collection of models and will execute the trigger for exery model instance in the collection.
+
+### QueryToCollection
+Triggers *get* on the query returned by the previous pipe and returns the result.
+
+### QueryToModel
+Triggers *first* on the query returned by the previous pipe and returns the result.
+
+### QueryToCount
+Triggers *count* on the query returned by the previous pipe and returns the result.
+
+
+
+### ToResourceView
+It expects the previous pipe to return a Model or Collection instance.
+The data (Model or Collection) will be passed into a [Laravel Resource](https://laravel.com/docs/8.x/eloquent-resources)
+and the resulting array will be returned.
+
+```php
+\MorningTrain\Laravel\Resources\Support\Pipes\ToResourceView::create()
+    ->view(MyResourceView::class)
+```
+
+Most Eloquent operations are already configured to use this pipe, so it will be possible to configure the resource like this:
+
+```php
+public function readOperation(Read $read)
+{
+    $read->model(MyModel::class)
+         ->resourceView(MyModelResource::class);
+}
+```
+
+### SetEnv
+This pipe sets context environment variables. 
+It is configurable using the *environment* method.
+
+```php
+\MorningTrain\Laravel\Resources\Support\Pipes\Context\SetEnv::create()
+    ->environment(['env' => 'variable'])
+```
+
+The *environment* method is a proxy of `Context::env`, 
+which means that it will also be able to take a closure that is executed when the ENV is generated.
+
+### BladeView
+The *BladeView* pipe returns a blade view matching the configuration.
+
+```php
+\MorningTrain\Laravel\Resources\Support\Pipes\Pages\BladeView::create()
+    ->path('path.to.blade.view')
+    ->parameters(['blade' => 'parameters'])
+```
+
+
+### RespondWithPageEnv
+The *RespondWithPageEnv* pipe return the current ENV from Context as the response
+if it is an AJAX request. It can be used to get the ENV of a page by calling its route using Ajax.
+
+```php
+\MorningTrain\Laravel\Resources\Support\Pipes\Pages\RespondWithPageEnv::create()
+```
+
+
 
 ## Credits
 This package is developed and actively maintained by [Morningtrain](https://morningtrain.dk).

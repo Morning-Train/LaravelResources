@@ -10,6 +10,8 @@ use MorningTrain\Laravel\Resources\Support\Traits\HasModel;
 class QueryModel extends Pipe
 {
 
+    protected $is_filtering;
+
     /////////////////////////////////
     /// Traits
     /////////////////////////////////
@@ -55,7 +57,14 @@ class QueryModel extends Pipe
         $query = $this->newQueryFromModel();
 
         if ($this->hasFilters()) {
-            $this->applyFiltersToQuery($query);
+            $filterCollection = $this->applyFiltersToQuery($query);
+
+            if(method_exists($filterCollection, 'isFiltering')) {
+                $this->is_filtering = $filterCollection->isFiltering();
+            } else {
+                $this->is_filtering = $filterCollection->collection()->isNotEmpty();
+            }
+
         }
 
         if (!empty($this->operation->getView('with'))) {
@@ -63,6 +72,11 @@ class QueryModel extends Pipe
         }
 
         $this->query = $query;
+    }
+
+    protected function after()
+    {
+        $this->payload->set('meta.state.is_filtering', $this->is_filtering);
     }
 
 }

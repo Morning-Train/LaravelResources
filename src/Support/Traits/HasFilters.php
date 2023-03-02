@@ -45,7 +45,10 @@ trait HasFilters
 
     public function applyFiltersToQuery(&$query)
     {
-        FilterCollection::create($this->filters)->apply($query, request());
+        $filterCollection = FilterCollection::create($this->filters);
+        $filterCollection->apply($query, request());
+
+        return $filterCollection;
     }
 
     protected function getMetaForFilters($filters)
